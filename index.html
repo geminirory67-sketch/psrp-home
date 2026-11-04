@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Palm State RolePlay</title>
+<meta name="description" content="Palm State RolePlay：以洛杉磯為舞台的 FiveM 角色扮演伺服器。警察、消防、醫護、司法與城市經濟。">
+<meta property="og:title" content="Palm State RolePlay">
+<meta property="og:description" content="以洛杉磯為舞台的 FiveM 角色扮演伺服器。警察、消防、醫護、司法與城市經濟。">
+<meta property="og:url" content="https://psrp2.com/">
+<meta name="theme-color" content="#0d1124">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<style>
+/* Layout: LA at dusk. Full-width hero with a drawn skyline and palms, then a dispatch-board grid of departments, a join strip, the two manuals, footer. Single dark theme by choice. */
+:root {
+  --night: #0d1124;
+  --night-2: #151b36;
+  --panel: #1a2142;
+  --line: #2b3460;
+  --ink: #eef0f7;
+  --muted: #a3abc8;
+  --sun: #ff8a3d;
+  --sun-2: #ff4f6d;
+  --gold: #e8b85a;
+  --lapd: #4a86ff;
+  --lafd: #ff4b3a;
+  --ems: #2fd0a6;
+  --doj: #e8b85a;
+  --civ: #b98cff;
+  --discord: #5865f2;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-zh-display: "Noto Serif TC", "Songti TC", serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body { margin: 0; background: var(--night); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.65; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+
+/* nav */
+.top { position: sticky; top: 0; z-index: 30; background: rgba(13,17,36,.86); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); padding-top: env(safe-area-inset-top, 0px); }
+.top .wrap { display: flex; align-items: center; gap: 18px; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
+.brand svg { flex: none; }
+.brand b { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: .06em; text-transform: uppercase; line-height: 1; }
+.brand small { display: block; font-size: 11px; color: var(--muted); letter-spacing: .14em; font-weight: 500; }
+.links { display: flex; gap: 4px; align-items: center; }
+.links a { text-decoration: none; font-size: 15px; padding: 8px 12px; border-radius: 6px; color: var(--muted); white-space: nowrap; }
+.links a:hover { color: var(--ink); background: rgba(255,255,255,.05); }
+.links a.doc { color: var(--ink); border: 1px solid var(--line); }
+.btn-discord { display: inline-flex; align-items: center; gap: 8px; background: var(--discord); color: #fff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 9px 16px; border-radius: 8px; white-space: nowrap; }
+.btn-discord:hover { filter: brightness(1.08); }
+.menu { display: none; background: none; border: 1px solid var(--line); color: var(--ink); border-radius: 6px; padding: 7px 10px; font: inherit; font-size: 14px; }
+
+/* hero */
+.hero { position: relative; overflow: hidden; background: linear-gradient(180deg, #0d1124 0%, #241a4a 38%, #7a2f5a 62%, #e2603f 82%, #ffa04d 100%); }
+.hero .wrap { position: relative; z-index: 2; padding-block: clamp(64px, 11vw, 132px) clamp(150px, 20vw, 230px); }
+.stars { position: absolute; inset: 0; z-index: 0; background-image: radial-gradient(1px 1px at 12% 18%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 32% 8%, #fff6 50%, transparent 51%), radial-gradient(1.5px 1.5px at 58% 14%, #fff9 50%, transparent 51%), radial-gradient(1px 1px at 74% 24%, #fff5 50%, transparent 51%), radial-gradient(1px 1px at 88% 10%, #fff7 50%, transparent 51%), radial-gradient(1px 1px at 46% 28%, #fff4 50%, transparent 51%); }
+.sun { position: absolute; z-index: 0; left: 50%; bottom: 70px; width: min(520px, 80vw); aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle at 50% 45%, #ffd27a 0%, #ff9a4a 45%, rgba(255,110,70,0) 70%); opacity: .9; }
+.city { position: absolute; z-index: 1; left: 0; right: 0; bottom: -1px; width: 100%; height: auto; display: block; }
+.kicker { font-family: var(--font-display); letter-spacing: .32em; font-size: 15px; color: var(--gold); text-transform: uppercase; margin: 0 0 14px; font-weight: 600; }
+.hero h1 { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; line-height: .92; letter-spacing: .01em; font-size: clamp(54px, 10vw, 128px); text-wrap: balance; }
+.hero h1 span { display: block; color: transparent; -webkit-text-stroke: 2px #fff; }
+.tagline { font-family: var(--font-zh-display); font-weight: 900; font-size: clamp(22px, 3.2vw, 34px); margin: 22px 0 8px; letter-spacing: .04em; }
+.sub { max-width: 560px; color: #e1dcef; margin: 0 0 28px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn-ghost { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 15px; padding: 11px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,.4); color: #fff; background: rgba(13,17,36,.35); }
+.btn-ghost:hover { background: rgba(13,17,36,.6); }
+.hero .btn-discord { padding: 12px 20px; font-size: 16px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+.pill { font-size: 13px; padding: 5px 12px; border-radius: 999px; background: rgba(13,17,36,.45); border: 1px solid rgba(255,255,255,.18); color: #f4eefb; }
+
+/* sections */
+section.block { padding-block: clamp(64px, 9vw, 104px); }
+.sec-head { display: grid; gap: 6px; margin-bottom: 34px; max-width: 720px; }
+.sec-head .k { font-family: var(--font-display); letter-spacing: .28em; text-transform: uppercase; font-size: 14px; color: var(--sun); font-weight: 600; }
+.sec-head h2 { margin: 0; font-family: var(--font-zh-display); font-weight: 900; font-size: clamp(28px, 4vw, 40px); letter-spacing: .03em; text-wrap: balance; }
+.sec-head p { margin: 4px 0 0; color: var(--muted); }
+
+/* departments: dispatch board */
+.depts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.dept { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 20px; display: grid; gap: 12px; align-content: start; overflow: hidden; }
+.dept::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--c); }
+.dept-top { display: flex; align-items: center; gap: 14px; padding-right: 84px; }
+.ico { flex: none; width: 52px; height: 52px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
+.dept h3 { margin: 0; font-family: var(--font-zh-display); font-weight: 900; font-size: 22px; line-height: 1.2; }
+.dept .en { display: block; font-family: var(--font-display); font-weight: 600; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--c); }
+.dept p { margin: 0; color: #cdd2e6; font-size: 15px; }
+.dept ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.dept li { font-size: 12.5px; padding: 3px 9px; border-radius: 4px; background: rgba(255,255,255,.05); color: var(--muted); }
+.code { position: absolute; right: 16px; top: 18px; font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: .1em; color: var(--muted); opacity: .7; }
+.dept a.more { justify-self: start; font-size: 14px; color: var(--c); text-decoration: none; font-weight: 700; }
+.dept a.more:hover { text-decoration: underline; }
+
+/* city strip */
+.strip { background: var(--night-2); border-block: 1px solid var(--line); }
+.feats { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 28px; }
+.feat h4 { margin: 0 0 6px; font-size: 18px; font-weight: 700; }
+.feat h4 small { display: block; font-family: var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--gold); font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.feat p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* manuals */
+.docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.docc { text-decoration: none; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start; padding: 24px; border-radius: 12px; background: linear-gradient(160deg, #1d2550, #151b36); border: 1px solid var(--line); transition: transform .15s ease, border-color .15s ease; }
+.docc:hover { transform: translateY(-2px); border-color: var(--gold); }
+.spine { width: 54px; height: 70px; border-radius: 4px 8px 8px 4px; background: var(--b); position: relative; box-shadow: inset 6px 0 0 rgba(0,0,0,.25); }
+.spine::after { content: ""; position: absolute; left: 14px; right: 8px; top: 14px; height: 2px; background: rgba(255,255,255,.6); box-shadow: 0 6px 0 rgba(255,255,255,.35); }
+.docc h3 { margin: 0; font-family: var(--font-zh-display); font-weight: 900; font-size: 22px; }
+.docc .en { display: block; font-family: var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+.docc p { margin: 0 0 12px; color: #cdd2e6; font-size: 15px; }
+.go { font-weight: 700; color: var(--gold); font-size: 14px; }
+
+/* join */
+.join { background: linear-gradient(120deg, #241a4a 0%, #5a2a5e 55%, #b2434a 100%); }
+.join .wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; padding-block: clamp(56px, 8vw, 88px); }
+.join h2 { margin: 0 0 10px; font-family: var(--font-zh-display); font-weight: 900; font-size: clamp(28px, 4vw, 42px); }
+.join p { margin: 0 0 22px; color: #eedff0; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; background: rgba(13,17,36,.4); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 14px 16px; }
+.steps li::before { content: counter(s); font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1; color: var(--gold); }
+.steps b { display: block; font-size: 16px; }
+.steps span { color: #e1d6ea; font-size: 14px; }
+.invite { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.invite code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; background: rgba(13,17,36,.5); padding: 6px 10px; border-radius: 6px; color: #fff; user-select: all; }
+
+/* footer */
+footer { background: #090c1a; color: var(--muted); font-size: 13.5px; }
+footer .wrap { padding-block: 40px 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
+footer h5 { margin: 0 0 10px; color: var(--ink); font-size: 14px; letter-spacing: .08em; }
+footer a { color: var(--ink); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+footer p { margin: 0 0 8px; line-height: 1.7; }
+
+@media (max-width: 860px) {
+  .links { display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; align-items: stretch; background: var(--night); border-bottom: 1px solid var(--line); padding: 8px max(20px, env(safe-area-inset-left, 0px)) 16px; }
+  .links.open { display: flex; }
+  .links a { padding: 12px; }
+  .menu { display: inline-block; white-space: nowrap; }
+  .brand small { display: none; }
+  .brand b { font-size: 20px; white-space: nowrap; }
+  .kicker { letter-spacing: .18em; font-size: 13px; }
+  .top .btn-discord span { display: none; }
+  .join .wrap { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .docc { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Palm State RolePlay 首頁">
+      <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#ff8a3d"/><path d="M20 38 C21 30 21 22 19.5 15" stroke="#0d1124" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M19.5 15 C14 11 9 12 6 16 M19.5 15 C16 9 11 8 8 9 M19.5 15 C22 9 27 8 31 10 M19.5 15 C25 11 30 13 33 17 M19.5 15 C19 10 20 6 22 4" stroke="#0d1124" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      <span><b>Palm State</b><small>ROLEPLAY · LOS ANGELES</small></span>
+    </a>
+    <nav class="links" id="links" aria-label="主選單">
+      <a href="#depts">部門</a>
+      <a href="#city">城市生活</a>
+      <a href="#join">如何加入</a>
+      <a class="doc" href="https://law.psrp2.com/#law">加州法典</a>
+      <a class="doc" href="https://law.psrp2.com/#lapd">LAPD 手冊</a>
+    </nav>
+    <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="links">選單</button>
+    <a class="btn-discord" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.6 5.3A17 17 0 0 0 15.4 4l-.5 1a15.6 15.6 0 0 0-5.8 0L8.6 4a17 17 0 0 0-4.2 1.3C1.7 9.3 1 13.2 1.3 17a17 17 0 0 0 5.2 2.6l1.1-1.8c-.6-.2-1.2-.5-1.8-.9l.4-.3a12.2 12.2 0 0 0 11.6 0l.4.3c-.6.4-1.2.7-1.8.9l1.1 1.8a17 17 0 0 0 5.2-2.6c.4-4.4-.7-8.3-3.1-11.7ZM8.7 14.7c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Zm6.6 0c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Z"/></svg>
+      <span>加入 Discord</span>
+    </a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="h1">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="sun" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="kicker">FiveM · Los Angeles · DOJ RolePlay</p>
+      <h1 id="h1">Palm State<span>RolePlay</span></h1>
+      <p class="tagline">在洛杉磯，寫下你的故事。</p>
+      <p class="sub">以洛杉磯為舞台的角色扮演伺服器。穿上制服守護城市、衝進火場救人、在急診室與時間賽跑，或在法庭上為正義辯論；也可以經營生意，在這座天使之城闖出名號。</p>
+      <div class="cta">
+        <a class="btn-discord" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.6 5.3A17 17 0 0 0 15.4 4l-.5 1a15.6 15.6 0 0 0-5.8 0L8.6 4a17 17 0 0 0-4.2 1.3C1.7 9.3 1 13.2 1.3 17a17 17 0 0 0 5.2 2.6l1.1-1.8c-.6-.2-1.2-.5-1.8-.9l.4-.3a12.2 12.2 0 0 0 11.6 0l.4.3c-.6.4-1.2.7-1.8.9l1.1 1.8a17 17 0 0 0 5.2-2.6c.4-4.4-.7-8.3-3.1-11.7ZM8.7 14.7c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Zm6.6 0c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Z"/></svg>
+          加入 Discord
+        </a>
+        <a class="btn-ghost" href="#depts">認識各部門 ↓</a>
+      </div>
+      <div class="pills">
+        <span class="pill">真實加州法條</span>
+        <span class="pill">完整 DOJ 司法流程</span>
+        <span class="pill">城市經濟系統</span>
+        <span class="pill">中文社群</span>
+      </div>
+    </div>
+    <svg class="city" viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <!-- far skyline -->
+      <path fill="#3a2350" d="M0 260V196h40v-18h26v18h22v-40h30v40h18v-26h24v26h40v-60h18v-24h10v24h18v60h26v-34h34v34h20v-80h14v-16h22v16h14v80h22v-48h30v48h36v-30h40v30h18v-96h12v-22h18v22h12v96h30v-56h24v56h22v-26h38v26h30v-70h34v70h18v-40h26v40h40v-24h30v24h16v-58h22v58h28v-32h34v32h40v-18h40v18h28v-44h22v44h36v-28h44v28h28V260Z" opacity=".85"/>
+      <!-- downtown towers -->
+      <path fill="#1f1636" d="M520 260V120h46v140Zm56 0V86h12l10-22 10 22h12v174Zm52 0V140h40v120Zm50 0V104h18v-16h20v16h18v156Zm66 0V150h38v110Zm46 0V128h44v132Z"/>
+      <path fill="#ffcf8a" opacity=".55" d="M528 132h6v6h-6zm14 0h6v6h-6zm0 20h6v6h-6zm-14 20h6v6h-6zm56-70h6v6h-6zm14 22h6v6h-6zm-14 24h6v6h-6zm96 0h6v6h-6zm14 22h6v6h-6zm-14 24h6v6h-6zm72-36h6v6h-6zm14 26h6v6h-6z"/>
+      <!-- ground -->
+      <path fill="#0d1124" d="M0 236c180-10 360-14 540-12s420 10 600 6 220-8 300-6v36H0Z"/>
+      <!-- palms -->
+      <g fill="none" stroke="#0d1124" stroke-linecap="round">
+        <path stroke-width="7" d="M150 240c6-50 10-100 2-150"/>
+        <path stroke-width="5" d="M152 92c-30-18-62-14-84 6M152 92c-18-28-44-40-72-36M152 92c12-30 40-44 70-40M152 92c30-14 62-8 82 14M152 92c-2-26 8-46 24-58"/>
+        <path stroke-width="6" d="M232 242c4-40 6-76 0-112"/>
+        <path stroke-width="4" d="M232 132c-24-12-48-8-64 6M232 132c-12-22-34-30-56-26M232 132c10-24 32-34 54-30M232 132c22-10 46-4 62 12"/>
+        <path stroke-width="7" d="M1250 240c-6-54-6-108 6-160"/>
+        <path stroke-width="5" d="M1256 82c30-16 62-10 82 10M1256 82c20-26 46-36 74-30M1256 82c-14-28-42-40-70-34M1256 82c-30-12-62-4-80 18M1256 82c4-26-4-46-20-60"/>
+        <path stroke-width="6" d="M1340 242c-2-36-2-70 6-100"/>
+        <path stroke-width="4" d="M1346 142c22-12 46-8 62 8M1346 142c-12-20-34-28-56-22M1346 142c14-22 36-30 58-24"/>
+      </g>
+    </svg>
+  </section>
+
+  <section class="block" id="depts" aria-labelledby="depts-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">Public Safety &amp; Justice</span>
+        <h2 id="depts-h">選擇你的崗位</h2>
+        <p>每個部門都有完整的階級、訓練與標準作業程序。從學院新生做起，一路晉升到指揮職。</p>
+      </div>
+      <div class="depts">
+        <article class="dept" style="--c: var(--lapd)">
+          <span class="code">CODE 3</span>
+          <div class="dept-top">
+            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 4.5 5v6c0 5 3.2 8.6 7.5 10.5 4.3-1.9 7.5-5.5 7.5-10.5V5L12 2.5Z"/><path d="m12 7.5 1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4L12 7.5Z"/></svg></div>
+            <h3>洛杉磯警察局<span class="en">LAPD</span></h3>
+          </div>
+          <p>巡邏、交通執法、刑事偵查與特勤任務。依加州法條執法，所有行動都要經得起法庭檢驗。</p>
+          <ul><li>巡邏</li><li>刑事偵查</li><li>SWAT</li><li>K9</li><li>空中支援</li><li>交通局</li></ul>
+          <a class="more" href="https://law.psrp2.com/#lapd">閱讀 LAPD 部門手冊 →</a>
+        </article>
+        <article class="dept" style="--c: var(--lafd)">
+          <span class="code">ALL HANDS</span>
+          <div class="dept-top">
+            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5c1 3.5 5.5 5.5 5.5 11a5.5 5.5 0 0 1-11 0c0-2.5 1.2-4.2 2.5-5.5.3 1.8 1.2 2.8 2.2 3.2-.6-3.2.3-6 .8-8.7Z"/><path d="M12 20.5a2.5 2.5 0 0 1-2.5-2.5c0-1.6 1.4-2.5 2.5-4 1.1 1.5 2.5 2.4 2.5 4a2.5 2.5 0 0 1-2.5 2.5Z"/></svg></div>
+            <h3>洛杉磯消防局<span class="en">LAFD</span></h3>
+          </div>
+          <p>建築火災、山林野火、車禍救援與危險物品處理。從雲梯車到救援直升機，全城的火場都歸你們管。</p>
+          <ul><li>消防車隊</li><li>雲梯救援</li><li>野火</li><li>危險物品</li><li>水上救援</li></ul>
+        </article>
+        <article class="dept" style="--c: var(--ems)">
+          <span class="code">RESCUE 1</span>
+          <div class="dept-top">
+            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l2-4.5 3.5 9 2.5-6 1.5 1.5h5.5"/></svg></div>
+            <h3>緊急醫療<span class="en">EMS &amp; Hospital</span></h3>
+          </div>
+          <p>救護車在第一時間抵達現場，急診室接手搶救。槍擊、車禍、用藥過量，每一通 911 都是與時間賽跑。</p>
+          <ul><li>救護車</li><li>急診室</li><li>外科</li><li>醫護訓練</li></ul>
+        </article>
+        <article class="dept" style="--c: var(--doj)">
+          <span class="code">COURT 101</span>
+          <div class="dept-top">
+            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M7 21h10M4 7h16M12 4.5 4 7M12 4.5 20 7"/><path d="M4 7 1.5 13a3 3 0 0 0 5 0L4 7Zm16 0-2.5 6a3 3 0 0 0 5 0L20 7Z"/></svg></div>
+            <h3>司法部<span class="en">DOJ &amp; Courts</span></h3>
+          </div>
+          <p>法官、地方檢察官、公設辯護人與律師。逮捕之後才是故事的開始：提審、預審、陪審團與判決。</p>
+          <ul><li>法官</li><li>地檢署</li><li>公設辯護人</li><li>私人律師</li></ul>
+          <a class="more" href="https://law.psrp2.com/#law">查閱加州法典 →</a>
+        </article>
+        <article class="dept" style="--c: var(--civ)">
+          <span class="code">CITY HALL</span>
+          <div class="dept-top">
+            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"/></svg></div>
+            <h3>市民與商業<span class="en">Civilians &amp; Business</span></h3>
+          </div>
+          <p>開餐廳、修車廠、夜店或物流公司，申請執照、僱用員工、繳稅賺錢。城市的經濟由市民撐起來。</p>
+          <ul><li>創業</li><li>職業</li><li>不動產</li><li>媒體</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block strip" id="city" aria-labelledby="city-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">Life in Los Angeles</span>
+        <h2 id="city-h">一座真實運作的城市</h2>
+      </div>
+      <div class="feats">
+        <div class="feat"><h4><small>Law</small>真實法條，真實後果</h4><p>犯罪、交通、民事全部依照加州法典，刑期與罰金都有依據，判決由法庭決定。</p></div>
+        <div class="feat"><h4><small>Economy</small>有價值的經濟</h4><p>工作、經商、置產與執照制度，每一分錢都要自己賺，也要繳稅。</p></div>
+        <div class="feat"><h4><small>Dispatch</small>完整勤務流程</h4><p>統一的無線電代碼、呼號與派遣，警消醫護在同一個頻道協同出勤。</p></div>
+        <div class="feat"><h4><small>Story</small>角色優先</h4><p>每個角色都有自己的故事線。我們重視沉浸感，也重視玩家之間的尊重。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="docs" aria-labelledby="docs-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">Reference Library</span>
+        <h2 id="docs-h">法規資料庫</h2>
+        <p>執法、檢察、辯護與審判都以這兩份文件為準，可以用中文、英文或條號即時搜尋。</p>
+      </div>
+      <div class="docs">
+        <a class="docc" href="https://law.psrp2.com/#law">
+          <span class="spine" style="--b: #b88a2e" aria-hidden="true"></span>
+          <span>
+            <h3>加州法典</h3>
+            <span class="en">California Legal Code · 中英對照</span>
+            <p>刑法、交通、毒品、武器、民事、刑事程序、執照、漁獵與政府法規，共 13 編，附常用罪名速查。</p>
+            <span class="go">開啟法典 →</span>
+          </span>
+        </a>
+        <a class="docc" href="https://law.psrp2.com/#lapd">
+          <span class="spine" style="--b: #2f5fb8" aria-hidden="true"></span>
+          <span>
+            <h3>LAPD 部門手冊</h3>
+            <span class="en">Department Manual</span>
+            <p>組織架構、階級晉升、無線電代碼、交通攔停、逮捕程序、武力使用、追緝政策與懲戒制度，共 19 章。</p>
+            <span class="go">開啟手冊 →</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="join" id="join" aria-labelledby="join-h">
+    <div class="wrap">
+      <div>
+        <h2 id="join-h">準備好來洛杉磯了嗎？</h2>
+        <p>所有申請、公告與活動都在 Discord 進行。加入後依照公告完成申請，就能開始你的故事。</p>
+        <div class="invite">
+          <a class="btn-discord" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.6 5.3A17 17 0 0 0 15.4 4l-.5 1a15.6 15.6 0 0 0-5.8 0L8.6 4a17 17 0 0 0-4.2 1.3C1.7 9.3 1 13.2 1.3 17a17 17 0 0 0 5.2 2.6l1.1-1.8c-.6-.2-1.2-.5-1.8-.9l.4-.3a12.2 12.2 0 0 0 11.6 0l.4.3c-.6.4-1.2.7-1.8.9l1.1 1.8a17 17 0 0 0 5.2-2.6c.4-4.4-.7-8.3-3.1-11.7ZM8.7 14.7c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Zm6.6 0c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Z"/></svg>
+            加入 Discord
+          </a>
+          <code>discord.gg/U8Js6HYvW3</code>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><div><b>加入 Discord</b><span>點上方按鈕加入伺服器，閱讀歡迎頻道的公告。</span></div></li>
+        <li><div><b>閱讀規則與法典</b><span>熟悉伺服器規則，以及加州法典與各部門手冊。</span></div></li>
+        <li><div><b>完成申請</b><span>依 Discord 公告提交角色或部門申請，等待審核。</span></div></li>
+        <li><div><b>進城</b><span>建立角色，開始在洛杉磯生活。</span></div></li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h5>Palm State RolePlay</h5>
+      <p>以洛杉磯為舞台的 FiveM 角色扮演伺服器。</p>
+      <ul>
+        <li><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></li>
+        <li><a href="https://law.psrp2.com/#law">加州法典</a></li>
+        <li><a href="https://law.psrp2.com/#lapd">LAPD 部門手冊</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>聲明</h5>
+      <p>本網站及伺服器內所有人物、事件與機構均為角色扮演之虛構內容。Palm State RolePlay 與 Cfx.re、Take-Two Interactive／Rockstar Games、加州政府、洛杉磯市政府、洛杉磯警察局、洛杉磯消防局或任何真實機關均無隸屬或合作關係。</p>
+    </div>
+    <div>
+      <h5>版權</h5>
+      <p>© 2026 Palm State RolePlay。版權所有。</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var b = document.getElementById("menu"), l = document.getElementById("links");
+  b.addEventListener("click", function () { var o = l.classList.toggle("open"); b.setAttribute("aria-expanded", String(o)); });
+  l.addEventListener("click", function (e) { if (e.target.closest("a")) { l.classList.remove("open"); b.setAttribute("aria-expanded", "false"); } });
+})();
+</script>
+</body>
+</html>
