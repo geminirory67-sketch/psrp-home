@@ -89,6 +89,22 @@
 .modbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; background: #2a2210; border: 1px solid #5a4818; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; color: var(--gold); }
 .modbar button, .modbar select { background: var(--night-2); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 3px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
 .empty { padding: 28px 18px; text-align: center; color: var(--muted); }
+.mgrbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.dlg { position: fixed; inset: 0; z-index: 100; background: rgba(5,8,20,.75); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.dlg .box { background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 1100px; max-height: 90vh; display: flex; flex-direction: column; }
+.dlg header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.dlg header h3 { margin: 0; font-size: 18px; }
+.dlg .bd { overflow: auto; padding: 14px 20px; display: grid; gap: 8px; }
+.dlg .ft { display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 14px 20px; border-top: 1px solid var(--line); }
+.brow, .bhead { display: grid; grid-template-columns: 130px 56px minmax(130px, 1fr) minmax(160px, 1.4fr) 130px 130px auto; gap: 8px; align-items: center; }
+.bhead { font-size: 12px; color: var(--muted); padding: 0 10px; }
+.brow { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.brow input, .brow select { width: 100%; min-width: 0; font: inherit; font-size: 14px; color: var(--ink); background: var(--night); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+.brow input.ic { text-align: center; font-size: 18px; padding: 3px; }
+.brow .ops { display: flex; gap: 4px; }
+.brow .ops button { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 3px 8px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.brow .ops button.del { color: #ff8a7a; } .brow .ops button:disabled { opacity: .3; cursor: default; }
+@media (max-width: 900px) { .bhead { display: none; } .brow { grid-template-columns: 1fr 56px; } .brow > :nth-child(3), .brow > :nth-child(4), .brow > :nth-child(5), .brow > :nth-child(6), .brow > :nth-child(7) { grid-column: 1 / -1; } }
 .side-note { font-size: 13px; color: var(--muted); }
 @media (max-width: 900px) {
   .cat { grid-template-columns: 44px minmax(0, 1fr); }
@@ -228,6 +244,7 @@
     var fs = document.getElementById("fstats"); fs.innerHTML = "";
     [["主題", tt], ["文章", tp], ["版面", cats.length]].forEach(function (x) { var d = el("div"); d.appendChild(el("b", null, String(x[1]))); d.appendChild(document.createTextNode(x[0])); fs.appendChild(d); });
     view.innerHTML = "";
+    if (staff) { var mb = el("div", { class: "mgrbar" }), mbb = el("button", { type: "button", class: "btn-sec" }, "⚙ 管理版面"); mbb.addEventListener("click", manageBoards); mb.appendChild(mbb); view.appendChild(mb); }
     if (!me) view.appendChild(loginHint("登入帳號後就可以發文與回覆；部門成員登入後還能看到部門內部討論區。"));
     var groups = [];
     cats.forEach(function (c) { var g = groups.filter(function (x) { return x.name === c.grp; })[0]; if (!g) groups.push(g = { name: c.grp, list: [] }); g.list.push(c); });
@@ -254,6 +271,63 @@
       });
       view.appendChild(box);
     });
+  }
+
+  /* ---------- Staff：管理版面 ---------- */
+  var VIEW = [["public", "所有人（含訪客）"], ["any", "登入會員"], ["member", "白名單成員"], ["police", "LAPD 成員"], ["fire", "LAFD 成員"], ["ems", "EMS 成員"], ["staff", "管理團隊"]];
+  var POST = [["any", "登入會員"], ["member", "白名單成員"], ["police", "LAPD 成員"], ["fire", "LAFD 成員"], ["ems", "EMS 成員"], ["staff", "管理團隊"], ["admin", "僅最高管理"]];
+  async function manageBoards() {
+    var r = await db.from("forum_categories").select("*").order("sort").order("id");
+    if (r.error) return alert(PSRP.errText(r.error));
+    var list = r.data.map(function (c) { return Object.assign({}, c, { orig: true }); }), removed = [];
+    var d = el("div", { class: "dlg", role: "dialog", "aria-modal": "true", "aria-label": "管理版面" }), bx = el("div", { class: "box" });
+    var hd = el("header"); hd.appendChild(el("h3", null, "管理論壇版面"));
+    var x = el("button", { type: "button", class: "btn-sec" }, "關閉"); x.addEventListener("click", function () { d.remove(); }); hd.appendChild(x);
+    var bd = el("div", { class: "bd" }), ft = el("div", { class: "ft" });
+    function sel(opts, v, on) { var s = el("select"); opts.forEach(function (o) { s.appendChild(el("option", { value: o[0] }, o[1])); }); s.value = v; s.addEventListener("change", function () { on(s.value); }); return s; }
+    function inp(v, ph, on, cls, max) { var i = el("input", { placeholder: ph, maxlength: String(max || 60), class: cls || "" }); i.value = v || ""; i.addEventListener("input", function () { on(i.value); }); return i; }
+    function draw() {
+      bd.innerHTML = "";
+      bd.appendChild(el("p", { class: "note", style: "margin:0" }, "同一個「分組」的版面會顯示在同一區塊。刪除版面會一併刪除裡面所有主題與回覆，請小心。"));
+      var h = el("div", { class: "bhead" }); ["分組", "圖示", "版面名稱", "說明", "誰可以看", "誰可以發文", ""].forEach(function (t) { h.appendChild(el("span", null, t)); }); bd.appendChild(h);
+      list.forEach(function (c, i) {
+        var row = el("div", { class: "brow" });
+        row.appendChild(inp(c.grp, "例如：社群", function (v) { c.grp = v; }, "", 40));
+        row.appendChild(inp(c.icon, "💬", function (v) { c.icon = v; }, "ic", 4));
+        row.appendChild(inp(c.title, "版面名稱", function (v) { c.title = v; }, "", 40));
+        row.appendChild(inp(c.description, "說明（可留空）", function (v) { c.description = v; }, "", 120));
+        row.appendChild(sel(VIEW, c.view_role, function (v) { c.view_role = v; }));
+        row.appendChild(sel(POST, c.post_role, function (v) { c.post_role = v; }));
+        var ops = el("div", { class: "ops" });
+        var up = el("button", { type: "button", title: "上移" }, "↑"), dn = el("button", { type: "button", title: "下移" }, "↓"), del = el("button", { type: "button", class: "del" }, "刪除");
+        up.disabled = i === 0; dn.disabled = i === list.length - 1;
+        up.addEventListener("click", function () { list.splice(i - 1, 0, list.splice(i, 1)[0]); draw(); });
+        dn.addEventListener("click", function () { list.splice(i + 1, 0, list.splice(i, 1)[0]); draw(); });
+        del.addEventListener("click", function () { if (c.orig && !confirm("刪除「" + c.title + "」？裡面所有主題與回覆都會一起刪除，無法復原。")) return; if (c.orig) removed.push(c.id); list.splice(i, 1); draw(); });
+        ops.appendChild(up); ops.appendChild(dn); ops.appendChild(del); row.appendChild(ops);
+        bd.appendChild(row);
+      });
+    }
+    var add = el("button", { type: "button", class: "btn-sec" }, "＋ 新增版面");
+    add.addEventListener("click", function () { var last = list[list.length - 1]; list.push({ grp: last ? last.grp : "社群", icon: "💬", title: "", description: "", view_role: "public", post_role: "any", orig: false }); draw(); var rows = bd.querySelectorAll(".brow"); rows[rows.length - 1].querySelectorAll("input")[2].focus(); });
+    var msg = el("span", { class: "form-msg", role: "status" }), save = el("button", { type: "button", class: "btn-primary" }, "儲存");
+    save.addEventListener("click", async function () {
+      msg.className = "form-msg";
+      if (list.some(function (c) { return !String(c.title).trim() || !String(c.grp).trim(); })) { msg.className = "form-msg err"; msg.textContent = "每個版面都要填分組與名稱。"; return; }
+      save.disabled = true; msg.textContent = "儲存中…";
+      try {
+        for (var i = 0; i < removed.length; i++) { var r1 = await db.from("forum_categories").delete().eq("id", removed[i]); if (r1.error) throw r1.error; }
+        for (var j = 0; j < list.length; j++) {
+          var c = list[j], row = { grp: c.grp.trim(), icon: (c.icon || "💬").trim(), title: c.title.trim(), description: (c.description || "").trim(), view_role: c.view_role, post_role: c.post_role, sort: (j + 1) * 10 }, r2;
+          if (c.orig) r2 = await db.from("forum_categories").update(row).eq("id", c.id);
+          else { row.slug = "b" + Date.now().toString(36) + j; r2 = await db.from("forum_categories").insert(row); }
+          if (r2.error) throw r2.error;
+        }
+        d.remove(); cats = []; showIndex();
+      } catch (err) { save.disabled = false; msg.className = "form-msg err"; msg.textContent = PSRP.errText(err); }
+    });
+    ft.appendChild(add); var rt = el("div", { style: "display:flex;gap:10px;align-items:center" }); rt.appendChild(msg); rt.appendChild(save); ft.appendChild(rt);
+    draw(); bx.appendChild(hd); bx.appendChild(bd); bx.appendChild(ft); d.appendChild(bx); document.body.appendChild(d);
   }
 
   /* ---------- 版面：主題列表 ---------- */
