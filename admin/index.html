@@ -49,6 +49,7 @@
       </div>
 
       <section id="tab-apps">
+        <p class="admin-only" style="margin:0 0 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="note">申請表題目：</span><a class="btn-sec" style="text-decoration:none" href="/formedit/?doc=form-whitelist">✎ 白名單</a><a class="btn-sec" style="text-decoration:none" href="/formedit/?doc=form-lapd">✎ LAPD</a><a class="btn-sec" style="text-decoration:none" href="/formedit/?doc=form-lafd">✎ LAFD</a><a class="btn-sec" style="text-decoration:none" href="/formedit/?doc=form-ems">✎ EMS</a></p>
         <div class="filters">
           <select id="flt-status" aria-label="狀態">
             <option value="open">未結案（審核中＋待面試）</option>
@@ -312,7 +313,7 @@
       left.appendChild(el("b", null, d.title));
       left.appendChild(el("div", { class: "note" }, "代號 " + d.slug + "  ·  閱讀：" + (d.required_role === "public" ? "所有人" : (PSRP.ROLE_NAMES[d.required_role] || d.required_role)) + "  ·  編輯：" + (PSRP.ROLE_NAMES[d.editor_role] || d.editor_role) + "  ·  更新於 " + new Date(d.updated_at).toLocaleString("zh-TW")));
       it.appendChild(left);
-      it.appendChild(el("a", { class: "btn-sec", href: "/editor/?doc=" + d.slug, style: "text-decoration:none" }, "✎ 線上編輯"));
+      it.appendChild(el("a", { class: "btn-sec", href: (d.slug.indexOf("form-") === 0 ? "/formedit/?doc=" : "/editor/?doc=") + d.slug, style: "text-decoration:none" }, d.slug.indexOf("form-") === 0 ? "✎ 編輯題目" : "✎ 線上編輯"));
       box.appendChild(it);
     });
   }
