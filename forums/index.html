@@ -89,6 +89,7 @@
 .modbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; background: #2a2210; border: 1px solid #5a4818; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; color: var(--gold); }
 .modbar button, .modbar select { background: var(--night-2); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 3px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
 .empty { padding: 28px 18px; text-align: center; color: var(--muted); }
+.staffinfo { white-space: pre-line; word-break: break-all; color: #e8b85a !important; font-size: 11.5px !important; border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 2px; }
 .mgrbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
 .dlg { position: fixed; inset: 0; z-index: 100; background: rgba(5,8,20,.75); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .dlg .box { background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 1100px; max-height: 90vh; display: flex; flex-direction: column; }
@@ -384,6 +385,8 @@
     var pr = await db.from("forum_posts").select("*").eq("thread_id", id).order("id").range(from, from + PPP - 1);
     if (pr.error) return errBox(PSRP.errText(pr.error));
     var ids = pr.data.map(function (p) { return p.author_id; }).filter(Boolean), info = {};
+    staffInfo = {};
+    if (staff && ids.length) { var si = await db.rpc("staff_user_info", { ids: ids }); (si.data || []).forEach(function (x) { staffInfo[x.id] = x; }); }
     if (ids.length) { var ai = await db.rpc("forum_authors", { ids: ids }); (ai.data || []).forEach(function (x) { info[x.id] = x; }); }
     view.innerHTML = "";
     view.appendChild(crumbs([["論壇", "#"], [c.title, "#c/" + c.slug], [t.title]]));
@@ -408,6 +411,7 @@
       location.hash = "#t/" + id + "/last"; if (location.hash === "#t/" + id + "/last") route();
     } }));
   }
+  var staffInfo = {};
   function postCard(p, inf, no, t) {
     var card = el("article", { class: "post" + (p.deleted ? " deleted" : ""), id: "p" + p.id });
     var au = el("div", { class: "au" });
@@ -418,12 +422,28 @@
     if (!rs.children.length) rs.appendChild(el("span", { class: "rb" }, roles.indexOf("member") !== -1 ? "成員" : "玩家"));
     au.appendChild(rs);
     if (inf) au.appendChild(el("small", null, inf.posts + " 篇文章 · " + new Date(inf.joined).getFullYear() + "/" + (new Date(inf.joined).getMonth() + 1) + " 加入"));
+    var sx = staffInfo[p.author_id];
+    if (sx) {
+      var st = el("small", { class: "staffinfo", title: "只有管理團隊看得到" }, "🛡️ " + sx.email + (sx.display_name && sx.display_name !== p.author_name ? "\n目前名稱：" + sx.display_name : ""));
+      au.appendChild(st);
+    }
     card.appendChild(au);
     var bd = el("div", { class: "bd" }), meta = el("div", { class: "meta" });
     meta.appendChild(el("span", { title: fullTime(p.created_at) }, ago(p.created_at) + (p.edited_at ? " · 已編輯" : "")));
     meta.appendChild(el("a", { href: "#t/" + p.thread_id + "/p" + p.id, title: "這篇的連結" }, "#" + no));
     bd.appendChild(meta);
     var content = el("div", { class: "content" }); content.innerHTML = md(p.body); bd.appendChild(content);
+    if (staff && p.deleted) {
+      var ob = el("button", { type: "button", class: "btn-sec", style: "justify-self:start;margin-top:8px;font-size:12.5px;padding:3px 10px" }, "🛡️ 查看原文");
+      ob.addEventListener("click", async function () {
+        var r = await db.from("content_audit").select("old_body, actor_name, created_at").eq("kind", "forum_post").eq("ref_id", p.id).eq("action", "delete").order("id", { ascending: false }).limit(1);
+        var x = (r.data || [])[0]; ob.remove();
+        var box = el("div", { class: "content", style: "margin-top:8px;border:1px dashed #e0584a;border-radius:8px;padding:10px 12px;font-style:normal;color:var(--ink)" });
+        box.innerHTML = x ? '<div style="font-size:12px;color:#ff9a9a;margin-bottom:6px">刪除前原文（' + esc(x.actor_name || "系統") + " 於 " + esc(fullTime(x.created_at)) + " 刪除，只有管理團隊看得到）</div>" + md(x.old_body) : '<span class="note">找不到原文紀錄（在紀錄功能上線前就已刪除）。</span>';
+        content.after(box);
+      });
+      content.after(ob);
+    }
     var acts = el("div", { class: "acts" });
     if (me && !p.deleted && !t.deleted && (!t.locked || staff)) {
       var q = el("button", { type: "button" }, "引用");
