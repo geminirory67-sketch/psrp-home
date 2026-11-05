@@ -25,8 +25,8 @@
   var ready = !!(cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase);
   var client = ready ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
 
-  var ROLE_NAMES = { admin: "管理團隊", reviewer: "招募審核", support: "工單客服", police: "LAPD", fire: "LAFD", ems: "EMS", police_cmd: "LAPD 高層", fire_cmd: "LAFD 高層", ems_cmd: "EMS 高層" };
-  var DEPT_NAMES = { lapd: "洛杉磯警察局 LAPD", lafd: "洛杉磯消防局 LAFD", ems: "緊急醫療 EMS" };
+  var ROLE_NAMES = { admin: "管理團隊", reviewer: "招募審核", support: "工單客服", member: "Member", civ: "CIV", police: "LAPD", fire: "LAFD", ems: "EMS", police_cmd: "LAPD 高層", fire_cmd: "LAFD 高層", ems_cmd: "EMS 高層" };
+  var DEPT_NAMES = { lapd: "洛杉磯警察局 LAPD", lafd: "洛杉磯消防局 LAFD", ems: "緊急醫療 EMS", whitelist: "白名單 Whitelist" };
   var STATUS_NAMES = { pending: "審核中", interview: "待面試", approved: "已錄取", rejected: "未錄取" };
 
   function errText(e) {
