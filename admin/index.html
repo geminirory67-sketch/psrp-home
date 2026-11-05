@@ -23,7 +23,7 @@
       <a href="/apply/">公職招募</a>
       <a href="/support/">工單</a>
       <a href="https://law.psrp2.com/">加州法典</a>
-      <a href="/lapd/">LAPD 手冊</a>
+      <a href="/pd/">LAPD 警察局</a>
     </nav>
     <div class="account" id="account"></div>
   </div>
@@ -333,7 +333,7 @@
   });
 
   /* ---------- Discord 設定 ---------- */
-  var DC_DEPTS = [["tickets", "工單通知（Staff 頻道，開新工單時標記下方身分組）"], ["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"]];
+  var DC_DEPTS = [["tickets", "工單通知（Staff 頻道，開新工單時標記下方身分組）"], ["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"], ["lapd_internal", "🔒 LAPD 內部公告（只發「僅限部門內部」的公告，請設成只有 LAPD 看得到的頻道）"], ["lafd_internal", "🔒 LAFD 內部公告"], ["ems_internal", "🔒 EMS 內部公告"]];
   var CFG_FIELDS = [["guild_id", "Discord 伺服器 ID"], ["role_member", "Member 身分組 ID"], ["role_civ", "CIV 身分組 ID"], ["role_police", "LAPD 身分組 ID"], ["role_fire", "LAFD 身分組 ID"], ["role_ems", "EMS 身分組 ID"]];
   async function loadConfig() {
     var box = document.getElementById("dcfg"); box.innerHTML = "";
