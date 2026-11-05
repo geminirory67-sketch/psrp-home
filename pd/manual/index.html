@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+.homebar .edit-doc-btn { background: var(--gold); color: #141414; padding: 3px 10px; border-radius: 4px; font-weight: 700; font-size: 12px; letter-spacing: .04em; }
+.homebar .edit-doc-btn:hover { color: #000; }
+.locked { max-width: 560px; margin: 60px auto; text-align: center; line-height: 1.8; }
+.locked h2 { font-size: 26px; margin-bottom: 8px; }
+.locked a.btn { display: inline-block; margin-top: 14px; padding: 10px 20px; border-radius: 8px; background: #f5b942; color: #111; font-weight: 700; text-decoration: none; }
+body.is-locked .bar, body.is-locked .tools, body.is-locked .side, body.is-locked .jump { display: none !important; }
+body.is-locked .content { display: block !important; }
+body.is-locked .layout { display: block; }
+.doc-updated { font-size: 12px; opacity: .75; }
+</style>
+</head>
+<body>
+<div class="pd-util"><div class="in"><span>Official Portal · Los Angeles Police Department · Palm State RolePlay</span><a href="/">← 返回 Palm State 主站</a></div></div>
+<header class="pdh"><div class="in"><a class="brand" href="/pd/"><img src="/assets/seal-lapd.png" alt="LAPD 警徽"><span><b>LAPD</b><small>LOS ANGELES POLICE DEPT.</small></span></a><nav aria-label="LAPD 選單"><a href="/pd/">首頁</a><a href="/pd/news/">部門公告</a><a href="/pd/deployment/">勤務表</a><a href="/pd/manual/" aria-current="page">部門手冊</a><a href="/pd/#codes">無線電代碼</a><a href="/apply/?dept=lapd">加入 LAPD</a><a href="https://law.psrp2.com/">加州法典</a></nav><div class="account" id="account"></div></div></header>
+<title>部門手冊 · LAPD</title>
+<link rel="icon" type="image/png" href="/assets/seal-lapd.png">
+<link rel="stylesheet" href="/assets/pd.css">
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: navy masthead with the search bar as the hero; sticky search; left index of Titles; statutes as dense ruled tables that collapse to cards on phones. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --ink: #18202f;
+  --muted: #5b6375;
+  --line: #d8dce4;
+  --navy: #13233f;
+  --navy-ink: #f2efe7;
+  --gold: #a87a22;
+  --gold-soft: #e7d6ae;
+  --hl: #fbe7a6;
+  --hl-ink: #1b1505;
+  --f: #b3261e; --w: #c2650f; --m: #1f5fa8; --i: #687083; --x-bg: #e9e5da; --x-ink: #4a4f5c;
+  --font-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --top: env(safe-area-inset-top, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1322; --surface: #141c2f; --surface-2: #1b2540; --ink: #e6e8ee; --muted: #9aa3b8; --line: #2a3553;
+    --navy: #0a1120; --navy-ink: #efe9da; --gold: #d6a84c; --gold-soft: #8f7440; --hl: #6b5310; --hl-ink: #fff4cf;
+    --f: #e0574e; --w: #e08a3a; --m: #5b93d8; --i: #8790a5; --x-bg: #2a3350; --x-ink: #c9cfdc;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1322; --surface: #141c2f; --surface-2: #1b2540; --ink: #e6e8ee; --muted: #9aa3b8; --line: #2a3553;
+  --navy: #0a1120; --navy-ink: #efe9da; --gold: #d6a84c; --gold-soft: #8f7440; --hl: #6b5310; --hl-ink: #fff4cf;
+  --f: #e0574e; --w: #e08a3a; --m: #5b93d8; --i: #8790a5; --x-bg: #2a3350; --x-ink: #c9cfdc;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: calc(var(--top) + 84px); }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: var(--top); z-index: 30; background: var(--navy); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* masthead */
+.mast { background: var(--navy); color: var(--navy-ink); }
+.mast .wrap { padding-block: 28px 18px; }
+.kicker { font-size: 12px; letter-spacing: .32em; color: var(--gold-soft); margin: 0 0 10px; font-weight: 500; }
+.mast h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(30px, 5vw, 46px); margin: 0; letter-spacing: .04em; line-height: 1.15; text-wrap: balance; }
+.mast h1 small { display: block; font-family: var(--font-body); font-weight: 400; font-size: clamp(13px, 1.8vw, 16px); letter-spacing: .06em; color: #b9c2d6; margin-top: 6px; }
+.scope { display: inline-flex; gap: 8px; align-items: center; margin-top: 14px; font-size: 12.5px; color: #cdd4e2; border: 1px solid rgba(231,214,174,.35); padding: 4px 10px; border-radius: 3px; }
+.scope b { color: var(--gold-soft); font-weight: 500; }
+
+/* sticky search */
+.bar { position: sticky; top: var(--top); z-index: 20; background: var(--navy); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+.bar .wrap { padding-block: 10px 10px; }
+.tools { background: var(--navy); border-bottom: 2px solid var(--gold); }
+.tools .wrap { padding-block: 4px 14px; display: grid; gap: 10px; }
+#q::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; display: none; }
+.search { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: 6px; padding: 0 12px; border: 1px solid transparent; }
+.search:focus-within { border-color: var(--gold); }
+.search svg { flex: none; color: var(--muted); }
+#q { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 17px; padding: 12px 0; outline: none; }
+#q::placeholder { color: var(--muted); }
+.kbd { font-family: var(--font-mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 3px; padding: 1px 6px; }
+#clear { border: 0; background: var(--surface-2); color: var(--muted); border-radius: 4px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.row2 { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid rgba(231,214,174,.35); background: transparent; color: var(--navy-ink); font: inherit; font-size: 13px; padding: 3px 10px; border-radius: 999px; cursor: pointer; }
+.chip:hover { border-color: var(--gold-soft); }
+.lbl { font-size: 12px; color: #9fabc2; letter-spacing: .08em; }
+.cls-filter { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.cf { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(231,214,174,.35); background: transparent; color: var(--navy-ink); font: inherit; font-size: 13px; padding: 3px 10px 3px 4px; border-radius: 999px; cursor: pointer; }
+.cf[aria-pressed="false"] { opacity: .45; }
+.status { font-size: 13px; color: #cdd4e2; margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* layout */
+.layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 32px; padding-block: 24px 48px; }
+.side { position: sticky; top: calc(var(--top) + 84px); align-self: start; max-height: calc(100vh - 100px); overflow: auto; }
+.side h4 { font-size: 12px; letter-spacing: .14em; color: var(--muted); margin: 0 0 8px; font-weight: 500; }
+.side ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.side a { display: grid; grid-template-columns: 62px 1fr; gap: 6px; text-decoration: none; padding: 6px 8px; border-radius: 4px; font-size: 14px; color: var(--ink); }
+.side a:hover { background: var(--surface-2); }
+.side a.dim { opacity: .35; }
+.side a .cnt { grid-column: 2; font-size: 11.5px; color: var(--gold); font-variant-numeric: tabular-nums; }
+.n-no { color: var(--muted); font-size: 12.5px; }
+.jump { display: none; }
+main { min-width: 0; }
+
+/* content */
+.part { margin-bottom: 44px; }
+.part-head { border-left: 3px solid var(--gold); padding: 2px 0 2px 16px; margin-bottom: 14px; }
+.part-no { margin: 0; color: var(--gold); font-size: 13px; letter-spacing: .12em; font-weight: 500; }
+.part-head h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 3vw, 30px); margin: 2px 0 0; color: var(--ink); text-wrap: balance; }
+.part-en { margin: 2px 0 0; color: var(--muted); font-size: 14px; letter-spacing: .03em; }
+.part > p, .part > ul, .part > ol { max-width: 75ch; }
+.part > p { color: var(--ink); }
+h3 { font-family: var(--font-display); font-weight: 700; font-size: 19px; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); text-wrap: balance; }
+h3 .en { font-family: var(--font-body); font-weight: 400; font-size: 14px; color: var(--muted); }
+ol li, ul li { margin-bottom: 6px; }
+.tcap { margin-top: 16px; }
+
+.tw { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.55; }
+th { text-align: left; background: var(--surface-2); color: var(--muted); font-weight: 500; font-size: 12.5px; padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+tbody tr:first-child td { border-top: 0; }
+td.sec { font-family: var(--font-mono); font-weight: 600; font-size: 12.5px; color: var(--ink); white-space: nowrap; }
+td.cls { white-space: nowrap; }
+table.wide th:nth-child(1) { width: 13%; }
+table.wide th:nth-child(2) { width: 21%; }
+table.wide th:nth-child(4) { width: 7%; }
+table.wide th:nth-child(5) { width: 24%; }
+.copy { display: block; margin-top: 4px; border: 0; background: none; color: var(--muted); font: inherit; font-family: var(--font-body); font-size: 11.5px; font-weight: 400; padding: 0; cursor: pointer; }
+.copy:hover { color: var(--gold); }
+
+.b { display: inline-block; min-width: 22px; text-align: center; font-family: var(--font-mono); font-weight: 600; font-size: 12px; line-height: 20px; padding: 0 6px; border-radius: 4px; color: #fff; margin: 1px 3px 1px 0; }
+.b-f { background: var(--f); } .b-w { background: var(--w); } .b-m { background: var(--m); } .b-i { background: var(--i); }
+.b-x { background: var(--x-bg); color: var(--x-ink); font-family: var(--font-body); font-weight: 500; font-size: 11.5px; }
+mark { background: var(--hl); color: var(--hl-ink); border-radius: 2px; padding: 0 1px; }
+
+.empty { display: none; background: var(--surface); border: 1px dashed var(--line); border-radius: 6px; padding: 28px; text-align: center; color: var(--muted); }
+.empty b { color: var(--ink); }
+.searching .hide { display: none !important; }
+
+/* footer */
+.foot { background: var(--navy); color: #c5cddd; font-size: 13px; }
+.foot .wrap { padding-block: 32px 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+.foot h5 { color: var(--gold-soft); font-size: 13px; letter-spacing: .1em; margin: 0 0 8px; font-weight: 500; }
+.foot p { margin: 0 0 8px; line-height: 1.65; }
+.foot .en { color: #8e99b1; font-size: 12px; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 6px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 40; }
+.toast.on { opacity: 1; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 12px; padding-top: 16px; }
+  .side { display: none; }
+  .jump { display: block; width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+  html { scroll-padding-top: calc(var(--top) + 84px); }
+}
+@media (max-width: 640px) {
+  .kbd { display: none; }
+  .status { margin-left: 0; width: 100%; }
+  .tw { border: 0; background: transparent; overflow: visible; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  thead { display: none; }
+  tr { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 10px; padding: 8px 12px; }
+  td { border: 0; padding: 4px 0; display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; }
+  td::before { content: attr(data-l); color: var(--muted); font-size: 11.5px; font-family: var(--font-body); font-weight: 400; padding-top: 2px; }
+  td.sec { white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+.homebar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.homebar a { text-decoration: none; color: var(--gold-soft); }
+.homebar .home { display: inline-flex; align-items: center; gap: 10px; }
+.homebar .home img { border-radius: 6px; display: block; }
+.homebar a:hover { color: #fff; }
+.homebar .dc { letter-spacing: .08em; font-size: 12px; background: #5865f2; color: #fff; padding: 3px 10px; border-radius: 4px; }
+/* book switcher */
+.books { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.book-tab { display: grid; grid-template-columns: auto auto; column-gap: 10px; align-items: baseline; text-align: left; font: inherit; cursor: pointer;
+  background: transparent; color: var(--navy-ink); border: 1px solid rgba(231,214,174,.35); border-radius: 6px; padding: 8px 14px; }
+.book-tab .bt-zh { font-family: var(--font-display); font-weight: 700; font-size: 17px; }
+.book-tab .bt-en { grid-column: 1; font-size: 11.5px; color: #9fabc2; letter-spacing: .04em; }
+.book-tab .bt-n { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 12px; color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+.book-tab[aria-selected="true"] { background: var(--gold); border-color: var(--gold); color: #17120a; }
+.book-tab[aria-selected="true"] .bt-en, .book-tab[aria-selected="true"] .bt-n { color: #3b2d10; }
+.other { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; font-size: 14px; }
+.other button { border: 0; background: var(--navy); color: var(--navy-ink); font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
+pre { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+code { font-family: var(--font-mono); font-size: .92em; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+pre code { background: none; padding: 0; }
+blockquote { margin: 0 0 12px; padding: 8px 14px; border-left: 3px solid var(--line); color: var(--muted); }
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <p class="kicker homebar"><span id="editslot"></span></p>
+    <h1>LAPD 部門手冊<small>Department Manual · 僅限 LAPD 成員</small></h1>
+    <div class="scope"><b>僅適用於 Palm State RolePlay</b><span>Roleplay use only</span></div>
+  </div>
+</header>
+
+<div class="bar" role="search">
+  <div class="wrap">
+    <label class="search" for="q">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input id="q" type="search" autocomplete="off" placeholder="搜尋罪名、條號或英文，例如：搶劫、酒駕、245、evading" aria-label="搜尋">
+      <span class="kbd">/</span>
+      <button id="clear" type="button" hidden>清除</button>
+    </label>
+  </div>
+</div>
+<div class="tools">
+  <div class="wrap">
+    <div class="row2">
+      <span class="lbl">常用</span>
+      <div class="chips" id="chips-lapd" data-for="lapd" hidden>
+        <button class="chip" type="button">10-codes</button>
+        <button class="chip" type="button">Code 3</button>
+        <button class="chip" type="button">呼號</button>
+        <button class="chip" type="button">追緝</button>
+        <button class="chip" type="button">武力</button>
+        <button class="chip" type="button">攔停</button>
+        <button class="chip" type="button">階級</button>
+        <button class="chip" type="button">懲戒</button>
+        <button class="chip" type="button">薪資</button>
+        <button class="chip" type="button">報告</button>
+      </div>
+    </div>
+    <div class="row2">
+      <span class="lbl" id="cf-lbl">等級</span>
+      <div class="cls-filter" id="cf">
+        <button class="cf" type="button" data-c="F" aria-pressed="true"><span class="b b-f">F</span>重罪</button>
+        <button class="cf" type="button" data-c="W" aria-pressed="true"><span class="b b-w">W</span>可重可輕</button>
+        <button class="cf" type="button" data-c="M" aria-pressed="true"><span class="b b-m">M</span>輕罪</button>
+        <button class="cf" type="button" data-c="I" aria-pressed="true"><span class="b b-i">I</span>違規</button>
+      </div>
+      <span class="status" id="status" aria-live="polite"></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap layout">
+  <nav class="side" aria-label="目錄">
+    <h4>目錄 CONTENTS</h4>
+    <ul class="nav" data-for="lapd" hidden></ul>
+  </nav>
+  <main id="main">
+    <select class="jump" data-for="lapd" aria-label="跳至章節" hidden><option value="">跳至章節 Jump to…</option></select>
+    <div class="other" id="other" hidden></div>
+    <div class="empty" id="empty"></div>
+    <div class="content" id="book-lapd" data-book="lapd" hidden><div class="locked" id="locked"><p>讀取中…</p></div></div>
+  </main>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <div>
+      <h5>免責聲明 DISCLAIMER</h5>
+      <p>本資料庫僅適用於 Palm State RolePlay FiveM 伺服器內之角色扮演，不構成任何法律意見。法典依截至版本日期之加州法律整理，可能經簡化或已有修正；LAPD 手冊為伺服器派系內部規範，參考真實 LAPD 制度改編。與伺服器規則或 DOJ 最新公告不一致時，以伺服器規則為準。伺服器內人物與事件均屬虛構。</p>
+      <p class="en">For roleplay on the Palm State RolePlay server only. Not legal advice. The legal code reflects California law as of the version date and may be simplified or outdated; the LAPD manual is an in-server faction policy adapted from real LAPD practice. Server rules and DOJ announcements prevail. All characters and events are fictional.</p>
+    </div>
+    <div>
+      <h5>版權 COPYRIGHT</h5>
+      <p>© 2026 Palm State RolePlay。版權所有。本資料庫之編排、中文翻譯、摘要及頁面設計為 Palm State RolePlay 之著作；加州法律條文本身屬公有領域。未經授權不得轉載、販售或用於其他伺服器。</p>
+      <p class="en">© 2026 Palm State RolePlay. All rights reserved. Not affiliated with Cfx.re, Take-Two Interactive / Rockstar Games, the State of California, the City of Los Angeles, the Los Angeles Police Department, or any real agency.</p>
+    </div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+window.__initBook = function () {
+  var ALIAS = {
+    "搶劫": ["強盜", "robbery", "劫", "211"], "搶": ["強盜", "robbery", "搶"], "打劫": ["強盜", "robbery"],
+    "偷": ["竊", "theft", "偷"], "偷車": ["車輛", "10851", "劫車", "auto"], "小偷": ["竊", "theft"],
+    "殺人": ["謀殺", "殺人", "murder", "manslaughter", "187"], "殺": ["殺", "murder"],
+    "酒駕": ["酒駕", "dui", "23152", "酒醉", "酒後", "酒精"], "毒駕": ["毒駕", "藥駕", "dui"], "喝酒": ["酒", "alcohol"],
+    "毒": ["毒", "drug", "h&s", "管制物質", "narcotic"], "吸毒": ["毒", "施用", "under the influence"],
+    "槍": ["槍", "firearm", "gun"], "刀": ["刀", "knife", "dagger", "blade"],
+    "超速": ["速", "speed", "mph"], "飆車": ["競速", "23109", "炫技", "racing"], "甩尾": ["炫技", "sideshow", "23109"],
+    "闖紅燈": ["紅燈", "21453"], "逃逸": ["逃逸", "逃避", "hit and run", "evad"], "逃避警察": ["逃避", "evad", "2800"],
+    "襲警": ["警察", "officer"], "拒捕": ["抗拒", "resist", "148", "69"], "打人": ["暴行", "攻擊", "battery", "assault"],
+    "打架": ["打鬥", "暴行", "battery", "415"], "綁票": ["綁架", "kidnap"], "人質": ["人質", "hostage"],
+    "炸彈": ["爆裂", "destructive", "bomb", "explos"], "賄賂": ["賄", "brib"], "貪污": ["賄", "侵占", "corrupt", "brib"],
+    "賭": ["賭", "gambl", "簽賭"], "嫖": ["賣淫", "prostitut"], "妓": ["賣淫", "妓", "prostitut"],
+    "幫派": ["幫派", "gang", "186.22"], "黑道": ["幫派", "gang"], "大麻": ["大麻", "cannabis"],
+    "無照": ["無照", "unlicensed", "without a license", "license"], "駕照": ["駕照", "license"],
+    "假證件": ["偽造", "false", "forged", "假"], "詐騙": ["詐", "fraud"], "洗錢": ["洗錢", "launder"],
+    "恐嚇": ["恐嚇", "threat", "extortion"], "勒索": ["恐嚇取財", "extortion", "勒"], "保護費": ["恐嚇取財", "extortion"],
+    "冒充警察": ["冒充", "impersonat"], "蒙面": ["蒙面", "mask"], "米蘭達": ["米蘭達", "miranda"],
+    "搜身": ["搜索", "拍身", "search", "terry", "pat"], "搜索": ["搜索", "search", "warrant"], "保釋": ["保釋", "bail"],
+    "越獄": ["脫逃", "escape"], "監獄": ["監", "prison", "jail"], "家暴": ["家庭", "家暴", "domestic", "273"],
+    "罰單": ["違規", "infraction", "罰金", "citation"], "停車": ["停車", "parking"], "手機": ["手機", "phone"],
+    "安全帶": ["安全帶", "seatbelt"], "酒吧": ["酒類", "abc", "alcohol"], "釣魚": ["釣魚", "fishing"], "打獵": ["狩獵", "hunt"],
+    "選舉": ["選", "elect", "vot"], "租屋": ["租", "tenant", "landlord"], "房東": ["房東", "landlord"],
+    "離婚": ["離婚", "divorce"], "工資": ["工資", "wage", "薪"], "遺囑": ["遺囑", "will"],
+    "追車": ["追緝", "pursuit", "逃避", "evad"], "追緝": ["追緝", "pursuit", "逃避", "evad"], "追逐": ["追緝", "追逐", "pursuit"], "開槍": ["開槍", "射擊", "deadly", "ois", "致命武力"],
+    "代碼": ["code", "代碼"], "暗號": ["code", "代碼"], "10-code": ["10-"], "10碼": ["10-"],
+    "升遷": ["晉升", "promotion"], "升職": ["晉升", "promotion"], "薪水": ["薪資", "salary", "pay"],
+    "處分": ["懲戒", "處分", "discipline"], "請假": ["請假", "loa", "leave"], "臂章": ["臂章", "stripe"],
+    "支援": ["支援", "backup", "code 2", "11-99"], "警察受傷": ["officer down", "11-99", "受傷"],
+    "報告": ["報告", "report"], "證物": ["證物", "evidence"], "密錄器": ["密錄", "bwv", "body"],
+    "swat": ["swat"], "特警": ["swat", "metro"], "直升機": ["空中", "air"], "警犬": ["k9", "警犬"]
+  };
+  var main = document.getElementById("main");
+  var q = document.getElementById("q");
+  var clearBtn = document.getElementById("clear");
+  var statusEl = document.getElementById("status");
+  var emptyEl = document.getElementById("empty");
+  var otherEl = document.getElementById("other");
+  var cfRow = document.getElementById("cf");
+  var cfLbl = document.getElementById("cf-lbl");
+  var active = { F: true, W: true, M: true, I: true };
+  var book = "lapd";
+  var NAMES = { law: "加州法典", lapd: "LAPD 部門手冊" };
+
+  function norm(s) { return (s || "").toLowerCase().replace(/[§\s]/g, "").replace(/（/g, "(").replace(/）/g, ")"); }
+  function each(sel, fn, root) { [].slice.call((root || document).querySelectorAll(sel)).forEach(fn); }
+
+  var books = {};
+  var records = [];
+  each(".content", function (cont) {
+    var b = cont.getAttribute("data-book");
+    var parts = [].slice.call(cont.querySelectorAll("section.part"));
+    books[b] = { el: cont, parts: parts, rows: cont.querySelectorAll("tbody tr td.sec").length };
+    parts.forEach(function (sec) {
+      var partTitle = sec.querySelector(".part-head").textContent;
+      var grp = null;
+      [].slice.call(sec.children).forEach(function (el) {
+        if (el.classList.contains("part-head")) return;
+        if (el.tagName === "H3") { grp = document.createElement("div"); grp.className = "grp"; sec.insertBefore(grp, el); grp.appendChild(el); return; }
+        if (grp) grp.appendChild(el);
+      });
+      each("tbody tr, li, pre, :scope > p, .grp > p", function (el) {
+        var g = el.closest(".grp"); var h = g ? g.querySelector("h3").textContent : "";
+        records.push({ el: el, book: b, sec: sec, text: norm(el.textContent), ctx: norm(h + " " + partTitle), html: el.innerHTML,
+          cls: el.tagName === "TR" ? (el.getAttribute("data-cls") || "") : "" });
+      }, sec);
+    });
+  });
+  // copy buttons on statute cells
+  function bindCopy(td) {
+    var tr = td.parentNode; var name = tr.children[1] ? tr.children[1].textContent.trim() : "";
+    var b = td.querySelector("button.copy");
+    if (!b) { b = document.createElement("button"); b.type = "button"; b.className = "copy"; b.textContent = "複製引用"; td.appendChild(b); }
+    else { var nb = b.cloneNode(true); b.replaceWith(nb); b = nb; }
+    b.addEventListener("click", function () {
+      var cite = td.firstChild.textContent.trim() + " " + name;
+      try { navigator.clipboard.writeText(cite).then(function () { toast("已複製：" + cite); }, function () { fallback(cite); }); } catch (e) { fallback(cite); }
+    });
+  }
+  each("td.sec", bindCopy);
+  records.forEach(function (r) { if (r.el.tagName === "TR") r.html = r.el.innerHTML; });
+  function fallback(t) { var s = document.createElement("span"); s.textContent = t; document.body.appendChild(s); var r = document.createRange(); r.selectNodeContents(s); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast("請按 Ctrl+C 複製"); setTimeout(function () { s.remove(); }, 4000); }
+  var tt; function toast(m) { var el = document.getElementById("toast"); el.textContent = m; el.classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { el.classList.remove("on"); }, 1800); }
+
+  function expand(tok) { var alts = [norm(tok)]; (ALIAS[tok.toLowerCase()] || ALIAS[tok] || []).forEach(function (a) { alts.push(norm(a)); }); return alts; }
+  function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  function highlight(el, words) {
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+    var re = new RegExp("(" + words.map(esc).join("|") + ")", "gi");
+    nodes.forEach(function (n) {
+      if (n.parentNode.closest && n.parentNode.closest("button")) return;
+      re.lastIndex = 0; if (!re.test(n.nodeValue)) return; re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m, v = n.nodeValue;
+      while ((m = re.exec(v))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(v.slice(last, m.index)));
+        var mk = document.createElement("mark"); mk.textContent = m[0]; frag.appendChild(mk);
+        last = m.index + m[0].length; if (!m[0].length) re.lastIndex++;
+      }
+      if (last < v.length) frag.appendChild(document.createTextNode(v.slice(last)));
+      n.parentNode.replaceChild(frag, n);
+    });
+  }
+
+  function setBook(b, keepScroll) {
+    book = b;
+    each(".book-tab", function (t) { t.setAttribute("aria-selected", String(t.getAttribute("data-book") === b)); });
+    each("[data-for]", function (el) { el.hidden = el.getAttribute("data-for") !== b; });
+    each(".content", function (c) { c.hidden = c.getAttribute("data-book") !== b; });
+    var law = b === "law";
+    cfRow.hidden = !law; cfLbl.hidden = !law;
+    q.placeholder = law ? "搜尋罪名、條號或英文，例如：搶劫、酒駕、245、evading" : "搜尋手冊，例如：10-codes、追緝、武力、Code 3、薪資";
+    run();
+    if (!keepScroll) window.scrollTo({ top: 0 });
+  }
+
+  var dirty = [];
+  function run() {
+    var raw = q.value.trim();
+    clearBtn.hidden = !raw;
+    dirty.forEach(function (r) { r.el.innerHTML = r.html; var td = r.el.querySelector && r.el.querySelector("td.sec"); if (td) bindCopy(td); }); dirty = [];
+    var filterOn = book === "law" && !(active.F && active.W && active.M && active.I);
+    var toks = raw ? raw.split(/\s+/).filter(Boolean) : [];
+    var cont = books[book].el;
+    each("[data-count]", function (el) { el.textContent = ""; });
+    otherEl.hidden = true;
+    if (!toks.length && !filterOn) {
+      main.classList.remove("searching");
+      each(".hide", function (e) { e.classList.remove("hide"); });
+      emptyEl.style.display = "none";
+      statusEl.textContent = book === "law" ? "共 " + books.law.rows + " 條法條 · " + books.law.parts.length + " 編" : "共 " + books.lapd.parts.length + " 章";
+      updateNav(null); return;
+    }
+    main.classList.add("searching");
+    var groups = toks.map(expand);
+    var words = []; groups.forEach(function (g) { g.forEach(function (a) { if (a) words.push(a); }); });
+    toks.forEach(function (t) { words.push(t); });
+    var hits = { law: 0, lapd: 0 }, perPart = {};
+    records.forEach(function (r) {
+      var hay = r.text + "|" + r.ctx;
+      var ok = toks.length ? groups.every(function (alts) { return alts.some(function (a) { return a && hay.indexOf(a) !== -1; }); }) : true;
+      if (ok && toks.length) {
+        ok = groups.some(function (alts) { return alts.some(function (a) { return r.text.indexOf(a) !== -1; }); }) ||
+             groups.every(function (alts) { return alts.some(function (a) { return r.ctx.indexOf(a) !== -1; }); });
+      }
+      if (ok && filterOn && r.book === "law") ok = r.el.tagName === "TR" && r.cls.split("").some(function (c) { return active[c]; });
+      if (ok) hits[r.book]++;
+      if (r.book !== book) return;
+      r.el.classList.toggle("hide", !ok);
+      if (ok) { perPart[r.sec.id] = (perPart[r.sec.id] || 0) + 1; if (toks.length) { highlight(r.el, words); dirty.push(r); } }
+    });
+    each(".tw", function (tw) { tw.classList.toggle("hide", !tw.querySelector("tbody tr:not(.hide)")); }, cont);
+    each("ul, ol", function (l) { l.classList.toggle("hide", !l.querySelector("li:not(.hide)")); }, cont);
+    each(".grp", function (g) {
+      var vis = g.querySelector("tbody tr:not(.hide), li:not(.hide), pre:not(.hide), :scope > p:not(.hide)");
+      g.classList.toggle("hide", !vis);
+    }, cont);
+    books[book].parts.forEach(function (s) { s.classList.toggle("hide", !perPart[s.id]); });
+    if (toks.length) {
+      each("[data-count]", function (el) { var n = hits[el.getAttribute("data-count")]; el.textContent = n ? n + " 筆" : "0"; });
+    }
+    var here = hits[book];
+    var otherB = book === "law" ? "lapd" : "law";
+    statusEl.textContent = here ? "找到 " + here + " 筆結果" : "沒有結果";
+    if (toks.length && hits[otherB]) {
+      otherEl.hidden = false; otherEl.innerHTML = "";
+      var s = document.createElement("span"); s.textContent = NAMES[otherB] + "中另有 " + hits[otherB] + " 筆符合";
+      var btn = document.createElement("button"); btn.type = "button"; btn.textContent = "查看" + NAMES[otherB] + " →";
+      btn.addEventListener("click", function () { setBook(otherB); });
+      otherEl.appendChild(s); otherEl.appendChild(btn);
+    }
+    if (!here) {
+      emptyEl.style.display = "block"; emptyEl.innerHTML = "";
+      var p1 = document.createElement("p"); p1.innerHTML = "在" + NAMES[book] + "中找不到符合「<b></b>」的內容。"; p1.querySelector("b").textContent = raw || "所選等級";
+      var p2 = document.createElement("p"); p2.textContent = "試試較短的關鍵字、英文，或直接輸入條號或代碼（例如 245、10-80）。";
+      emptyEl.appendChild(p1); emptyEl.appendChild(p2);
+    } else emptyEl.style.display = "none";
+    updateNav(perPart);
+  }
+  function updateNav(perPart) {
+    each(".nav a", function (a) {
+      var id = a.getAttribute("data-nav"); var c = a.querySelector(".cnt");
+      if (!perPart) { a.classList.remove("dim"); if (c) c.remove(); return; }
+      var n = perPart[id] || 0; a.classList.toggle("dim", !n);
+      if (!c) { c = document.createElement("span"); c.className = "cnt"; a.appendChild(c); }
+      c.textContent = n ? n + " 筆" : "";
+    });
+  }
+
+  var timer; q.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(run, 120); });
+  clearBtn.addEventListener("click", function () { q.value = ""; run(); q.focus(); });
+  each(".chips", function (c) { c.addEventListener("click", function (e) { var b = e.target.closest(".chip"); if (!b) return; q.value = b.textContent; run(); window.scrollTo({ top: 0 }); }); });
+  each(".book-tab", function (t) { t.addEventListener("click", function () { if (t.getAttribute("data-book") !== book) setBook(t.getAttribute("data-book")); }); });
+  cfRow.addEventListener("click", function (e) {
+    var b = e.target.closest(".cf"); if (!b) return; var c = b.getAttribute("data-c");
+    active[c] = !active[c]; b.setAttribute("aria-pressed", String(active[c]));
+    if (!active.F && !active.W && !active.M && !active.I) { active = { F: true, W: true, M: true, I: true }; each(".cf", function (x) { x.setAttribute("aria-pressed", "true"); }); }
+    run();
+  });
+  each(".jump", function (sel) { sel.addEventListener("change", function (e) { var id = e.target.value; if (!id) return; var el = document.getElementById(id); if (el) el.scrollIntoView(); e.target.value = ""; }); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === "Escape" && document.activeElement === q) { q.value = ""; run(); }
+  });
+  function fromHash() {
+    var h = (location.hash || "").slice(1); if (!h) return;
+    if (h === "lapd" && !books.lapd) { location.replace("https://psrp2.com/pd/manual/"); return; } if (h === "lapd" || h === "law") return;
+    var el = document.getElementById(h); if (!el) return;
+    var c = el.closest(".content"); if (c && c.getAttribute("data-book") !== book) setBook(c.getAttribute("data-book"), true);
+    el.scrollIntoView();
+  }
+  window.addEventListener("hashchange", fromHash);
+  setBook(book, true);
+  fromHash();
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/marked.js"></script>
+<script src="/assets/mdbook.js"></script>
+<script src="/assets/docs.js"></script>
+<script>
+(async function () {
+  document.body.classList.add("is-locked");
+  var box = document.getElementById("locked");
+  function lock(title, text, link, linkText) {
+    box.innerHTML = "";
+    box.appendChild(PSRP.el("h2", null, title));
+    box.appendChild(PSRP.el("p", null, text));
+    if (link) box.appendChild(PSRP.el("a", { class: "btn", href: link }, linkText));
+  }
+  if (!PSRP.client) { lock("手冊暫時無法開啟", "帳號系統尚未啟用，請稍後再來。"); return; }
+  var me = await PSRP.profile();
+  if (!me) { lock("僅限 LAPD 成員", "部門手冊只開放給 LAPD 成員。請先登入你的帳號。", "/apply/?next=/lapd/", "登入／註冊"); return; }
+  if (!PSRP.hasRole(me, "police")) { lock("需要 LAPD 身分組", "你的帳號（" + (me.display_name || me.email) + "）目前沒有 LAPD 身分組。通過招募審核後，管理團隊會開通權限。", "/apply/", "前往公職招募"); return; }
+  var d;
+  try { d = await PSRPDocs.get("lapd", { cache: false, timeout: 6000 }); } catch (e) { lock("讀取失敗", PSRP.errText(e)); return; }
+  if (!d) { lock("找不到手冊", "管理團隊尚未上傳手冊內容。"); return; }
+  var html, navH, optH;
+  if (d.source) { var r = PSRPMd.renderBook(d.source, "d"); html = r.html; navH = PSRPMd.navHtml(r.nav); optH = PSRPMd.navOpts(r.nav); }
+  else { var parts = (d.nav || "").split("<!--OPTS-->"); html = d.body; navH = parts[0] || ""; optH = parts[1] || ""; }
+  document.querySelector('.nav[data-for="lapd"]').innerHTML = navH;
+  document.querySelector('.jump[data-for="lapd"]').insertAdjacentHTML("beforeend", optH);
+  document.getElementById("book-lapd").innerHTML = html;
+  document.body.classList.remove("is-locked");
+  window.__initBook();
+  PSRPDocs.editButton(document.getElementById("editslot"), "lapd", d.editor_role || "police_cmd");
+})();
+</script>
+<footer class="pdf"><div class="in"><img src="/assets/seal-lapd.png" alt=""><div><b>LOS ANGELES POLICE DEPARTMENT</b><span class="motto">TO PROTECT AND TO SERVE · 保護與服務</span><small>Palm State RolePlay 角色扮演用途，並非真實警政機關或官方網站。</small></div><nav><a href="/pd/">LAPD 首頁</a><a href="/news/">伺服器公告</a><a href="/rules/">伺服器規則</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><a href="/">Palm State 主站</a></nav></div></footer>
+<script>if (window.PSRP) PSRP.mountAccountChip(document.getElementById('account'));</script>
+</body>
+</html>
