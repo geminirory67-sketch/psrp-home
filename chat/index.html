@@ -114,6 +114,40 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
 .vsub { margin: 8px 0 0; font-size: 14px; }
 .vmrow { display: flex; align-items: center; justify-content: space-between; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
 .vdanger { color: #ff8a7a !important; border-color: #e0584a !important; }
+.panel { position: relative; }
+.vmusic { position: absolute; right: 16px; bottom: 96px; z-index: 15; width: 300px; max-width: calc(100% - 32px); max-height: calc(100% - 120px); overflow: auto; background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 14px 40px rgba(0,0,0,.5); padding: 10px 12px 12px; display: grid; gap: 8px; }
+.vmusic[hidden] { display: none; }
+.vm-hd { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; }
+.vm-hd button { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; width: 28px; height: 22px; cursor: pointer; }
+#vm-player-wrap { border-radius: 8px; overflow: hidden; background: #000; }
+#vm-player-wrap[hidden] { display: none; }
+#vm-player-wrap iframe { display: block; width: 100%; height: 200px; border: 0; }
+.vm-now { display: grid; gap: 2px; min-width: 0; }
+.vm-now b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vm-now span { font-size: 12px; color: var(--muted); }
+.vm-ctl { display: flex; align-items: center; gap: 6px; }
+.vm-ctl button { background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); border-radius: 6px; width: 34px; height: 30px; cursor: pointer; font-size: 14px; }
+.vm-ctl button:disabled { opacity: .35; cursor: default; }
+#vm-time { white-space: nowrap; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vm-vol { margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 13px; }
+.vm-vol input { width: 76px; accent-color: var(--gold); }
+.vm-add { display: flex; gap: 6px; }
+.vm-add input { flex: 1; min-width: 0; font: inherit; font-size: 13.5px; color: var(--ink); background: var(--night); border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; }
+.vm-add .btn-primary { padding: 6px 12px; font-size: 13.5px; }
+.vm-qh { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+.vm-queue { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; max-height: 150px; overflow: auto; }
+.vm-queue li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; font-size: 13px; background: var(--panel); border-radius: 6px; padding: 4px 6px 4px 8px; }
+.vq-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vq-b { font-size: 11px; color: var(--muted); }
+.vm-queue button { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 15px; }
+.vm-queue button:hover { color: #ff8a7a; }
+.vbar .vbt #vbar-hq { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; }
+.vbar .vbt #vbar-hq[aria-pressed="true"], .vbar .vbt #vbar-music[aria-pressed="true"] { background: #3d3212; border-color: var(--gold); color: var(--gold); }
+.vpinrow { display: flex; gap: 8px; }
+.vpinrow select { flex: 1; }
+.vpinrow input { width: 110px; letter-spacing: .3em; text-align: center; }
+.vpin { font: inherit; font-size: 28px; letter-spacing: .6em; text-align: center; color: var(--ink); background: var(--night); border: 1px solid var(--line); border-radius: 10px; padding: 10px; width: 100%; }
+@media (max-width: 760px) { .vmusic { right: 8px; left: 8px; width: auto; max-width: none; bottom: 110px; } }
 .vtoast { position: fixed; z-index: 200; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--night-2); border: 1px solid var(--line); color: var(--ink); border-radius: 10px; padding: 10px 16px; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: calc(100vw - 32px); }
 .vtoast.bad { border-color: #e0584a; }
 
@@ -176,6 +210,8 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
           <div class="vbt">
             <button type="button" id="vbar-mute" aria-pressed="false" title="靜音麥克風">🎙️</button>
             <button type="button" id="vbar-deaf" aria-pressed="false" title="關閉所有聲音">🎧</button>
+            <button type="button" id="vbar-hq" aria-pressed="false" title="高音質模式">HQ</button>
+            <button type="button" id="vbar-music" aria-pressed="false" title="YouTube 音樂">🎵</button>
             <button type="button" id="vbar-leave" class="vlv" title="離開語音">離開</button>
           </div>
         </div>
@@ -189,6 +225,21 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
           <span class="live" id="live">連線中</span>
         </div>
         <div class="msgs" id="msgs" aria-live="polite"></div>
+        <div class="vmusic" id="vmusic" hidden>
+          <div class="vm-hd"><b>🎵 頻道音樂</b><button type="button" id="vm-close" title="收起">—</button></div>
+          <div id="vm-player-wrap" hidden><div id="vm-player"></div></div>
+          <div class="vm-now"><b id="vm-now">目前沒有播放音樂</b><span id="vm-by"></span></div>
+          <div class="vm-ctl">
+            <button type="button" id="vm-pp" title="暫停">⏸</button>
+            <button type="button" id="vm-skip" title="下一首">⏭</button>
+            <button type="button" id="vm-stop" title="停止並清空清單">⏹</button>
+            <span id="vm-time"></span>
+            <label class="vm-vol" title="音樂音量（只影響你自己）">🔉<input type="range" id="vm-vol" min="0" max="100" step="5" aria-label="音樂音量"></label>
+          </div>
+          <div class="vm-add"><input id="vm-url" placeholder="貼上 YouTube 連結" aria-label="YouTube 連結"><button type="button" class="btn-primary" id="vm-add">點歌</button></div>
+          <div class="vm-qh" id="vm-qh">接下來（0）</div>
+          <ol class="vm-queue" id="vm-queue"></ol>
+        </div>
         <form class="compose" id="compose" novalidate>
           <div class="row">
             <textarea id="input" rows="1" maxlength="500" placeholder="輸入訊息，Enter 送出、Shift+Enter 換行" aria-label="訊息"></textarea>
