@@ -24,6 +24,13 @@ body { overflow-x: hidden; }
 .chlist button.ch[aria-current="true"] { background: var(--panel-2); color: var(--ink); box-shadow: inset 3px 0 0 var(--gold); }
 .chlist button.ch.mod::after { content: " ●"; color: var(--sun); }
 .chlist .add { width: 100%; margin-top: 8px; }
+.chlist .chctl { display: flex; gap: 4px; padding: 2px 4px 8px 12px; }
+.chlist .chctl button { font: inherit; font-size: 12px; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+.chlist .chctl button:disabled { opacity: .35; cursor: default; }
+.chlist .chctl .del { margin-left: auto; color: #ff8a7a; }
+.chlist button.ch.dragging { opacity: .4; }
+.chlist button.ch.dropto { box-shadow: inset 0 2px 0 var(--gold); }
+
 .pane { display: flex; flex-direction: column; min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .pane .ph { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding: 8px; border-bottom: 1px solid var(--line); }
 .pane .ph b { font-size: 13px; color: var(--muted); margin-right: 4px; }
@@ -177,11 +184,34 @@ body { overflow-x: hidden; }
   function chTitle(c) { return c.title.replace(/^##\s*/, "") || "（無標題）"; }
   function renderList() {
     var box = document.getElementById("chlist"); box.innerHTML = "";
+    var head = chapters[0] && chapters[0].title === "（開頭）" ? 1 : 0;
     chapters.forEach(function (c, i) {
-      var b = el("button", { type: "button", class: "ch" + (c.mod ? " mod" : ""), "aria-current": String(i === cur) }, chTitle(c));
+      var b = el("button", { type: "button", class: "ch" + (c.mod ? " mod" : ""), "aria-current": String(i === cur), draggable: i >= head ? "true" : "false", "data-i": i }, chTitle(c));
       b.addEventListener("click", function () { select(i); });
+      if (i >= head) {
+        b.addEventListener("dragstart", function (e) { e.dataTransfer.setData("text/plain", String(i)); b.classList.add("dragging"); });
+        b.addEventListener("dragend", function () { b.classList.remove("dragging"); });
+        b.addEventListener("dragover", function (e) { e.preventDefault(); b.classList.add("dropto"); });
+        b.addEventListener("dragleave", function () { b.classList.remove("dropto"); });
+        b.addEventListener("drop", function (e) { e.preventDefault(); b.classList.remove("dropto"); move(parseInt(e.dataTransfer.getData("text/plain"), 10), i); });
+      }
       box.appendChild(b);
+      if (i === cur && i >= head) {
+        var ctl = el("div", { class: "chctl" });
+        var up = el("button", { type: "button", title: "上移" }, "↑ 上移");
+        var dn = el("button", { type: "button", title: "下移" }, "↓ 下移");
+        var del = el("button", { type: "button", title: "刪除這一章", class: "del" }, "刪除");
+        up.disabled = i <= head; dn.disabled = i >= chapters.length - 1;
+        up.addEventListener("click", function () { move(i, i - 1); });
+        dn.addEventListener("click", function () { move(i, i + 1); });
+        del.addEventListener("click", function () {
+          if (!confirm("確定要刪除「" + chTitle(c) + "」這一章？儲存前都可以重新整理頁面取消。")) return;
+          chapters.splice(i, 1); markDirty(); select(Math.max(head, Math.min(i, chapters.length - 1)));
+        });
+        ctl.appendChild(up); ctl.appendChild(dn); ctl.appendChild(del); box.appendChild(ctl);
+      }
     });
+    box.appendChild(el("p", { class: "note", style: "font-size:12px;margin:8px 4px 0" }, "可以直接拖曳章節調整順序。"));
     var add = el("button", { type: "button", class: "btn-sec add" }, "＋ 新增一章");
     add.addEventListener("click", function () {
       var name = prompt(cfg.mode === "rules" ? "新章節名稱（例如：第十四章 活動規範）" : "新章節名稱（例如：第二十章 特殊勤務 Special Operations）");
@@ -189,6 +219,12 @@ body { overflow-x: hidden; }
       chapters.push({ title: name, text: "## " + name + "\n\n", mod: true }); markDirty(); select(chapters.length - 1);
     });
     box.appendChild(add);
+  }
+  function move(from, to) {
+    var head = chapters[0] && chapters[0].title === "（開頭）" ? 1 : 0;
+    if (from === to || to < head || to >= chapters.length || from < head) return;
+    var c = chapters.splice(from, 1)[0]; chapters.splice(to, 0, c);
+    c.mod = true; markDirty(); select(to);
   }
   function select(i) {
     cur = i; srcEl.value = chapters[i].text; renderList(); refreshPreview(); srcEl.focus(); srcEl.setSelectionRange(0, 0); srcEl.scrollTop = 0;
