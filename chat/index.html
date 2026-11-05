@@ -101,7 +101,7 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
 .vbar { border-top: 1px solid var(--line); background: #0b1324; padding: 8px 10px; display: grid; gap: 6px; }
 .vbar .vst { font-size: 12px; color: var(--ok); font-weight: 700; }
 .vbar .vrn { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.vbar .vbt { display: flex; gap: 6px; }
+.vbar .vbt { display: flex; gap: 4px; }
 .vbar .vbt button { flex: 1; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); border-radius: 6px; padding: 5px 0; font: inherit; font-size: 15px; cursor: pointer; }
 .vbar .vbt button[aria-pressed="true"] { background: #4a1c18; border-color: #e0584a; }
 .vbar .vbt .vlv { background: #5a1d1a; border-color: #e0584a; font-size: 13px; }
@@ -212,6 +212,7 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
             <button type="button" id="vbar-deaf" aria-pressed="false" title="關閉所有聲音">🎧</button>
             <button type="button" id="vbar-hq" aria-pressed="false" title="高音質模式">HQ</button>
             <button type="button" id="vbar-music" aria-pressed="false" title="YouTube 音樂">🎵</button>
+            <button type="button" id="vbar-sfx" aria-pressed="false" title="加入／離開音效">🔔</button>
             <button type="button" id="vbar-leave" class="vlv" title="離開語音">離開</button>
           </div>
         </div>

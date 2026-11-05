@@ -11,6 +11,7 @@
   var rooms = [], room = null, stream = null, muted = false, deafened = false;
   var sig = null, myKey = "", peers = {}, listCh = null, pingT = null, refreshT = null, meterT = null;
   var speaking = {}, vols = {}, actx = null, analysers = {};
+  var lastSong = null;
   var skew = 0, yt = null, ytReady = false, ytWant = null, musicOpen = false, musicVol = 50, driftT = null, startT = null;
   try { var mv = Number(localStorage.getItem("psrp-music-vol")); if (mv >= 0 && mv <= 100 && localStorage.getItem("psrp-music-vol") !== null) musicVol = mv; } catch (e) { /* 略過 */ }
   var MAXDEF = 10;
@@ -231,6 +232,38 @@
     c.subscribe(function (s) { if (s === "SUBSCRIBED") { c.send({ type: "broadcast", event: "ctl", payload: payload }); setTimeout(function () { db.removeChannel(c); }, 800); } });
   }
 
+
+  /* ---------- 音效（自己合成的短提示音） ---------- */
+  var sfxCtx = null, sfxOn = true, synced = false, joinedAt = 0;
+  try { sfxOn = localStorage.getItem("psrp-voice-sfx") !== "0"; } catch (e) { /* 略過 */ }
+  function tone(seq) {
+    if (!sfxOn || deafened) return;
+    try {
+      sfxCtx = sfxCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (sfxCtx.state === "suspended") sfxCtx.resume();
+      var t = sfxCtx.currentTime + 0.02, out = sfxCtx.createGain(); out.gain.value = 0.22; out.connect(sfxCtx.destination);
+      seq.forEach(function (n) {
+        var o = sfxCtx.createOscillator(), g = sfxCtx.createGain(), o2 = sfxCtx.createOscillator(), g2 = sfxCtx.createGain();
+        o.type = "sine"; o.frequency.setValueAtTime(n[0], t + n[1]);
+        o2.type = "triangle"; o2.frequency.setValueAtTime(n[0] * 2, t + n[1]); g2.gain.value = 0.18;
+        g.gain.setValueAtTime(0.0001, t + n[1]);
+        g.gain.exponentialRampToValueAtTime(1, t + n[1] + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + n[1] + n[2]);
+        o.connect(g); o2.connect(g2); g2.connect(g); g.connect(out);
+        o.start(t + n[1]); o2.start(t + n[1]); o.stop(t + n[1] + n[2] + 0.05); o2.stop(t + n[1] + n[2] + 0.05);
+      });
+    } catch (e) { /* 不支援就不播 */ }
+  }
+  var SFX = {
+    connect: [[523.25, 0, 0.16], [659.25, 0.09, 0.16], [783.99, 0.18, 0.32]],   /* 自己加入：Do Mi Sol */
+    join: [[587.33, 0, 0.14], [880, 0.1, 0.26]],                               /* 有人加入：往上 */
+    leave: [[880, 0, 0.14], [587.33, 0.1, 0.26]],                              /* 有人離開：往下 */
+    disconnect: [[659.25, 0, 0.14], [523.25, 0.1, 0.14], [392, 0.2, 0.3]],    /* 自己離開 */
+    mute: [[440, 0, 0.09], [330, 0.06, 0.12]],
+    unmute: [[330, 0, 0.09], [440, 0.06, 0.12]],
+    song: [[783.99, 0, 0.1], [1046.5, 0.07, 0.18]]
+  };
+  function sfx(k) { if (window.__sfx) window.__sfx.push(k); tone(SFX[k]); }
   /* ---------- 加入／離開 ---------- */
   async function join(r, already) {
     if (room) await leave();
@@ -248,6 +281,7 @@
     room = r; muted = !stream; deafened = false;
     if (stream) meter("me", stream);
     myKey = me.id + ":" + Math.random().toString(36).slice(2, 8);
+    synced = false; joinedAt = Date.now(); sfx("connect");
     sig = db.channel("psrp-voice-" + r.id, { config: { broadcast: { self: false }, presence: { key: myKey } } });
     sig.on("broadcast", { event: "sig" }, function (p) { onSignal(p.payload); })
        .on("broadcast", { event: "ctl" }, function (p) { onCtl(p.payload); })
@@ -338,7 +372,7 @@
   }
   async function leave(why) {
     if (!room) return;
-    var id = room.id; room = null;
+    var id = room.id; room = null; sfx("disconnect");
     clearInterval(pingT);
     Object.keys(peers).forEach(drop);
     if (sig) { try { sig.untrack(); } catch (e) { /* 略過 */ } db.removeChannel(sig); sig = null; }
@@ -372,14 +406,21 @@
 
   /* ---------- WebRTC：每個人跟每個人直接連線 ---------- */
   function syncPeers(state) {
-    var live = {};
+    var live = {}, before = {};
+    Object.keys(peers).forEach(function (k) { before[peers[k].uid] = 1; });
     Object.keys(state || {}).forEach(function (k) {
       if (k === myKey) return;
       var s = (state[k] || [])[0]; if (!s) return;
       live[k] = s;
       if (!peers[k]) { mkPeer(k, s); if (myKey < k) offer(k); }
     });
-    Object.keys(peers).forEach(function (k) { if (!live[k]) drop(k); });
+    var gone = 0; Object.keys(peers).forEach(function (k) { if (!live[k]) { drop(k); gone++; } });
+    if (synced && Date.now() - joinedAt > 2000) {
+      var after = {}; Object.keys(peers).forEach(function (k) { after[peers[k].uid] = 1; });
+      if (Object.keys(after).some(function (u) { return !before[u]; })) sfx("join");
+      else if (gone && Object.keys(before).some(function (u) { return !after[u]; })) sfx("leave");
+    }
+    if (state && state[myKey]) synced = true;
     soon(); renderBar();
   }
   function mkPeer(k, s) {
@@ -497,6 +538,7 @@
     if (!ytReady) return;
     var pos = wantPos(cur), data = yt.getVideoData ? yt.getVideoData() : {}, same = data && data.video_id === cur.id;
     if (!same) {
+      if (lastSong !== cur.id) { lastSong = cur.id; sfx("song"); }
       if (pos < 0) { yt.cueVideoById({ videoId: cur.id, startSeconds: 0 }); startT = setTimeout(function () { applyMusic(ytWant); }, -pos * 1000); }
       else if (cur.paused != null) yt.cueVideoById({ videoId: cur.id, startSeconds: pos });
       else yt.loadVideoById({ videoId: cur.id, startSeconds: pos });
@@ -564,11 +606,15 @@
     $("vbar-leave").addEventListener("click", function () { leave(); });
     $("vbar-mute").addEventListener("click", function () {
       if (!stream) { toast("沒有麥克風權限。請在瀏覽器網址列允許麥克風後重新加入。", true); return; }
-      muted = !muted; stream.getAudioTracks().forEach(function (t) { t.enabled = !muted; });
+      muted = !muted; stream.getAudioTracks().forEach(function (t) { t.enabled = !muted; }); sfx(muted ? "mute" : "unmute");
       renderBar(); render(); ping();
     });
-    $("vbar-deaf").addEventListener("click", function () { deafened = !deafened; applyVol(); setMusicVol(); renderBar(); });
+    $("vbar-deaf").addEventListener("click", function () { if (!deafened) sfx("mute"); deafened = !deafened; if (!deafened) sfx("unmute"); applyVol(); setMusicVol(); renderBar(); });
     $("vbar-hq").addEventListener("click", function () { setHQ(!hq); });
+    var sb = $("vbar-sfx");
+    function sfxBtn() { sb.textContent = sfxOn ? "🔔" : "🔕"; sb.title = sfxOn ? "加入／離開音效：開（點一下關閉）" : "加入／離開音效：關（點一下開啟）"; sb.setAttribute("aria-pressed", String(!sfxOn)); }
+    sb.addEventListener("click", function () { sfxOn = !sfxOn; try { localStorage.setItem("psrp-voice-sfx", sfxOn ? "1" : "0"); } catch (e) { /* 略過 */ } sfxBtn(); if (sfxOn) sfx("join"); });
+    sfxBtn();
     $("vbar-music").addEventListener("click", function () { musicOpen = !musicOpen; renderMusic(); if (musicOpen) { loadYT(); $("vm-url").focus(); } });
     $("vm-add").addEventListener("click", addSong);
     $("vm-url").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addSong(); } });
