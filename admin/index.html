@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>管理後台 · Palm State RolePlay</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/rules/">伺服器規則</a>
+      <a href="/apply/">公職招募</a>
+      <a href="https://law.psrp2.com/">加州法典</a>
+      <a href="/lapd/">LAPD 手冊</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<section class="phead">
+  <div class="wrap">
+    <span class="k">Staff Panel</span>
+    <h1>管理後台</h1>
+    <p>審核公職申請、管理成員身分組與部門文件。</p>
+  </div>
+</section>
+
+<main class="page">
+  <div class="wrap">
+    <div id="gate"></div>
+    <div id="panel" hidden>
+      <div class="admtabs" role="tablist">
+        <button type="button" role="tab" data-tab="apps" aria-selected="true">申請審核</button>
+        <button type="button" role="tab" data-tab="members" aria-selected="false" class="admin-only">成員管理</button>
+        <button type="button" role="tab" data-tab="docs" aria-selected="false" class="admin-only">文件管理</button>
+      </div>
+
+      <section id="tab-apps">
+        <div class="filters">
+          <select id="flt-status" aria-label="狀態">
+            <option value="open">未結案（審核中＋待面試）</option>
+            <option value="pending">審核中</option>
+            <option value="interview">待面試</option>
+            <option value="approved">已錄取</option>
+            <option value="rejected">未錄取</option>
+            <option value="all">全部</option>
+          </select>
+          <select id="flt-dept" aria-label="部門">
+            <option value="all">全部部門</option>
+            <option value="lapd">LAPD</option>
+            <option value="lafd">LAFD</option>
+            <option value="ems">EMS</option>
+          </select>
+          <button type="button" class="btn-sec" id="reload">重新整理</button>
+        </div>
+        <div class="applist" id="apps"></div>
+        <div id="detail" hidden></div>
+      </section>
+
+      <section id="tab-members" hidden>
+        <div class="filters">
+          <input id="msearch" type="search" placeholder="搜尋暱稱或 Discord" aria-label="搜尋成員">
+        </div>
+        <p class="note" style="margin-bottom:12px">勾選後按「儲存」即生效。錄取申請時系統會自動給予對應部門身分組；這裡可以手動調整。「招募審核」可以進入後台審核申請；「管理團隊」擁有全部權限。</p>
+        <div class="applist" id="members"></div>
+      </section>
+
+      <section id="tab-docs" hidden>
+        <div class="notice">部門手冊只存放在資料庫中，只有擁有對應身分組的帳號才能讀取。上傳 Claude 產生的 <code>lapd-manual.json</code> 即可更新 LAPD 手冊。</div>
+        <div class="applist" id="docs"></div>
+        <div class="review-box">
+          <label class="fld" for="docfile"><span>上傳手冊檔案（.json）</span><input id="docfile" type="file" accept=".json,application/json"></label>
+          <p class="form-msg" id="docmsg" role="status"></p>
+          <div class="review-actions"><button type="button" class="btn-primary" id="docup">上傳並更新</button></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>© 2026 Palm State RolePlay。版權所有。</span>
+    <span><a href="/">首頁</a> · <a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var el = function (t, a, x) { return PSRP.el(t, a, x); };
+  var me = null, isAdmin = false, people = {}, apps = [];
+  var gate = document.getElementById("gate"), panel = document.getElementById("panel");
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    me = await PSRP.profile();
+    if (!me) { panel.hidden = true; PSRP.mountAuthForm(gate, start, "管理團隊請先登入。"); return; }
+    if (!PSRP.hasRole(me, "reviewer")) {
+      panel.hidden = true; gate.innerHTML = "";
+      var g = el("div", { class: "gate-msg" });
+      g.appendChild(el("h2", null, "沒有權限"));
+      g.appendChild(el("p", { class: "note" }, "這個帳號沒有「招募審核」或「管理團隊」身分組。如需權限，請聯繫管理團隊。"));
+      gate.appendChild(g); return;
+    }
+    isAdmin = PSRP.hasRole(me, "admin");
+    gate.innerHTML = ""; panel.hidden = false;
+    [].slice.call(document.querySelectorAll(".admin-only")).forEach(function (b) { b.hidden = !isAdmin; });
+    loadApps();
+  }
+
+  /* ---------- 分頁 ---------- */
+  document.querySelector(".admtabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-tab]"); if (!b) return;
+    [].slice.call(document.querySelectorAll(".admtabs button")).forEach(function (x) { x.setAttribute("aria-selected", String(x === b)); });
+    ["apps", "members", "docs"].forEach(function (t) { document.getElementById("tab-" + t).hidden = t !== b.dataset.tab; });
+    if (b.dataset.tab === "members") loadMembers();
+    if (b.dataset.tab === "docs") loadDocs();
+  });
+
+  /* ---------- 申請審核 ---------- */
+  async function loadPeople(ids) {
+    var need = ids.filter(function (i) { return i && !people[i]; });
+    if (!need.length) return;
+    var r = await PSRP.client.from("profiles").select("id, display_name, discord, roles").in("id", need);
+    (r.data || []).forEach(function (p) { people[p.id] = p; });
+  }
+  function who(id) { var p = people[id]; return p ? (p.display_name || "（未命名）") + (p.discord ? "  ·  Discord: " + p.discord : "") : "未知帳號"; }
+
+  async function loadApps() {
+    var box = document.getElementById("apps"); box.innerHTML = ""; box.hidden = false;
+    document.getElementById("detail").hidden = true;
+    box.appendChild(el("p", { class: "note" }, "讀取中…"));
+    var st = document.getElementById("flt-status").value, dp = document.getElementById("flt-dept").value;
+    var q = PSRP.client.from("applications").select("*").order("created_at", { ascending: false }).limit(200);
+    if (st === "open") q = q.in("status", ["pending", "interview"]); else if (st !== "all") q = q.eq("status", st);
+    if (dp !== "all") q = q.eq("department", dp);
+    var r = await q;
+    box.innerHTML = "";
+    if (r.error) { box.appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    apps = r.data;
+    await loadPeople(apps.map(function (a) { return a.user_id; }).concat(apps.map(function (a) { return a.reviewer_id; })));
+    if (!apps.length) { box.appendChild(el("p", { class: "note" }, "沒有符合條件的申請。")); return; }
+    apps.forEach(function (a) {
+      var it = el("div", { class: "appitem clickable", tabindex: "0", role: "button" });
+      var row = el("div", { class: "row" });
+      row.appendChild(el("span", { class: "status st-" + a.status }, PSRP.STATUS_NAMES[a.status]));
+      row.appendChild(el("b", null, (a.answers && a.answers.character_name) || "（未填角色名）"));
+      row.appendChild(el("span", { class: "note" }, PSRP.DEPT_NAMES[a.department]));
+      it.appendChild(row);
+      it.appendChild(el("span", { class: "note" }, "#" + a.id + "  ·  " + who(a.user_id) + "  ·  " + new Date(a.created_at).toLocaleString("zh-TW")));
+      var open = function () { showDetail(a); };
+      it.addEventListener("click", open);
+      it.addEventListener("keydown", function (e) { if (e.key === "Enter") open(); });
+      box.appendChild(it);
+    });
+  }
+  document.getElementById("reload").addEventListener("click", loadApps);
+  document.getElementById("flt-status").addEventListener("change", loadApps);
+  document.getElementById("flt-dept").addEventListener("change", loadApps);
+
+  function showDetail(a) {
+    document.getElementById("apps").hidden = true;
+    var d = document.getElementById("detail"); d.innerHTML = ""; d.hidden = false;
+    var back = el("button", { type: "button", class: "btn-sec" }, "← 返回列表");
+    back.addEventListener("click", function () { d.hidden = true; document.getElementById("apps").hidden = false; });
+    d.appendChild(back);
+    d.appendChild(el("h2", { class: "section-title" }, "#" + a.id + "  " + PSRP.DEPT_NAMES[a.department]));
+    var head = el("div", { class: "row", style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center" });
+    head.appendChild(el("span", { class: "status st-" + a.status }, PSRP.STATUS_NAMES[a.status]));
+    head.appendChild(el("span", { class: "note" }, "申請帳號：" + who(a.user_id)));
+    head.appendChild(el("span", { class: "note" }, "送出：" + new Date(a.created_at).toLocaleString("zh-TW")));
+    if (a.reviewer_id) head.appendChild(el("span", { class: "note" }, "最後審核：" + (people[a.reviewer_id] ? people[a.reviewer_id].display_name : "") + "（" + new Date(a.updated_at).toLocaleString("zh-TW") + "）"));
+    d.appendChild(head);
+
+    var ans = a.answers || {}, labels = ans._questions || {};
+    var dl = el("dl", { class: "qa" });
+    Object.keys(ans).forEach(function (k) {
+      if (k === "_questions") return;
+      var v = ans[k];
+      var wrap = el("div");
+      wrap.appendChild(el("dt", null, labels[k] || k));
+      wrap.appendChild(el("dd", null, typeof v === "boolean" ? (v ? "✔ 已勾選" : "✘ 未勾選") : (String(v) || "（空白）")));
+      dl.appendChild(wrap);
+    });
+    d.appendChild(dl);
+
+    var box = el("div", { class: "review-box" });
+    var lab = el("label", { class: "fld", for: "rv-note" });
+    lab.appendChild(el("span", null, "審核備註（申請者會看到）"));
+    var note = el("textarea", { id: "rv-note", placeholder: "例如：請於週六晚上 9 點到 Discord 面試頻道報到。" });
+    note.value = a.reviewer_note || "";
+    lab.appendChild(note); box.appendChild(lab);
+    var msg = el("p", { class: "form-msg", role: "status" });
+    var acts = el("div", { class: "review-actions" });
+    [["interview", "安排面試", ""], ["approved", "錄取並給予身分組", "btn-ok"], ["rejected", "不錄取", "btn-bad"], ["pending", "退回審核中", ""]].forEach(function (s) {
+      var b = el("button", { type: "button", class: "btn-sec " + s[2] }, s[1]);
+      b.addEventListener("click", async function () {
+        if (s[0] === "approved" && !confirm("確定錄取？系統會自動給予此帳號 " + PSRP.ROLE_NAMES[{ lapd: "police", lafd: "fire", ems: "ems" }[a.department]] + " 身分組。")) return;
+        b.disabled = true; msg.className = "form-msg"; msg.textContent = "";
+        var r = await PSRP.client.rpc("review_application", { app_id: a.id, new_status: s[0], note: note.value.trim() });
+        b.disabled = false;
+        if (r.error) { msg.className = "form-msg err"; msg.textContent = PSRP.errText(r.error); return; }
+        msg.className = "form-msg ok"; msg.textContent = "已更新為「" + PSRP.STATUS_NAMES[s[0]] + "」。";
+        delete people[a.user_id];
+        setTimeout(loadApps, 700);
+      });
+      acts.appendChild(b);
+    });
+    box.appendChild(msg); box.appendChild(acts);
+    d.appendChild(box);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* ---------- 成員管理 ---------- */
+  var allMembers = [];
+  async function loadMembers() {
+    var box = document.getElementById("members"); box.innerHTML = "";
+    box.appendChild(el("p", { class: "note" }, "讀取中…"));
+    var r = await PSRP.client.from("profiles").select("id, display_name, discord, roles, created_at").order("created_at", { ascending: false }).limit(1000);
+    if (r.error) { box.innerHTML = ""; box.appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    allMembers = r.data; renderMembers();
+  }
+  function renderMembers() {
+    var box = document.getElementById("members"); box.innerHTML = "";
+    var q = document.getElementById("msearch").value.trim().toLowerCase();
+    var list = allMembers.filter(function (m) { return !q || (m.display_name || "").toLowerCase().indexOf(q) !== -1 || (m.discord || "").toLowerCase().indexOf(q) !== -1; });
+    if (!list.length) { box.appendChild(el("p", { class: "note" }, "沒有符合的成員。")); return; }
+    list.forEach(function (m) {
+      var it = el("div", { class: "appitem member" });
+      var left = el("div");
+      left.appendChild(el("b", null, m.display_name || "（未命名）"));
+      left.appendChild(el("div", { class: "note" }, "Discord: " + (m.discord || "—") + "  ·  註冊於 " + new Date(m.created_at).toLocaleDateString("zh-TW")));
+      var tog = el("div", { class: "roletog" });
+      ["admin", "reviewer", "police", "fire", "ems"].forEach(function (r) {
+        var l = el("label"); var c = el("input", { type: "checkbox", value: r });
+        c.checked = (m.roles || []).indexOf(r) !== -1;
+        if (m.id === me.id && r === "admin") c.disabled = true;
+        l.appendChild(c); l.appendChild(document.createTextNode(PSRP.ROLE_NAMES[r])); tog.appendChild(l);
+      });
+      left.appendChild(tog);
+      var msg = el("span", { class: "form-msg", role: "status" });
+      left.appendChild(msg);
+      var save = el("button", { type: "button", class: "btn-sec" }, "儲存");
+      save.addEventListener("click", async function () {
+        var roles = [].slice.call(tog.querySelectorAll("input:checked")).map(function (c) { return c.value; });
+        save.disabled = true;
+        var r = await PSRP.client.rpc("set_roles", { target: m.id, new_roles: roles });
+        save.disabled = false;
+        if (r.error) { msg.className = "form-msg err"; msg.textContent = PSRP.errText(r.error); return; }
+        m.roles = roles; msg.className = "form-msg ok"; msg.textContent = "已儲存";
+      });
+      it.appendChild(left); it.appendChild(save);
+      box.appendChild(it);
+    });
+  }
+  document.getElementById("msearch").addEventListener("input", renderMembers);
+
+  /* ---------- 文件管理 ---------- */
+  async function loadDocs() {
+    var box = document.getElementById("docs"); box.innerHTML = "";
+    var r = await PSRP.client.from("documents").select("slug, title, required_role, updated_at").order("slug");
+    if (r.error) { box.appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    if (!r.data.length) { box.appendChild(el("p", { class: "note" }, "資料庫裡還沒有任何文件。")); return; }
+    r.data.forEach(function (d) {
+      var it = el("div", { class: "appitem" });
+      it.appendChild(el("b", null, d.title));
+      it.appendChild(el("span", { class: "note" }, "代號 " + d.slug + "  ·  需要身分組：" + (PSRP.ROLE_NAMES[d.required_role] || d.required_role) + "  ·  更新於 " + new Date(d.updated_at).toLocaleString("zh-TW")));
+      box.appendChild(it);
+    });
+  }
+  document.getElementById("docup").addEventListener("click", async function () {
+    var f = document.getElementById("docfile").files[0], msg = document.getElementById("docmsg");
+    msg.className = "form-msg"; msg.textContent = "";
+    if (!f) { msg.className = "form-msg err"; msg.textContent = "請先選擇檔案。"; return; }
+    var doc;
+    try { doc = JSON.parse(await f.text()); } catch (e) { msg.className = "form-msg err"; msg.textContent = "檔案不是有效的 JSON。"; return; }
+    if (!doc.slug || !doc.title || !doc.required_role || !doc.body) { msg.className = "form-msg err"; msg.textContent = "檔案缺少 slug、title、required_role 或 body 欄位。"; return; }
+    var r = await PSRP.client.from("documents").upsert({ slug: doc.slug, title: doc.title, required_role: doc.required_role, body: doc.body, nav: doc.nav || "", updated_at: new Date().toISOString() });
+    if (r.error) { msg.className = "form-msg err"; msg.textContent = PSRP.errText(r.error); return; }
+    msg.className = "form-msg ok"; msg.textContent = "「" + doc.title + "」已更新。";
+    loadDocs();
+  });
+
+  if (PSRP.client) PSRP.client.auth.onAuthStateChange(function (ev) { if (ev === "SIGNED_IN" && !me) start(); });
+  start();
+})();
+</script>
+</body>
+</html>
