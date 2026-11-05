@@ -19,13 +19,13 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
 .chat { flex: 1; min-height: 0; display: grid; grid-template-columns: 240px minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
 .side { background: var(--night-2); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
 .side h2 { margin: 0; padding: 14px 16px 8px; font-size: 12px; letter-spacing: .14em; color: var(--muted); }
-.chlist { flex: 1; overflow: auto; padding: 0 8px 8px; }
+.chlist { flex: 1 1 auto; min-height: 60px; overflow: auto; padding: 0 8px 8px; }
 .chb { display: flex; width: 100%; align-items: center; gap: 8px; text-align: left; background: none; border: 0; color: var(--muted); font: inherit; font-size: 14.5px; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
 .chb:hover { background: var(--panel-2); color: var(--ink); }
 .chb[aria-current="true"] { background: var(--panel-2); color: var(--ink); box-shadow: inset 3px 0 0 var(--gold); }
 .chb .hash { color: var(--muted); opacity: .7; }
 .chb .dot { margin-left: auto; min-width: 18px; height: 18px; border-radius: 9px; background: var(--sun); color: #1b1405; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
-.online { border-top: 1px solid var(--line); padding: 10px 16px 12px; font-size: 13px; color: var(--muted); max-height: 40%; overflow: auto; }
+.online { border-top: 1px solid var(--line); padding: 10px 16px 12px; font-size: 13px; color: var(--muted); max-height: 22%; overflow: auto; flex: none; }
 .online b { color: var(--ink); }
 .online ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 3px; }
 .online li::before { content: "● "; color: var(--ok); font-size: 10px; }
@@ -66,7 +66,57 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
 .compose .hint { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 .compose .err { color: var(--bad); }
 .empty { margin: auto; text-align: center; color: var(--muted); }
+.who .sx { font-size: 11.5px; color: #e8b85a; opacity: .85; }
+.m.cont .who { display: none; }
+.orig { background: none; border: 1px dashed #e0584a; color: #ff9a9a; border-radius: 5px; font: inherit; font-size: 12px; padding: 1px 8px; cursor: pointer; margin-top: 3px; }
+.origtx { font-size: 13.5px; color: #ffb4a8; border-left: 3px solid #e0584a; padding: 2px 8px; margin-top: 3px; white-space: pre-wrap; }
 .mgr { margin: 0 8px 8px; }
+.vsec { border-top: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; max-height: 46%; }
+.vsec h2 { display: flex; align-items: center; justify-content: space-between; }
+.vsec h2 button { background: none; border: 1px solid var(--line); color: var(--ink); border-radius: 6px; width: 26px; height: 24px; font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+.vsec h2 button:hover { border-color: var(--gold); color: var(--gold); }
+.vlist { overflow: auto; padding: 0 8px 8px; }
+.vnone { margin: 2px 10px 6px; font-size: 12.5px; color: var(--muted); }
+.vroom { border-radius: 8px; margin-bottom: 2px; }
+.vroom.on { background: rgba(60,207,142,.07); box-shadow: inset 3px 0 0 var(--ok); }
+.vhead { display: flex; align-items: center; }
+.vhead .chb { flex: 1; min-width: 0; }
+.vname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vcnt { margin-left: auto; font-size: 11.5px; color: var(--muted); }
+.vgear { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 5px; }
+.vgear:hover { color: var(--gold); background: var(--panel-2); }
+.vtag { font-size: 10.5px; color: var(--gold); margin: -4px 0 2px 36px; }
+.vmem { list-style: none; margin: 0 0 4px; padding: 0 0 0 26px; display: grid; gap: 1px; }
+.vmem li { display: flex; align-items: center; gap: 7px; font-size: 13.5px; color: var(--muted); padding: 3px 6px; border-radius: 5px; position: relative; }
+.vmem li.tap { cursor: pointer; } .vmem li.tap:hover { background: var(--panel-2); color: var(--ink); }
+.vmem li.self .vmn { color: var(--ink); }
+.vav { width: 22px; height: 22px; border-radius: 50%; background: var(--panel-2); color: var(--ink); display: grid; place-items: center; font-size: 11px; font-weight: 700; flex: none; box-shadow: 0 0 0 2px transparent; transition: box-shadow .12s; }
+.vmem li.spk .vav { box-shadow: 0 0 0 2px var(--ok); }
+.vmn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vmic, .vown { font-size: 11px; }
+.vpop { position: absolute; z-index: 30; left: 20px; top: 100%; background: var(--night); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 8px; width: 210px; box-shadow: 0 10px 30px rgba(0,0,0,.45); color: var(--ink); cursor: default; }
+.vpop label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; }
+.vpop input[type=range] { flex: 1; min-width: 0; accent-color: var(--gold); }
+.vkick { background: none; border: 1px solid #e0584a; color: #ff8a7a; border-radius: 6px; font: inherit; font-size: 12.5px; padding: 3px 10px; cursor: pointer; }
+.vbar { border-top: 1px solid var(--line); background: #0b1324; padding: 8px 10px; display: grid; gap: 6px; }
+.vbar .vst { font-size: 12px; color: var(--ok); font-weight: 700; }
+.vbar .vrn { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vbar .vbt { display: flex; gap: 6px; }
+.vbar .vbt button { flex: 1; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); border-radius: 6px; padding: 5px 0; font: inherit; font-size: 15px; cursor: pointer; }
+.vbar .vbt button[aria-pressed="true"] { background: #4a1c18; border-color: #e0584a; }
+.vbar .vbt .vlv { background: #5a1d1a; border-color: #e0584a; font-size: 13px; }
+.vind { background: rgba(60,207,142,.12); border: 1px solid rgba(60,207,142,.5); color: #7fe0b0; border-radius: 999px; font: inherit; font-size: 12.5px; padding: 3px 10px; cursor: pointer; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vbox { max-width: 480px !important; }
+.vf { display: grid; gap: 5px; font-size: 13.5px; color: var(--muted); }
+.vf input, .vf select { font: inherit; font-size: 15px; color: var(--ink); background: var(--night); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.vchk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; cursor: pointer; }
+.vchk input { margin-top: 3px; accent-color: var(--gold); }
+.vsub { margin: 8px 0 0; font-size: 14px; }
+.vmrow { display: flex; align-items: center; justify-content: space-between; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
+.vdanger { color: #ff8a7a !important; border-color: #e0584a !important; }
+.vtoast { position: fixed; z-index: 200; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--night-2); border: 1px solid var(--line); color: var(--ink); border-radius: 10px; padding: 10px 16px; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: calc(100vw - 32px); }
+.vtoast.bad { border-color: #e0584a; }
+
 .dlg { position: fixed; inset: 0; z-index: 100; background: rgba(5,8,20,.75); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .dlg .box { background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 860px; max-height: 88vh; display: flex; flex-direction: column; }
 .dlg header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
@@ -117,12 +167,25 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
         <h2>頻道</h2>
         <div class="chlist" id="chlist"></div>
         <button type="button" class="btn-sec mgr" id="mgr" hidden>⚙ 管理頻道</button>
+        <div class="vsec">
+          <h2>語音頻道 <button type="button" id="vadd" title="建立語音頻道" aria-label="建立語音頻道">＋</button></h2>
+          <div class="vlist" id="vlist"></div>
+        </div>
+        <div class="vbar" id="vbar" hidden>
+          <div><div class="vst" id="vbar-state">語音已連線</div><div class="vrn" id="vbar-name"></div></div>
+          <div class="vbt">
+            <button type="button" id="vbar-mute" aria-pressed="false" title="靜音麥克風">🎙️</button>
+            <button type="button" id="vbar-deaf" aria-pressed="false" title="關閉所有聲音">🎧</button>
+            <button type="button" id="vbar-leave" class="vlv" title="離開語音">離開</button>
+          </div>
+        </div>
         <div class="online" id="online"></div>
       </aside>
       <section class="panel">
         <div class="ph">
           <button type="button" class="mb" id="mb" aria-label="切換頻道">☰ 頻道</button>
           <div><h1 id="ch-title"># 綜合大廳</h1><p id="ch-desc"></p></div>
+          <button type="button" class="vind" id="vind" hidden></button>
           <span class="live" id="live">連線中</span>
         </div>
         <div class="msgs" id="msgs" aria-live="polite"></div>
@@ -141,6 +204,7 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="/assets/config.js"></script>
 <script src="/assets/auth.js"></script>
+<script src="/chat/voice.js"></script>
 <script>
 (function () {
   var el = PSRP.el, db = PSRP.client, me = null, staff = false, myName = "";
@@ -187,7 +251,19 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
     render(true, r.data.length === 80);
     input.focus();
   }
-  function add(m) { msgs[m.id] = m; if (m.id > lastId) lastId = m.id; }
+  function add(m) { msgs[m.id] = m; if (m.id > lastId) lastId = m.id; if (staff && m.user_id && !(m.user_id in uinfo)) needInfo(m.user_id); }
+  /* Staff：查詢發言者的 Email 與目前名稱 */
+  var uinfo = {}, infoQ = [], infoT = null;
+  function needInfo(id) {
+    uinfo[id] = null; infoQ.push(id);
+    clearTimeout(infoT);
+    infoT = setTimeout(async function () {
+      var ids = infoQ.splice(0); if (!ids.length) return;
+      var r = await db.rpc("staff_user_info", { ids: ids });
+      (r.data || []).forEach(function (x) { uinfo[x.id] = x; });
+      render();
+    }, 50);
+  }
 
   /* ---------- 訊息 ---------- */
   function render(scroll, hasOlder) {
@@ -213,8 +289,19 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
       who.appendChild(el("b", { style: "color:" + color(m.author_name) }, m.author_name));
       (m.author_roles || []).filter(function (r) { return r !== "member" && r !== "civ"; }).slice(0, 2).forEach(function (r) { who.appendChild(el("span", { class: "rb " + r }, PSRP.ROLE_NAMES[r] || r)); });
       who.appendChild(el("time", { datetime: m.created_at, title: new Date(m.created_at).toLocaleString("zh-TW") }, hhmm(m.created_at)));
+      var ux = staff && uinfo[m.user_id];
+      if (ux) who.appendChild(el("span", { class: "sx", title: "只有管理團隊看得到" }, "🛡️ " + ux.email + (ux.display_name && ux.display_name !== m.author_name ? "（目前名稱：" + ux.display_name + "）" : "")));
       right.appendChild(who);
       var t = el("div", { class: "txt", title: cont ? hhmm(m.created_at) : "" }); t.innerHTML = fmt(m.body); right.appendChild(t);
+      if (staff && m.deleted) {
+        var ob = el("button", { type: "button", class: "orig" }, "🛡️ 查看原文");
+        ob.addEventListener("click", async function () {
+          var r = await db.from("content_audit").select("old_body, actor_name").eq("kind", "chat").eq("ref_id", m.id).eq("action", "delete").order("id", { ascending: false }).limit(1);
+          var x = (r.data || [])[0];
+          ob.replaceWith(el("div", { class: "origtx" }, x ? "原文：" + x.old_body + "（由 " + (x.actor_name || "系統") + " 刪除）" : "找不到原文紀錄（在紀錄功能上線前就已刪除）。"));
+        });
+        right.appendChild(ob);
+      }
       row.appendChild(right);
       if (!m.deleted && (m.user_id === me.id || staff)) {
         var x = el("button", { type: "button", class: "x", title: "刪除訊息" }, "刪除");
@@ -358,6 +445,7 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
     var want = location.hash.replace("#", "") || saved;
     await open(channels.some(function (c) { return c.slug === want; }) ? want : channels[0].slug);
     connect();
+    if (window.PSRPVoice) window.PSRPVoice.init({ db: db, me: me, staff: staff, el: el, name: myName });
   }
   start();
 })();
