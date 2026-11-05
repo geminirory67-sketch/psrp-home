@@ -1,4 +1,14 @@
 /* LAPD 警察入口 — 深藍＋警徽金。header/footer 自帶樣式，可用在任何頁面（部門手冊不載入 site.css）。 */
+/* 部門主題：預設 LAPD 深藍＋金；LAFD、EMS 用 body.fd / body.emsd 覆寫 */
+.pd-util, .pdh, .pdf, body.pd, body.fd, body.emsd { --acc: #d4af5a; --hdr: #0b1a36; --deep: #050b16; --hdr-line: #2c4675; }
+body.fd, body.fd .pd-util, body.fd .pdh, body.fd .pdf { --acc: #e0b04a; --hdr: #3a0d0b; --deep: #160504; --hdr-line: #6a2620; }
+body.emsd, body.emsd .pd-util, body.emsd .pdh, body.emsd .pdf { --acc: #4fd6b4; --hdr: #06302b; --deep: #031513; --hdr-line: #1d5a51; }
+body.fd { --night: #12080a; --night-2: #1a0c0e; --panel: #241114; --panel-2: #33181b; --line: #4a2428; --ink: #f6eeee; --muted: #c9a9a9; --sun: #e0b04a; --gold: #e0b04a; background: var(--night); }
+body.fd .phead { background: linear-gradient(180deg, #3a0d0b 0%, #12080a 100%); border-bottom-color: #4a2428; }
+body.emsd { --night: #061413; --night-2: #0a1d1b; --panel: #0e2724; --panel-2: #143531; --line: #1f4a44; --ink: #eef7f5; --muted: #a2c4bd; --sun: #4fd6b4; --gold: #4fd6b4; background: var(--night); }
+body.emsd .phead { background: linear-gradient(180deg, #06302b 0%, #061413 100%); border-bottom-color: #1f4a44; }
+body.fd .phead .k, body.emsd .phead .k { color: var(--acc); }
+body.fd .chip-login, body.fd .btn-primary, body.emsd .chip-login, body.emsd .btn-primary { background: var(--acc); border-color: var(--acc); color: #111; }
 body.pd {
   --night: #07101f; --night-2: #0b1730; --panel: #0f1f3b; --panel-2: #16294c; --line: #233a62;
   --ink: #eef2f8; --muted: #9fb0cc; --sun: #d4af5a; --gold: #d4af5a; --lapd: #6d9cff;
@@ -8,18 +18,18 @@ body.pd .phead { background: linear-gradient(180deg, #0f2246 0%, #07101f 100%); 
 body.pd .phead .k { color: #d4af5a; }
 body.pd .chip-login, body.pd .btn-primary { background: #d4af5a; border-color: #d4af5a; color: #0b1324; }
 
-.pd-util { background: #050b16; color: #8ea0bf; font: 600 11.5px/1 "Barlow Condensed", "Noto Sans TC", sans-serif; letter-spacing: .16em; text-transform: uppercase; border-bottom: 1px solid #16294c; }
+.pd-util { background: var(--deep); color: #8ea0bf; font: 600 11.5px/1 "Barlow Condensed", "Noto Sans TC", sans-serif; letter-spacing: .16em; text-transform: uppercase; border-bottom: 1px solid #16294c; }
 .pd-util .in, .pdh .in, .pdf .in { max-width: 1240px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 .pd-util .in { display: flex; justify-content: space-between; gap: 12px; padding-top: 7px; padding-bottom: 7px; }
-.pd-util a { color: #d4af5a; text-decoration: none; letter-spacing: .08em; }
+.pd-util a { color: var(--acc); text-decoration: none; letter-spacing: .08em; }
 .pd-util a:hover { text-decoration: underline; }
 
-.pdh { position: sticky; top: 0; z-index: 40; background: #0b1a36; border-bottom: 3px solid #d4af5a; box-shadow: 0 6px 20px rgba(0,0,0,.35); font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif; }
+.pdh { position: sticky; top: 0; z-index: 40; background: var(--hdr); border-bottom: 3px solid var(--acc); box-shadow: 0 6px 20px rgba(0,0,0,.35); font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif; }
 .pdh .in { display: flex; align-items: center; gap: 18px; min-height: 68px; }
 .pdh .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; flex: 0 0 auto; }
 .pdh .brand img { width: 46px; height: 46px; object-fit: contain; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
 .pdh .brand b { display: block; font: 700 24px/1 "Barlow Condensed", "Arial Narrow", sans-serif; letter-spacing: .12em; }
-.pdh .brand small { display: block; font: 600 10.5px/1.2 "Barlow Condensed", "Arial Narrow", sans-serif; letter-spacing: .2em; color: #d4af5a; margin-top: 3px; }
+.pdh .brand small { display: block; font: 600 10.5px/1.2 "Barlow Condensed", "Arial Narrow", sans-serif; letter-spacing: .2em; color: var(--acc); margin-top: 3px; }
 .pdh nav { display: flex; gap: 2px; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .pdh nav::-webkit-scrollbar { display: none; }
 .pdh nav a { white-space: nowrap; text-decoration: none; color: #c3cee2; font-size: 14.5px; padding: 8px 12px; border-radius: 4px; position: relative; }
@@ -27,17 +37,17 @@ body.pd .chip-login, body.pd .btn-primary { background: #d4af5a; border-color: #
 .pdh nav a[aria-current="page"] { color: #fff; }
 .pdh nav a[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -14px; height: 3px; background: #fff; }
 .pdh .account { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; flex: 0 0 auto; }
-.pdh .chip-login, .pdh .chip-link { text-decoration: none; padding: 6px 12px; border-radius: 4px; border: 1px solid #2c4675; color: #eef2f8; font-size: 13.5px; }
-.pdh .chip-login { background: #d4af5a; color: #0b1324; border-color: #d4af5a; font-weight: 700; }
+.pdh .chip-login, .pdh .chip-link { text-decoration: none; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--hdr-line); color: #eef2f8; font-size: 13.5px; }
+.pdh .chip-login { background: var(--acc); color: #0b1324; border-color: var(--acc); font-weight: 700; }
 .pdh .chip-name { color: #eef2f8; font-weight: 500; }
 .pdh .chip-role { padding: 2px 8px; border-radius: 4px; background: #16294c; color: #9fb0cc; font-size: 12px; }
-.pdh .chip-out { background: none; border: 1px solid #2c4675; color: #9fb0cc; border-radius: 4px; padding: 5px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.pdh .chip-out { background: none; border: 1px solid var(--hdr-line); color: #9fb0cc; border-radius: 4px; padding: 5px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 
-.pdf { background: #050b16; color: #8ea0bf; border-top: 3px solid #d4af5a; margin-top: 56px; font: 14px/1.7 "Noto Sans TC", system-ui, sans-serif; }
+.pdf { background: var(--deep); color: #8ea0bf; border-top: 3px solid var(--acc); margin-top: 56px; font: 14px/1.7 "Noto Sans TC", system-ui, sans-serif; }
 .pdf .in { display: grid; grid-template-columns: auto 1fr auto; gap: 22px; align-items: center; padding-top: 26px; padding-bottom: 30px; }
 .pdf img { width: 60px; height: 60px; object-fit: contain; opacity: .9; }
 .pdf b { display: block; color: #eef2f8; font: 700 18px/1.2 "Barlow Condensed", sans-serif; letter-spacing: .14em; }
-.pdf .motto { color: #d4af5a; font: 600 13px/1.4 "Barlow Condensed", sans-serif; letter-spacing: .22em; }
+.pdf .motto { color: var(--acc); font: 600 13px/1.4 "Barlow Condensed", sans-serif; letter-spacing: .22em; }
 .pdf small { display: block; font-size: 12px; margin-top: 4px; }
 .pdf nav { display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
 .pdf a { color: #c3cee2; text-decoration: none; }
