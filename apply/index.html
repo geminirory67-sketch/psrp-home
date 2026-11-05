@@ -23,7 +23,7 @@
       <a href="/apply/" aria-current="page">公職招募</a>
       <a href="/support/">工單</a>
       <a href="https://law.psrp2.com/">加州法典</a>
-      <a href="/lapd/">LAPD 手冊</a>
+      <a href="/pd/">LAPD 警察局</a>
     </nav>
     <div class="account" id="account"></div>
   </div>
@@ -155,6 +155,9 @@
     document.getElementById("f-dc").value = me.discord || "";
     loadMine();
     renderDiscord();
+    var pre = new URLSearchParams(location.search).get("dept");
+    var pb = pre && document.querySelector('.deptpick[data-dept="' + pre.replace(/[^a-z]/g, "") + '"]');
+    if (pb) pb.click();
   }
 
   function renderDiscord() {
