@@ -166,3 +166,10 @@ footer.foot a { color: var(--ink); text-decoration: none; }
 legend { font-size: 15px; color: var(--gold-soft, #f5d58a); }
 .account { gap: 6px; }
 .account .chip-name { max-width: 10em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 頁首帳號區：只顯示名稱、後台、登出，身分組不在頁首顯示 */
+.top .chip-role { display: none; }
+.top .wrap { flex-wrap: nowrap; }
+.top .navl { flex: 1 1 auto; min-width: 0; justify-content: flex-end; }
+.top .account { flex: 0 0 auto; flex-wrap: nowrap; white-space: nowrap; }
+@media (max-width: 900px) { .top .wrap { flex-wrap: wrap; } }
