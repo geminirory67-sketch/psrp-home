@@ -326,8 +326,17 @@ body { overflow-x: hidden; }
       if (docs.length) { var a = el("a", { class: "btn-primary", href: "?doc=" + docs[0].slug, style: "text-decoration:none;display:inline-block;margin-top:10px" }, "前往編輯 " + DOCS[docs[0].slug].title); g.appendChild(a); }
       gate.appendChild(g); return;
     }
+    if (PSRP.hasRole(me, "admin")) {
+      var og = el("optgroup", { label: "申請表（題目編輯器）" });
+      [["form-whitelist", "白名單申請表"], ["form-lapd", "LAPD 申請表"], ["form-lafd", "LAFD 申請表"], ["form-ems", "EMS 申請表"]].forEach(function (f) { og.appendChild(el("option", { value: f[0] }, "申請表：" + f[1])); });
+      pick.appendChild(og);
+    }
     pick.value = slug;
-    pick.addEventListener("change", function () { if (dirty && !confirm("有未儲存的變更，確定要切換文件？")) { pick.value = slug; return; } dirty = false; location.search = "?doc=" + pick.value; });
+    pick.addEventListener("change", function () {
+      if (dirty && !confirm("有未儲存的變更，確定要切換文件？")) { pick.value = slug; return; }
+      dirty = false;
+      if (pick.value.indexOf("form-") === 0) location.href = "/formedit/?doc=" + pick.value; else location.search = "?doc=" + pick.value;
+    });
     document.title = "編輯 " + cfg.title + " · Palm State RolePlay";
     document.getElementById("doc-title").textContent = "編輯：" + cfg.title;
     document.getElementById("b-view").href = cfg.view;
