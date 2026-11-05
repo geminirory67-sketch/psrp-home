@@ -45,6 +45,7 @@
         <button type="button" role="tab" data-tab="members" aria-selected="false" class="admin-only">成員管理</button>
         <button type="button" role="tab" data-tab="docs" aria-selected="false" class="admin-only">文件管理</button>
         <button type="button" role="tab" data-tab="discord" aria-selected="false" class="admin-only">Discord 設定</button>
+        <button type="button" role="tab" data-tab="logs" aria-selected="false" class="admin-only">社群紀錄</button>
       </div>
 
       <section id="tab-apps">
@@ -77,6 +78,39 @@
         </div>
         <p class="note" style="margin-bottom:12px">勾選後按「儲存」即生效。錄取申請時系統會自動給予對應部門身分組；這裡可以手動調整。「招募審核」可以進入後台審核申請；「工單客服」可以查看與回覆所有工單；「部門高層」可以發布該部門公告、線上編輯該部門手冊（並自動擁有該部門成員權限）；「管理團隊」擁有全部權限。</p>
         <div class="applist" id="members"></div>
+      </section>
+
+      <section id="tab-logs" hidden>
+        <style>
+          .lgbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+          .lgbar input, .lgbar select { font: inherit; font-size: 14px; color: var(--ink); background: var(--night); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+          .lgbar input { flex: 1; min-width: 220px; }
+          .lgi { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: grid; gap: 6px; }
+          .lgi.delete, .lgi.purge { border-left-color: #e0584a; } .lgi.edit { border-left-color: #e8b85a; } .lgi.restore { border-left-color: #3ccf8e; }
+          .lgi .h { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13px; color: var(--muted); align-items: center; }
+          .lgi .h b { color: var(--ink); }
+          .lgi .tg { font-size: 11.5px; font-weight: 700; padding: 1px 7px; border-radius: 4px; background: var(--panel-2); color: var(--ink); }
+          .lgi .tx { white-space: pre-wrap; word-break: break-word; font-size: 14px; background: var(--night); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+          .lgi .tx.new { border-style: dashed; color: var(--muted); }
+          .lgi .tx small { display: block; font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+          .who-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; display: grid; gap: 6px; }
+          .who-card .h { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
+          .who-card .rows { display: grid; gap: 4px; max-height: 340px; overflow: auto; font-size: 13.5px; }
+          .who-card .rows div { border-top: 1px solid var(--line); padding-top: 4px; }
+          .who-card .rows span { color: var(--muted); font-size: 12px; margin-right: 8px; }
+        </style>
+        <div class="notice">論壇文章與聊天訊息被<b>編輯、刪除，或隨版面／頻道一起被移除</b>時，原文都會保存在這裡，只有管理團隊看得到。也可以用 Email、名稱或 Discord 查詢某位玩家的所有發言。</div>
+        <h2 class="section-title">查詢玩家</h2>
+        <div class="lgbar"><input id="pq" placeholder="輸入 Email、網站名稱或 Discord 名稱" aria-label="查詢玩家"><button type="button" class="btn-primary" id="pq-go">查詢</button></div>
+        <div id="pq-out"></div>
+        <h2 class="section-title">刪除與編輯紀錄</h2>
+        <div class="lgbar">
+          <select id="lg-kind" aria-label="類型"><option value="">全部類型</option><option value="forum">論壇</option><option value="chat">聊天室</option></select>
+          <select id="lg-act" aria-label="動作"><option value="">全部動作</option><option value="delete">刪除</option><option value="edit">編輯</option><option value="purge">隨版面／頻道移除</option><option value="restore">還原</option></select>
+          <input id="lg-q" type="search" placeholder="搜尋內容、作者、Email、主題或頻道" aria-label="搜尋紀錄">
+        </div>
+        <div id="lg-list"><p class="note">讀取中…</p></div>
+        <p style="text-align:center"><button type="button" class="btn-sec" id="lg-more" hidden>載入更多</button></p>
       </section>
 
       <section id="tab-discord" hidden>
@@ -156,11 +190,86 @@
   document.querySelector(".admtabs").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-tab]"); if (!b) return;
     [].slice.call(document.querySelectorAll(".admtabs button")).forEach(function (x) { x.setAttribute("aria-selected", String(x === b)); });
-    ["apps", "members", "docs", "discord"].forEach(function (t) { document.getElementById("tab-" + t).hidden = t !== b.dataset.tab; });
+    ["apps", "members", "docs", "discord", "logs"].forEach(function (t) { document.getElementById("tab-" + t).hidden = t !== b.dataset.tab; });
     if (b.dataset.tab === "members") loadMembers();
     if (b.dataset.tab === "docs") loadDocs();
     if (b.dataset.tab === "discord") loadDiscord();
+    if (b.dataset.tab === "logs" && !logs.loaded) loadLogs(true);
   });
+
+  /* ---------- 社群紀錄 ---------- */
+  var logs = { rows: [], page: 0, loaded: false };
+  var KIND = { forum_post: "論壇回覆", forum_thread: "論壇主題", chat: "聊天室" };
+  var ACT = { delete: "刪除", edit: "編輯", purge: "隨版面／頻道移除", restore: "還原" };
+  function fmtT(d) { return new Date(d).toLocaleString("zh-TW"); }
+  async function loadLogs(reset) {
+    if (reset) { logs.rows = []; logs.page = 0; }
+    var from = logs.page * 300;
+    var r = await PSRP.client.from("content_audit").select("*").order("created_at", { ascending: false }).range(from, from + 299);
+    if (r.error) { document.getElementById("lg-list").innerHTML = ""; document.getElementById("lg-list").appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    logs.rows = logs.rows.concat(r.data); logs.page++; logs.loaded = true;
+    document.getElementById("lg-more").hidden = r.data.length < 300;
+    renderLogs();
+  }
+  function renderLogs() {
+    var k = document.getElementById("lg-kind").value, a = document.getElementById("lg-act").value, q = document.getElementById("lg-q").value.trim().toLowerCase();
+    var box = document.getElementById("lg-list"); box.innerHTML = "";
+    var list = logs.rows.filter(function (x) {
+      if (k === "forum" && x.kind.indexOf("forum") !== 0) return false;
+      if (k === "chat" && x.kind !== "chat") return false;
+      if (a && x.action !== a) return false;
+      if (q && [x.old_body, x.new_body, x.author_name, x.author_email, x.place, x.actor_name].join("\n").toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    if (!list.length) { box.appendChild(el("p", { class: "note" }, logs.rows.length ? "沒有符合的紀錄。" : "目前還沒有任何刪除或編輯紀錄。")); return; }
+    list.forEach(function (x) {
+      var it = el("div", { class: "lgi " + x.action }), h = el("div", { class: "h" });
+      h.appendChild(el("span", { class: "tg" }, (KIND[x.kind] || x.kind) + "・" + (ACT[x.action] || x.action)));
+      h.appendChild(el("span", null, fmtT(x.created_at)));
+      if (x.place) h.appendChild(el("span", null, (x.kind === "chat" ? "#" : "📄 ") + x.place));
+      var au = el("span"); au.appendChild(document.createTextNode("作者 ")); au.appendChild(el("b", null, x.author_name || "—")); if (x.author_email) au.appendChild(document.createTextNode("（" + x.author_email + "）")); h.appendChild(au);
+      h.appendChild(el("span", null, "操作者：" + (x.actor_name || "系統")));
+      it.appendChild(h);
+      var o = el("div", { class: "tx" }); o.appendChild(el("small", null, x.kind === "forum_thread" ? "原本內容" : "原文")); o.appendChild(document.createTextNode(x.old_body || "（空白）")); it.appendChild(o);
+      if (x.action === "edit" && x.new_body != null) { var n = el("div", { class: "tx new" }); n.appendChild(el("small", null, "改成")); n.appendChild(document.createTextNode(x.new_body)); it.appendChild(n); }
+      box.appendChild(it);
+    });
+  }
+  ["lg-kind", "lg-act"].forEach(function (id) { document.getElementById(id).addEventListener("change", renderLogs); });
+  document.getElementById("lg-q").addEventListener("input", renderLogs);
+  document.getElementById("lg-more").addEventListener("click", function () { loadLogs(false); });
+
+  async function findPlayer() {
+    var q = document.getElementById("pq").value.trim(), out = document.getElementById("pq-out");
+    out.innerHTML = ""; if (q.length < 2) { out.appendChild(el("p", { class: "note" }, "請輸入至少 2 個字。")); return; }
+    var r = await PSRP.client.rpc("staff_find_user", { q: q });
+    if (r.error) { out.appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    if (!r.data.length) { out.appendChild(el("p", { class: "note" }, "找不到符合的玩家。")); return; }
+    for (var i = 0; i < r.data.length; i++) {
+      var u = r.data[i], card = el("div", { class: "who-card" }), h = el("div", { class: "h" });
+      h.appendChild(el("b", null, u.display_name || "（未設定名稱）"));
+      h.appendChild(el("span", null, u.email));
+      if (u.discord) h.appendChild(el("span", { class: "note" }, "Discord：" + u.discord + (u.discord_id ? "（已綁定）" : "")));
+      h.appendChild(el("span", { class: "note" }, "註冊於 " + fmtT(u.created_at)));
+      card.appendChild(h);
+      var res = await Promise.all([
+        PSRP.client.from("forum_posts").select("id, thread_id, body, created_at, deleted, author_name").eq("author_id", u.id).order("id", { ascending: false }).limit(50),
+        PSRP.client.from("chat_messages").select("id, channel, body, created_at, deleted, author_name").eq("user_id", u.id).order("id", { ascending: false }).limit(100),
+        PSRP.client.from("content_audit").select("kind, action, old_body, place, created_at").eq("author_id", u.id).in("action", ["delete", "purge", "edit"]).order("created_at", { ascending: false }).limit(100)
+      ]);
+      var rows = el("div", { class: "rows" }), items = [];
+      (res[0].data || []).forEach(function (p) { items.push([p.created_at, "論壇 #" + p.thread_id + (p.deleted ? "（已刪除）" : "") + " · 當時名稱 " + p.author_name, p.body]); });
+      (res[1].data || []).forEach(function (m) { items.push([m.created_at, "聊天 #" + m.channel + (m.deleted ? "（已刪除）" : "") + " · 當時名稱 " + m.author_name, m.body]); });
+      (res[2].data || []).forEach(function (a) { items.push([a.created_at, "原文紀錄・" + (KIND[a.kind] || a.kind) + (ACT[a.action] || a.action) + (a.place ? " · " + a.place : ""), a.old_body]); });
+      items.sort(function (a, b) { return a[0] < b[0] ? 1 : -1; });
+      if (!items.length) rows.appendChild(el("div", { class: "note" }, "這位玩家還沒有任何論壇或聊天發言。"));
+      items.forEach(function (x) { var d = el("div"); d.appendChild(el("span", null, fmtT(x[0]) + " · " + x[1])); d.appendChild(document.createTextNode(String(x[2] || "").slice(0, 400))); rows.appendChild(d); });
+      card.appendChild(el("b", { style: "font-size:13px;color:var(--muted)" }, "發言紀錄（最新在上）")); card.appendChild(rows);
+      out.appendChild(card);
+    }
+  }
+  document.getElementById("pq-go").addEventListener("click", findPlayer);
+  document.getElementById("pq").addEventListener("keydown", function (e) { if (e.key === "Enter") findPlayer(); });
 
   /* ---------- 申請審核 ---------- */
   async function loadPeople(ids) {
