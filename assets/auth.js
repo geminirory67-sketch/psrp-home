@@ -25,7 +25,7 @@
   var ready = !!(cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase);
   var client = ready ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
 
-  var ROLE_NAMES = { admin: "管理團隊", reviewer: "招募審核", police: "LAPD", fire: "LAFD", ems: "EMS", police_cmd: "LAPD 高層", fire_cmd: "LAFD 高層", ems_cmd: "EMS 高層" };
+  var ROLE_NAMES = { admin: "管理團隊", reviewer: "招募審核", support: "工單客服", police: "LAPD", fire: "LAFD", ems: "EMS", police_cmd: "LAPD 高層", fire_cmd: "LAFD 高層", ems_cmd: "EMS 高層" };
   var DEPT_NAMES = { lapd: "洛杉磯警察局 LAPD", lafd: "洛杉磯消防局 LAFD", ems: "緊急醫療 EMS" };
   var STATUS_NAMES = { pending: "審核中", interview: "待面試", approved: "已錄取", rejected: "未錄取" };
 
@@ -179,6 +179,7 @@
     container.appendChild(name);
     (p.roles || []).forEach(function (r) { container.appendChild(el("span", { class: "chip-role r-" + r }, ROLE_NAMES[r] || r)); });
     if (hasRole(p, "reviewer")) container.appendChild(el("a", { href: "/admin/", class: "chip-link" }, "管理後台"));
+    else if (hasRole(p, "support")) container.appendChild(el("a", { href: "/support/", class: "chip-link" }, "工單管理"));
     var out = el("button", { type: "button", class: "chip-out" }, "登出");
     out.addEventListener("click", signOut);
     container.appendChild(out);
