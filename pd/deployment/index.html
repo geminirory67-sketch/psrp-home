@@ -665,7 +665,6 @@ textarea.e-in { min-height: 110px; resize: vertical; line-height: 1.6; }
     if (cmd) {
       document.getElementById("roster").hidden = false;
       var tools = document.getElementById("cmd-tools");
-      tools.appendChild(el("span", { style: "color:#6b7086;font-size:13px" }, "LAPD 高層"));
       var eb = el("button", { type: "button", class: "pbtn", id: "edit-toggle" }, "✏️ 編輯勤務表");
       eb.addEventListener("click", function () { setEditing(!editing); });
       tools.appendChild(eb);
