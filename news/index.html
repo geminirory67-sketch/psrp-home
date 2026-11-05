@@ -36,6 +36,15 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
 .empty-news { text-align: center; padding: 40px 10px; color: var(--muted); }
 
 /* 公告正式版面 */
+.itag { background: #3a1d1d; color: #ffb4a8; border: 1px solid #7a3a32; border-radius: 4px; padding: 0 7px; font-size: 12px; font-weight: 700; }
+.ann .stamp { margin: 14px 34px 0; padding: 8px 14px; border: 2px solid #b3261e; color: #b3261e; font-weight: 700; letter-spacing: .08em; font-size: 13.5px; border-radius: 4px; background: #fff3f1; }
+.visrow { display: grid; gap: 8px; margin-top: 12px; }
+.visrow > span { font-size: 14px; color: var(--muted); }
+.visopt { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.visopt label { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; background: var(--night); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; cursor: pointer; }
+.visopt label:has(input:checked) { border-color: var(--gold); background: var(--panel-2); }
+.visopt input { margin-top: 5px; accent-color: var(--gold); }
+.visopt b { font-size: 15px; } .visopt small { grid-column: 2; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .ann { background: #f7f5ef; color: #1d2030; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.35); overflow: hidden; max-width: 860px; margin: 0 auto; }
 .ann .band { background: var(--c); height: 8px; }
 .ann .nh { display: flex; gap: 16px; align-items: center; padding: 26px 34px 16px; border-bottom: 2px solid #1d2030; }
@@ -115,7 +124,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       <a href="/apply/">公職招募</a>
       <a href="/support/">工單</a>
       <a href="https://law.psrp2.com/">加州法典</a>
-      <a href="/lapd/">LAPD 手冊</a>
+      <a href="/pd/">LAPD 警察局</a>
     </nav>
     <div class="account" id="account"></div>
   </div>
@@ -169,6 +178,13 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
           <label class="fld" for="c-tt"><span>標題</span><input id="c-tt" maxlength="120" required placeholder="例如：LAPD 第三期學院訓練招募公告"></label>
           <label class="fld" for="c-sum"><span>重點摘要（一兩句話，會顯示在列表與公告最上方）</span><textarea id="c-sum" style="min-height:70px" placeholder="例如：即日起至 11/20 開放報名，名額 12 名，錄取者將於 11/25 開始受訓。"></textarea></label>
           <label class="check"><input type="checkbox" id="c-pin"> <span>置頂這則公告</span></label>
+          <div class="visrow" id="c-vis-row">
+            <span>公開範圍</span>
+            <div class="visopt">
+              <label><input type="radio" name="c-vis" value="public" checked><b>🌐 對外公開</b><small>所有人都看得到，包含未登入的市民。會發到部門的公開 Discord 頻道。</small></label>
+              <label><input type="radio" name="c-vis" value="internal"><b>🔒 僅限部門內部</b><small>只有擁有該部門身分組的成員看得到，附件也不會公開。只會發到部門的「內部」Discord 頻道。</small></label>
+            </div>
+          </div>
         </fieldset>
         <fieldset>
           <legend>公告內文</legend>
@@ -224,6 +240,10 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   var esc = PSRPMd.esc, el = PSRP.el;
   var all = [], me = null, shown = PAGE, filt = { dept: "", cat: "", q: "" }, editing = null, files = [];
   var bucket = PSRP.client ? PSRP.client.storage.from("announcements") : null;
+  var ibucket = PSRP.client ? PSRP.client.storage.from("ann-internal") : null;
+  var PD = window.PD_DEPT || "";
+  function bucketFor(a) { return a && a.visibility === "internal" ? ibucket : bucket; }
+  function isInt(a) { return a.visibility === "internal"; }
 
   function fileUrl(path) { return bucket.getPublicUrl(path).data.publicUrl; }
   function fmtDate(d) { var x = new Date(d); return x.getFullYear() + "/" + String(x.getMonth() + 1).padStart(2, "0") + "/" + String(x.getDate()).padStart(2, "0"); }
@@ -233,14 +253,19 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     if (d === "all") return PSRP.hasRole(me, "admin");
     return PSRP.hasRole(me, { lapd: "police_cmd", lafd: "fire_cmd", ems: "ems_cmd" }[d]);
   }
-  function myDepts() { return Object.keys(DEPTS).filter(canManage); }
+  function myDepts() { return Object.keys(DEPTS).filter(function (d) { return (!PD || d === PD) && canManage(d); }); }
 
   /* ---------- 讀取 ---------- */
   async function load() {
     var r = await PSRP.client.from("announcements").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(1000);
     if (r.error) { document.getElementById("count").textContent = "讀取失敗：" + PSRP.errText(r.error); return; }
-    all = r.data;
-    all.forEach(function (a) { a._hay = [a.title, a.summary, a.body, a.ref_no, a.category, DEPTS[a.department].name, DEPTS[a.department].short, a.signer].join("\n").toLowerCase(); });
+    all = PD ? r.data.filter(function (a) { return a.department === PD; }) : r.data;
+    all.forEach(function (a) { a._hay = [a.title, a.summary, a.body, a.ref_no, a.category, DEPTS[a.department].name, DEPTS[a.department].short, a.signer, isInt(a) ? "內部 internal" : "公開"].join("\n").toLowerCase(); });
+    var priv = []; all.forEach(function (a) { if (isInt(a)) (a.attachments || []).forEach(function (f) { if (f.path) priv.push(f); }); });
+    if (priv.length) {
+      var sg = await ibucket.createSignedUrls(priv.map(function (f) { return f.path; }), 3600);
+      (sg.data || []).forEach(function (x, i) { if (x.signedUrl) priv[i].url = x.signedUrl; });
+    }
     route();
   }
 
@@ -273,7 +298,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       card.appendChild(el("span", { class: "bar" }));
       var inn = el("span", { class: "in" });
       var top = el("span", { class: "ntop" });
-      top.innerHTML = (a.pinned ? '<span class="pin">📌 置頂</span>' : "") + (d.icon ? '<img class="dicon' + (d.sq ? ' sq' : '') + '" src="' + d.icon + '" alt="">' : '') + '<span class="dtag">' + d.short + '</span><span class="ctag">' + esc(a.category) + "</span><span>" + esc(a.ref_no || "") + "</span><span>" + fmtDate(a.created_at) + "</span>" + ((a.attachments || []).length ? '<span class="att">📎 ' + a.attachments.length + "</span>" : "");
+      top.innerHTML = (a.pinned ? '<span class="pin">📌 置頂</span>' : "") + (d.icon ? '<img class="dicon' + (d.sq ? ' sq' : '') + '" src="' + d.icon + '" alt="">' : '') + '<span class="dtag">' + d.short + '</span>' + (isInt(a) ? '<span class="itag">🔒 內部</span>' : '') + '<span class="ctag">' + esc(a.category) + "</span><span>" + esc(a.ref_no || "") + "</span><span>" + fmtDate(a.created_at) + "</span>" + ((a.attachments || []).length ? '<span class="att">📎 ' + a.attachments.length + "</span>" : "");
       inn.appendChild(top);
       var h = el("h3"); h.innerHTML = hl(a.title, terms); inn.appendChild(h);
       var snippet = a.summary || a.body.replace(/[#>*_`|\-]/g, " ").replace(/\s+/g, " ").slice(0, 160);
@@ -302,6 +327,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       '<div class="facts"><div><b>字號</b>' + esc(a.ref_no || "（發布後產生）") + "</div><div><b>發布日期</b>" + fmtDate(a.created_at || new Date()) + "</div>" +
       (a.effective_date ? "<div><b>生效日期</b>" + a.effective_date.replace(/-/g, "/") + "</div>" : "") +
       "<div><b>類別</b>" + esc(a.category) + "</div></div>" +
+      (isInt(a) ? '<div class="stamp">🔒 INTERNAL · 僅限 ' + esc(d.short) + ' 內部成員閱讀，請勿截圖或外流</div>' : "") +
       '<div class="nb"><h1>' + esc(a.title) + "</h1>" +
       (a.summary ? '<div class="sum"><b>重點摘要</b>' + esc(a.summary).replace(/\n/g, "<br>") + "</div>" : "") +
       '<div class="txt">' + PSRPMd.renderNotice(a.body) + "</div>";
@@ -316,7 +342,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       h += "</div>";
     }
     h += '<div class="sign">' + esc(a.signer || d.signer) + "<small>謹此公告</small></div></div>" +
-      '<div class="nf"><span>Palm State RolePlay · 角色扮演內容</span><span>psrp2.com/news/#n' + (a.id || "") + "</span></div></article>";
+      '<div class="nf"><span>Palm State RolePlay · 角色扮演內容</span><span>psrp2.com/' + (PD ? "pd/" : "") + 'news/#n' + (a.id || "") + "</span></div></article>";
     return h;
   }
   function showDetail(id) {
@@ -338,7 +364,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
           var r = await PSRP.client.from("announcements").delete().eq("id", a.id);
           if (r.error) { alert(PSRP.errText(r.error)); return; }
           var paths = (a.attachments || []).map(function (f) { return f.path; }).filter(Boolean);
-          if (paths.length) await bucket.remove(paths);
+          if (paths.length) await bucketFor(a).remove(paths);
           location.hash = ""; load();
         });
         right.appendChild(ed); right.appendChild(del);
@@ -369,7 +395,13 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   };
   CATS.forEach(function (c) { f.cat.appendChild(el("option", { value: c }, c)); });
   var lastAutoSigner = "";
+  function getVis() { var x = document.querySelector('input[name="c-vis"]:checked'); return f.dept.value === "all" ? "public" : (x ? x.value : "public"); }
+  function setVis(v, lock) {
+    [].forEach.call(document.querySelectorAll('input[name="c-vis"]'), function (x) { x.checked = x.value === v; x.disabled = lock; });
+    document.getElementById("c-vis-row").hidden = f.dept.value === "all";
+  }
   f.dept.addEventListener("change", function () {
+    document.getElementById("c-vis-row").hidden = f.dept.value === "all";
     if (!f.signer.value || f.signer.value === lastAutoSigner) { f.signer.value = lastAutoSigner = DEPTS[f.dept.value].signer; }
   });
   function openCompose(a) {
@@ -382,6 +414,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     f.eff.value = a && a.effective_date ? a.effective_date : "";
     f.title.value = a ? a.title : ""; f.sum.value = a ? a.summary : ""; f.body.value = a ? a.body : "";
     f.pin.checked = a ? a.pinned : false;
+    setVis(a ? (a.visibility || "public") : "public", !!a);
     f.signer.value = lastAutoSigner = a ? a.signer : DEPTS[f.dept.value].signer;
     f.msg.textContent = ""; f.msg.className = "form-msg";
     document.getElementById("c-title").textContent = a ? "編輯公告 " + (a.ref_no || "") : "發布公告";
@@ -435,8 +468,8 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     return {
       id: editing && editing.id, ref_no: editing && editing.ref_no, created_at: editing ? editing.created_at : new Date().toISOString(),
       department: f.dept.value, category: f.cat.value, effective_date: f.eff.value || null, signer: f.signer.value.trim(),
-      title: f.title.value.trim(), summary: f.sum.value.trim(), body: f.body.value, pinned: f.pin.checked,
-      attachments: files.map(function (x) { return { path: x.path, url: x.existing ? undefined : x.url, name: x.name, type: x.type, size: x.size }; })
+      title: f.title.value.trim(), summary: f.sum.value.trim(), body: f.body.value, pinned: f.pin.checked, visibility: editing ? (editing.visibility || "public") : getVis(),
+      attachments: files.map(function (x) { return { path: x.path, url: x.url, name: x.name, type: x.type, size: x.size }; })
     };
   }
   document.getElementById("c-preview").addEventListener("click", function () {
@@ -459,7 +492,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
         f.msg.textContent = "上傳附件 " + (i + 1) + "/" + files.length + "…";
         var ext = (x.name.match(/\.[a-z0-9]+$/i) || [""])[0].toLowerCase();
         var path = d.department + "/" + new Date().toISOString().slice(0, 10) + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ext;
-        var up = await bucket.upload(path, x.file, { contentType: x.type, upsert: false });
+        var up = await bucketFor(d).upload(path, x.file, { contentType: x.type, upsert: false });
         if (up.error) throw up.error;
         x.existing = true; x.path = path; delete x.file;
         uploaded.push({ path: path, name: x.name, type: x.type, size: x.size });
@@ -470,9 +503,9 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
         row.updated_at = new Date().toISOString();
         r = await PSRP.client.from("announcements").update(row).eq("id", editing.id).select().single();
         var removed = (editing.attachments || []).filter(function (o) { return !uploaded.some(function (u) { return u.path === o.path; }); }).map(function (o) { return o.path; });
-        if (!r.error && removed.length) await bucket.remove(removed);
+        if (!r.error && removed.length) await bucketFor(editing).remove(removed);
       } else {
-        row.department = d.department;
+        row.department = d.department; row.visibility = d.visibility;
         r = await PSRP.client.from("announcements").insert(row).select().single();
       }
       if (r.error) throw r.error;
@@ -488,6 +521,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   /* ---------- 啟動 ---------- */
   async function start() {
     catChips();
+    if (PD) { filt.dept = PD; document.getElementById("f-dept").hidden = true; }
     if (!PSRP.client) { document.getElementById("count").textContent = "公告系統暫時無法使用。"; return; }
     PSRP.mountAccountChip(document.getElementById("account"));
     me = await PSRP.profile();
