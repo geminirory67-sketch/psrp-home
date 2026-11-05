@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>公職招募 · Palm State RolePlay</title>
+<meta name="description" content="Palm State RolePlay 公職招募：洛杉磯警察局、消防局、緊急醫療。">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/rules/">伺服器規則</a>
+      <a href="/apply/" aria-current="page">公職招募</a>
+      <a href="https://law.psrp2.com/">加州法典</a>
+      <a href="/lapd/">LAPD 手冊</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<section class="phead">
+  <div class="wrap">
+    <span class="k">Public Service Recruitment</span>
+    <h1>公職人員招募</h1>
+    <p>洛杉磯警察局、洛杉磯消防局與緊急醫療正在招募。登入帳號後填寫申請表，管理團隊會在 Discord 與你聯繫安排面試。</p>
+    <div class="meta"><span>申請前請先閱讀伺服器規則</span><span>審核結果會顯示在本頁</span></div>
+  </div>
+</section>
+
+<main class="page">
+  <div class="wrap">
+    <div id="gate"></div>
+
+    <div id="portal" hidden>
+      <div id="flash"></div>
+
+      <h2 class="section-title">我的申請</h2>
+      <div class="applist" id="mine"><p class="note">讀取中…</p></div>
+
+      <h2 class="section-title">選擇申請部門</h2>
+      <div class="depts" id="picker">
+        <button type="button" class="deptpick" data-dept="lapd" style="--c: var(--lapd)" aria-pressed="false"><em>LAPD</em><b>洛杉磯警察局</b><span>巡邏、交通執法、刑事偵查。須熟讀加州法典與部門手冊。</span></button>
+        <button type="button" class="deptpick" data-dept="lafd" style="--c: var(--lafd)" aria-pressed="false"><em>LAFD</em><b>洛杉磯消防局</b><span>火災、救援、危險物品處理與車禍現場救助。</span></button>
+        <button type="button" class="deptpick" data-dept="ems" style="--c: var(--ems)" aria-pressed="false"><em>EMS</em><b>緊急醫療</b><span>救護車出勤、現場急救與醫院治療。在衝突中保持中立。</span></button>
+      </div>
+
+      <form class="appform" id="appform" hidden novalidate>
+        <h2 class="section-title" id="formtitle">申請表</h2>
+
+        <fieldset>
+          <legend>基本資料</legend>
+          <div class="grid2">
+            <label class="fld" for="f-char"><span>角色姓名</span><input id="f-char" name="character_name" required placeholder="名與姓，例如 John Carter"></label>
+            <label class="fld" for="f-charage"><span>角色年齡</span><input id="f-charage" name="character_age" type="number" min="18" max="70" required></label>
+            <label class="fld" for="f-dc"><span>Discord 使用者名稱</span><input id="f-dc" name="discord" required></label>
+            <label class="fld" for="f-hours"><span>每週可上線時數</span><select id="f-hours" name="weekly_hours" required><option value="">請選擇</option><option>5 小時以下</option><option>5–10 小時</option><option>10–20 小時</option><option>20 小時以上</option></select></label>
+          </div>
+          <label class="fld" for="f-times"><span>主要上線時段</span><input id="f-times" name="play_times" required placeholder="例如：平日晚上 8 點到 12 點（台灣時間）"></label>
+          <label class="check"><input type="checkbox" name="age_ok" required> <span>我已達到伺服器公告的年齡要求。</span></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>角色扮演經驗</legend>
+          <label class="fld" for="f-exp"><span>過去的 RP 經驗</span><small>曾在哪些伺服器、擔任過什麼角色、時間多長。沒有經驗也可以如實填寫。</small><textarea id="f-exp" name="rp_experience" required></textarea></label>
+          <label class="fld" for="f-why"><span>為什麼想加入這個部門？</span><textarea id="f-why" name="motivation" required></textarea></label>
+          <label class="fld" for="f-back"><span>角色背景故事</span><small>至少 150 字。說明角色的成長經歷，以及他為什麼選擇這份工作。</small><textarea id="f-back" name="backstory" required></textarea></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>規則測驗</legend>
+          <label class="fld" for="f-q1"><span>用自己的話解釋 Metagaming 與 Powergaming，各舉一個例子。</span><textarea id="f-q1" name="q_meta_power" required></textarea></label>
+          <label class="fld" for="f-q2"><span>什麼是新生命規則（NLR）？被 EMS 救活與在醫院重生有什麼不同？</span><textarea id="f-q2" name="q_nlr" required></textarea></label>
+        </fieldset>
+
+        <fieldset id="dept-q">
+          <legend>部門情境題</legend>
+          <div id="dept-q-body"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>同意事項</legend>
+          <label class="check"><input type="checkbox" name="agree_rules" required> <span>我已閱讀並同意遵守<a href="/rules/" target="_blank">伺服器規則</a>。</span></label>
+          <label class="check"><input type="checkbox" name="agree_manual" required> <span>錄取後我會遵守部門手冊與上級指揮，並參加學院訓練。</span></label>
+          <label class="check"><input type="checkbox" name="agree_mic" required> <span>我有清晰的麥克風，可以在 Discord 參加語音面試。</span></label>
+          <label class="check"><input type="checkbox" name="agree_truth" required> <span>以上內容均為本人填寫且屬實；抄襲或代寫將取消資格。</span></label>
+        </fieldset>
+
+        <p class="form-msg" id="formmsg" role="status"></p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn-primary" type="submit" id="submitbtn">送出申請</button>
+          <button class="btn-sec" type="button" id="cancelbtn">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>© 2026 Palm State RolePlay。版權所有。</span>
+    <span><a href="/">首頁</a> · <a href="/rules/">伺服器規則</a> · <a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var DEPT_Q = {
+    lapd: [
+      ["q_dept_1", "交通攔停時，你發現駕駛座旁放著一把手槍，駕駛神情緊張。請描述你接下來的處理步驟。"],
+      ["q_dept_2", "「合理懷疑」與「相當理由」有什麼不同？各可以讓警察做什麼？"],
+      ["q_dept_3", "嫌犯駕車逃逸並開始逆向行駛、闖紅燈。什麼情況下你應該終止追緝？"],
+      ["q_dept_4", "你看到同事對已經被上銬、沒有反抗的嫌犯動手。你會怎麼做？"]
+    ],
+    lafd: [
+      ["q_dept_1", "抵達一棟起火的兩層樓住宅，鄰居說二樓可能還有人。請描述你到場後的處理順序。"],
+      ["q_dept_2", "車禍現場有一輛車漏油、駕駛被卡在車內。你如何確保現場安全並救出駕駛？"],
+      ["q_dept_3", "火場附近有槍擊案仍在進行，警方尚未控制現場。你會怎麼做？"]
+    ],
+    ems: [
+      ["q_dept_1", "槍擊現場有兩名傷者：一名腹部中彈意識模糊，一名手臂中彈清醒並大聲呼救。你先處理誰？為什麼？"],
+      ["q_dept_2", "警方尚未清場，但傷者就在附近。你會進入現場救人嗎？請說明。"],
+      ["q_dept_3", "你救治的傷者是正在被通緝的嫌犯，他請你不要通知警察。你會怎麼處理？"]
+    ]
+  };
+  var gate = document.getElementById("gate"), portal = document.getElementById("portal");
+  var form = document.getElementById("appform"), msg = document.getElementById("formmsg");
+  var current = null, me = null;
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    me = await PSRP.profile();
+    if (!me) {
+      portal.hidden = true;
+      PSRP.mountAuthForm(gate, start, "申請公職前，請先登入或註冊帳號。註冊時請填寫你的 Discord 使用者名稱，方便管理團隊聯繫你。");
+      return;
+    }
+    var next = new URLSearchParams(location.search).get("next");
+    if (next && /^\/[a-z]/.test(next)) { location.replace(next); return; }
+    gate.innerHTML = ""; portal.hidden = false;
+    document.getElementById("f-dc").value = me.discord || "";
+    loadMine();
+  }
+
+  async function loadMine() {
+    var box = document.getElementById("mine");
+    var r = await PSRP.client.from("applications").select("id, department, status, reviewer_note, created_at, updated_at").eq("user_id", me.id).order("created_at", { ascending: false });
+    box.innerHTML = "";
+    if (r.error) { box.appendChild(PSRP.el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    if (!r.data.length) { box.appendChild(PSRP.el("p", { class: "note" }, "你還沒有送出任何申請。")); return; }
+    r.data.forEach(function (a) {
+      var it = PSRP.el("div", { class: "appitem" });
+      var row = PSRP.el("div", { class: "row" });
+      row.appendChild(PSRP.el("b", null, PSRP.DEPT_NAMES[a.department]));
+      row.appendChild(PSRP.el("span", { class: "status st-" + a.status }, PSRP.STATUS_NAMES[a.status]));
+      row.appendChild(PSRP.el("span", { class: "note" }, "送出於 " + new Date(a.created_at).toLocaleString("zh-TW")));
+      it.appendChild(row);
+      if (a.reviewer_note) it.appendChild(PSRP.el("p", { class: "note" }, "審核備註：" + a.reviewer_note));
+      if (a.status === "approved") it.appendChild(PSRP.el("p", { class: "note" }, "恭喜錄取！請留意 Discord 通知，參加學院訓練。"));
+      box.appendChild(it);
+    });
+  }
+
+  document.getElementById("picker").addEventListener("click", function (e) {
+    var b = e.target.closest(".deptpick"); if (!b) return;
+    current = b.getAttribute("data-dept");
+    [].slice.call(document.querySelectorAll(".deptpick")).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    document.getElementById("formtitle").textContent = PSRP.DEPT_NAMES[current] + " 申請表";
+    var body = document.getElementById("dept-q-body"); body.innerHTML = "";
+    DEPT_Q[current].forEach(function (q) {
+      var l = PSRP.el("label", { class: "fld", for: "f-" + q[0] });
+      l.appendChild(PSRP.el("span", null, q[1]));
+      var t = PSRP.el("textarea", { id: "f-" + q[0], name: q[0], required: "" });
+      l.appendChild(t); body.appendChild(l);
+    });
+    form.hidden = false; msg.textContent = ""; msg.className = "form-msg";
+    form.scrollIntoView({ behavior: "smooth" });
+  });
+  document.getElementById("cancelbtn").addEventListener("click", function () {
+    form.hidden = true; form.reset(); current = null;
+    [].slice.call(document.querySelectorAll(".deptpick")).forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+    document.getElementById("f-dc").value = (me && me.discord) || "";
+  });
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    msg.className = "form-msg"; msg.textContent = "";
+    var missing = [].slice.call(form.querySelectorAll("[required]")).filter(function (i) {
+      return i.type === "checkbox" ? !i.checked : !String(i.value).trim();
+    });
+    if (missing.length) { msg.className = "form-msg err"; msg.textContent = "還有 " + missing.length + " 個欄位未填寫或未勾選。"; missing[0].focus(); return; }
+    var back = form.backstory.value.trim();
+    if (back.length < 150) { msg.className = "form-msg err"; msg.textContent = "角色背景故事至少需要 150 字，目前 " + back.length + " 字。"; form.backstory.focus(); return; }
+    var answers = {};
+    [].slice.call(form.elements).forEach(function (i) {
+      if (!i.name) return;
+      answers[i.name] = i.type === "checkbox" ? i.checked : i.value.trim();
+    });
+    answers._questions = {};
+    [].slice.call(form.querySelectorAll(".fld")).forEach(function (l) {
+      var i = l.querySelector("input,select,textarea"); if (i && i.name) answers._questions[i.name] = l.querySelector("span").textContent;
+    });
+    var btn = document.getElementById("submitbtn"); btn.disabled = true;
+    var r = await PSRP.client.from("applications").insert({ department: current, answers: answers });
+    btn.disabled = false;
+    if (r.error) { msg.className = "form-msg err"; msg.textContent = PSRP.errText(r.error); return; }
+    form.hidden = true; form.reset(); current = null;
+    [].slice.call(document.querySelectorAll(".deptpick")).forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+    var f = document.getElementById("flash"); f.innerHTML = "";
+    f.appendChild(PSRP.el("div", { class: "notice ok" }, "申請已送出。管理團隊審核後，結果會顯示在下方「我的申請」，並會透過 Discord 聯繫你。"));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    loadMine();
+  });
+
+  if (PSRP.client) PSRP.client.auth.onAuthStateChange(function (ev) { if (ev === "SIGNED_IN" && !me) start(); });
+  start();
+})();
+</script>
+</body>
+</html>
