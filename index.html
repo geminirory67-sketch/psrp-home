@@ -89,7 +89,10 @@ section.block { padding-block: clamp(64px, 9vw, 104px); }
 .depts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 .dept { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 20px; display: grid; gap: 12px; align-content: start; overflow: hidden; }
 .dept::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--c); }
-.dept-top { display: flex; align-items: center; gap: 14px; padding-right: 84px; }
+.dept-top { display: grid; justify-items: start; gap: 12px; }
+.ico.img { width: 64px; height: 64px; background: none; border-radius: 0; }
+.ico.img img, .ico.img svg { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
+.dept .more + .more { margin-top: 6px; }
 .ico { flex: none; width: 52px; height: 52px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
 .dept h3 { margin: 0; font-family: var(--font-zh-display); font-weight: 900; font-size: 22px; line-height: 1.2; }
 .dept .en { display: block; font-family: var(--font-display); font-weight: 600; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--c); }
@@ -196,7 +199,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       <a href="/apply/">公職招募</a>
       <a href="/support/">工單</a>
       <a class="doc" href="https://law.psrp2.com/">加州法典</a>
-      <a class="doc" href="/lapd/">LAPD 手冊</a>
+      <a class="doc" href="/pd/">LAPD 警察局</a>
       <span class="acct" id="account"></span>
     </nav>
     <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="links">選單</button>
@@ -264,17 +267,17 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <article class="dept" style="--c: var(--lapd)">
           <span class="code">CODE 3</span>
           <div class="dept-top">
-            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 4.5 5v6c0 5 3.2 8.6 7.5 10.5 4.3-1.9 7.5-5.5 7.5-10.5V5L12 2.5Z"/><path d="m12 7.5 1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4L12 7.5Z"/></svg></div>
+            <div class="ico img"><img src="/assets/seal-lapd.png" alt="LAPD 警徽" width="60" height="60"></div>
             <h3>洛杉磯警察局<span class="en">LAPD</span></h3>
           </div>
           <p>巡邏、交通執法、刑事偵查與特勤任務。依加州法條執法，所有行動都要經得起法庭檢驗。</p>
           <ul><li>巡邏</li><li>刑事偵查</li><li>SWAT</li><li>K9</li><li>空中支援</li><li>交通局</li></ul>
-          <a class="more" href="/apply/">申請加入 LAPD →</a>
+          <a class="more" href="/pd/">進入 LAPD 官方入口 →</a>
         </article>
         <article class="dept" style="--c: var(--lafd)">
           <span class="code">ALL HANDS</span>
           <div class="dept-top">
-            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5c1 3.5 5.5 5.5 5.5 11a5.5 5.5 0 0 1-11 0c0-2.5 1.2-4.2 2.5-5.5.3 1.8 1.2 2.8 2.2 3.2-.6-3.2.3-6 .8-8.7Z"/><path d="M12 20.5a2.5 2.5 0 0 1-2.5-2.5c0-1.6 1.4-2.5 2.5-4 1.1 1.5 2.5 2.4 2.5 4a2.5 2.5 0 0 1-2.5 2.5Z"/></svg></div>
+            <div class="ico img"><img src="/assets/seal-lafd.png" alt="LAFD 徽章" width="60" height="60"></div>
             <h3>洛杉磯消防局<span class="en">LAFD</span></h3>
           </div>
           <p>建築火災、山林野火、車禍救援與危險物品處理。從雲梯車到救援直升機，全城的火場都歸你們管。</p>
@@ -283,7 +286,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <article class="dept" style="--c: var(--ems)">
           <span class="code">RESCUE 1</span>
           <div class="dept-top">
-            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l2-4.5 3.5 9 2.5-6 1.5 1.5h5.5"/></svg></div>
+            <div class="ico img"><svg viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="生命之星"><g fill="#fff" stroke="#fff" stroke-width="3.2" stroke-linejoin="round"><rect x="18.5" y="3" width="11" height="42" rx="1.5"/><rect x="18.5" y="3" width="11" height="42" rx="1.5" transform="rotate(60 24 24)"/><rect x="18.5" y="3" width="11" height="42" rx="1.5" transform="rotate(120 24 24)"/></g><g fill="#1f6fd6"><rect x="18.5" y="3" width="11" height="42" rx="1.5"/><rect x="18.5" y="3" width="11" height="42" rx="1.5" transform="rotate(60 24 24)"/><rect x="18.5" y="3" width="11" height="42" rx="1.5" transform="rotate(120 24 24)"/></g><g fill="none" stroke="#fff" stroke-linecap="round"><path d="M24 10v29" stroke-width="2.4"/><path d="M24 12.5c3.2 0 3.6 3.4.8 4.4-3.6 1.2-3.8 4.6-.4 5.3 3.6.8 3.6 4.4.2 5.3-3.2.8-3.2 4 .2 4.6" stroke-width="1.9"/></g><circle cx="24" cy="10.6" r="1.6" fill="#fff"/></svg></div>
             <h3>緊急醫療<span class="en">EMS &amp; Hospital</span></h3>
           </div>
           <p>救護車在第一時間抵達現場，急診室接手搶救。槍擊、車禍、用藥過量，每一通 911 都是與時間賽跑。</p>
@@ -292,7 +295,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <article class="dept" style="--c: var(--civ)">
           <span class="code">CITY HALL</span>
           <div class="dept-top">
-            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"/></svg></div>
+            <div class="ico img"><img src="/assets/psrp-icon-512.png" alt="Palm State" width="60" height="60" style="border-radius:12px"></div>
             <h3>市民與商業<span class="en">Civilians &amp; Business</span></h3>
           </div>
           <p>開餐廳、修車廠、夜店或物流公司，申請執照、僱用員工、繳稅賺錢。城市的經濟由市民撐起來。</p>
@@ -369,7 +372,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
             <span class="go">開啟法典 →</span>
           </span>
         </a>
-        <a class="docc" href="/lapd/">
+        <a class="docc" href="/pd/manual/">
           <span class="spine" style="--b: #2f5fb8" aria-hidden="true"></span>
           <span>
             <h3>LAPD 部門手冊</h3>
@@ -436,7 +439,8 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <li><a href="/support/">工單回報</a></li>
         <li><a href="/whitelist/">白名單申請</a></li>
         <li><a href="/apply/">公職招募</a></li>
-        <li><a href="/lapd/">LAPD 部門手冊（成員限定）</a></li>
+        <li><a href="/pd/">LAPD 警察局入口</a></li>
+        <li><a href="/pd/manual/">LAPD 部門手冊（成員限定）</a></li>
       </ul>
     </div>
     <div>
