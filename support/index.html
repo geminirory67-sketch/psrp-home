@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>工單中心 · Palm State RolePlay</title>
+<meta name="description" content="Palm State RolePlay 工單中心：技術問題、玩家檢舉、處分申訴、帳號問題與建議回饋。">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+.tk-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.tk-bar .l { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13.5px; background: var(--panel); color: var(--muted); border: 0; padding: 7px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--gold); color: #141414; font-weight: 700; }
+.tk-search { background: var(--panel); border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: 14px; padding: 7px 12px; border-radius: 8px; min-width: 0; width: 240px; }
+.tk-sel { background: var(--panel); border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: 14px; padding: 7px 10px; border-radius: 8px; }
+.tk-list { display: grid; gap: 8px; }
+.tk-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; text-decoration: none; color: inherit; }
+.tk-item:hover { border-color: var(--gold); }
+.tk-item .ic { font-size: 22px; width: 40px; height: 40px; display: grid; place-items: center; background: var(--panel-2); border-radius: 10px; }
+.tk-item b { display: block; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-item .m { font-size: 13px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.tst { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.tst-open { background: rgba(255,138,61,.16); color: var(--sun); }
+.tst-replied { background: rgba(60,207,142,.15); color: #3ccf8e; }
+.tst-closed { background: rgba(163,171,200,.14); color: var(--muted); }
+.unread { width: 8px; height: 8px; border-radius: 50%; background: var(--sun); display: inline-block; margin-left: 6px; vertical-align: 2px; }
+
+.cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 760px) { .cats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cat { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; cursor: pointer; display: grid; gap: 4px; align-content: start; }
+.cat:hover, .cat[aria-pressed="true"] { border-color: var(--gold); background: var(--panel-2); }
+.cat .e { font-size: 24px; }
+.cat b { font-size: 16px; }
+.cat span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+.chat-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-start; justify-content: space-between; background: var(--panel); border: 1px solid var(--line); border-radius: 12px 12px 0 0; padding: 14px 18px; }
+.chat-head h2 { margin: 0 0 4px; font-size: 20px; line-height: 1.4; }
+.chat-head .m { font-size: 13px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.chat-head .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.chat { background: #0a0e1f; border-left: 1px solid var(--line); border-right: 1px solid var(--line); padding: 18px; display: flex; flex-direction: column; gap: 14px; min-height: 280px; max-height: 62vh; overflow-y: auto; }
+.msg { max-width: min(78%, 640px); display: grid; gap: 4px; }
+.msg .who { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+.msg .who .badge { background: var(--gold); color: #141414; font-weight: 700; font-size: 11px; padding: 1px 7px; border-radius: 4px; }
+.msg .bub { padding: 10px 14px; border-radius: 14px; line-height: 1.7; word-break: break-word; white-space: pre-wrap; font-size: 15px; }
+.msg.them { align-self: flex-start; } .msg.them .bub { background: var(--panel-2); border-top-left-radius: 4px; }
+.msg.me { align-self: flex-end; } .msg.me .who { justify-content: flex-end; } .msg.me .bub { background: #2a4a8f; border-top-right-radius: 4px; }
+.msg.staff.them .bub { background: #2e3b2a; border: 1px solid rgba(60,207,142,.35); }
+.msg .files { display: flex; flex-wrap: wrap; gap: 6px; }
+.msg .files a { display: block; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: 13px; }
+.msg .files img { display: block; width: 140px; height: 100px; object-fit: cover; }
+.msg .files .pdf { padding: 8px 10px; background: var(--panel-2); }
+.sysline { align-self: center; font-size: 12.5px; color: var(--muted); background: var(--panel); border-radius: 999px; padding: 3px 12px; }
+.composer { background: var(--panel); border: 1px solid var(--line); border-radius: 0 0 12px 12px; padding: 12px; display: grid; gap: 8px; }
+.composer textarea { width: 100%; min-height: 84px; resize: vertical; background: var(--night); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: inherit; font-size: 15px; line-height: 1.6; }
+.composer textarea:focus { outline: none; border-color: var(--gold); }
+.composer .row { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.composer .att { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--muted); }
+.chipf { background: var(--panel-2); border-radius: 6px; padding: 3px 8px; display: inline-flex; gap: 6px; align-items: center; }
+.chipf button { background: none; border: 0; color: var(--muted); cursor: pointer; font: inherit; }
+.closed-note { text-align: center; color: var(--muted); font-size: 14px; padding: 10px; }
+.hint { font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) {
+  .tk-item { grid-template-columns: minmax(0, 1fr) auto; }
+  .tk-item .ic { display: none; }
+  .tk-search { width: 100%; }
+  .msg { max-width: 92%; }
+  .chat { padding: 12px; max-height: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/rules/">伺服器規則</a>
+      <a href="/news/">公告</a>
+      <a href="/apply/">公職招募</a>
+      <a href="/support/" aria-current="page">工單</a>
+      <a href="https://law.psrp2.com/">加州法典</a>
+      <a href="/lapd/">LAPD 手冊</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<section class="phead" id="phead">
+  <div class="wrap">
+    <span class="k">Support Tickets</span>
+    <h1 id="ph-title">工單中心</h1>
+    <p id="ph-desc">遇到技術問題、要檢舉玩家、申訴處分或有任何建議，都可以在這裡開工單，管理團隊會直接在工單裡回覆你。</p>
+  </div>
+</section>
+
+<main class="page">
+  <div class="wrap">
+    <div id="gate"></div>
+
+    <section id="v-list" hidden>
+      <div class="tk-bar">
+        <div class="l">
+          <div class="seg" id="f-status">
+            <button type="button" data-v="active" aria-pressed="true">處理中</button>
+            <button type="button" data-v="open" aria-pressed="false">待處理</button>
+            <button type="button" data-v="replied" aria-pressed="false">已回覆</button>
+            <button type="button" data-v="closed" aria-pressed="false">已結案</button>
+            <button type="button" data-v="all" aria-pressed="false">全部</button>
+          </div>
+          <select class="tk-sel" id="f-cat" aria-label="類別"></select>
+          <input class="tk-search" id="f-q" type="search" placeholder="搜尋主旨、編號或玩家" aria-label="搜尋工單">
+        </div>
+        <button type="button" class="btn-primary" id="b-new">＋ 開新工單</button>
+      </div>
+      <div class="tk-list" id="list"><p class="note">讀取中…</p></div>
+    </section>
+
+    <section id="v-new" hidden>
+      <p><a href="#" class="btn-sec" style="text-decoration:none">← 返回工單列表</a></p>
+      <h2 class="section-title">選擇問題類別</h2>
+      <div class="cats" id="cats"></div>
+      <form class="appform" id="nform" style="margin-top:20px" hidden novalidate>
+        <fieldset>
+          <legend id="n-legend">工單內容</legend>
+          <label class="fld" for="n-subject"><span>主旨</span><input id="n-subject" maxlength="120" required></label>
+          <label class="fld" for="n-body"><span>詳細說明</span><small id="n-tip"></small><textarea id="n-body" style="min-height:200px" required></textarea></label>
+          <div>
+            <button type="button" class="btn-sec" id="n-attach">📎 附加圖片或 PDF</button>
+            <input type="file" id="n-files" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf" multiple hidden>
+            <span class="hint">每個檔案 10 MB 以內；影片請上傳到 YouTube／Medal 等平台後貼連結。</span>
+            <div class="att" id="n-filelist" style="margin-top:8px"></div>
+          </div>
+        </fieldset>
+        <p class="form-msg" id="n-msg" role="status"></p>
+        <button type="submit" class="btn-primary" id="n-submit">送出工單</button>
+      </form>
+    </section>
+
+    <section id="v-ticket" hidden></section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>© 2026 Palm State RolePlay。版權所有。</span>
+    <span><a href="/">首頁</a> · <a href="/rules/">伺服器規則</a> · <a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var CATS = {
+    tech:    ["🛠️", "技術問題", "遊戲閃退、卡住、無法連線、錯誤訊息。", "請寫下：發生時間、做了什麼操作、畫面上的錯誤訊息（可附截圖）、你的遊戲角色名。"],
+    report:  ["🚨", "玩家檢舉", "檢舉違反伺服器規則的玩家。", "請寫下：被檢舉人的角色名或 ID、發生時間與地點、事件經過、違反的規則條號，並附上影片或截圖連結（沒有證據的檢舉可能無法受理）。"],
+    appeal:  ["⚖️", "處分申訴", "對警告、停權或其他處分提出申訴。", "請寫下：處分日期與內容、處理的管理員（如果知道）、你認為處分不當的理由，以及能證明的資料。"],
+    account: ["👤", "帳號問題", "網站帳號、Discord 連結、身分組、角色資料。", "請寫下：遇到的問題、你的 Discord 名稱，以及遊戲角色名。"],
+    suggest: ["💡", "建議回饋", "對伺服器、網站或活動的建議。", "請具體描述你的建議，以及它能改善什麼。"],
+    other:   ["📝", "其他", "以上都不符合的問題。", "請盡量詳細說明，方便管理團隊處理。"]
+  };
+  var STATUS = { open: ["待處理", "tst-open"], replied: ["已回覆", "tst-replied"], closed: ["已結案", "tst-closed"] };
+  var el = PSRP.el, me = null, staff = false, tickets = [], names = {}, filt = { status: "active", cat: "", q: "" };
+  var bucket = PSRP.client ? PSRP.client.storage.from("tickets") : null;
+  var pollTimer = null, newCat = null, newFiles = [];
+  var SEEN = "psrp-ticket-seen";
+
+  function fmt(d) { var x = new Date(d); return x.toLocaleDateString("zh-TW") + " " + x.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" }); }
+  function seen() { try { return JSON.parse(localStorage.getItem(SEEN) || "{}"); } catch (e) { return {}; } }
+  function markSeen(t) { try { var s = seen(); s[t.id] = t.updated_at; localStorage.setItem(SEEN, JSON.stringify(s)); } catch (e) {} }
+  async function loadNames(ids) {
+    ids = ids.filter(function (i, k) { return i && !names[i] && ids.indexOf(i) === k; });
+    if (!ids.length) return;
+    var r = await PSRP.client.rpc("ticket_names", { ids: ids });
+    (r.data || []).forEach(function (n) { names[n.id] = n; });
+  }
+  function show(id) {
+    ["v-list", "v-new", "v-ticket"].forEach(function (v) { document.getElementById(v).hidden = v !== id; });
+    document.getElementById("phead").hidden = id === "v-ticket";
+    if (pollTimer && id !== "v-ticket") { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  /* ---------- 列表 ---------- */
+  async function loadList() {
+    var r = await PSRP.client.from("tickets").select("*").order("updated_at", { ascending: false }).limit(500);
+    if (r.error) { document.getElementById("list").innerHTML = ""; document.getElementById("list").appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    tickets = r.data;
+    if (staff) await loadNames(tickets.map(function (t) { return t.user_id; }));
+    renderList();
+  }
+  function renderList() {
+    var box = document.getElementById("list"); box.innerHTML = "";
+    var q = filt.q.toLowerCase().replace(/^#/, ""), s = seen();
+    var res = tickets.filter(function (t) {
+      if (filt.status === "active" && t.status === "closed") return false;
+      if (filt.status !== "active" && filt.status !== "all" && t.status !== filt.status) return false;
+      if (filt.cat && t.category !== filt.cat) return false;
+      if (q) {
+        var n = names[t.user_id] || {};
+        var hay = (t.subject + " " + t.id + " " + (n.display_name || "") + " " + (n.discord || "")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+    if (!res.length) {
+      box.appendChild(el("div", { class: "notice", style: "text-align:center" }, tickets.length ? "沒有符合條件的工單。" : (staff ? "目前沒有任何工單。" : "你還沒有開過工單。有問題請按「＋ 開新工單」。")));
+      return;
+    }
+    res.forEach(function (t) {
+      var c = CATS[t.category] || CATS.other, st = STATUS[t.status];
+      var a = el("a", { class: "tk-item", href: "#t" + t.id });
+      a.appendChild(el("span", { class: "ic", "aria-hidden": "true" }, c[0]));
+      var mid = el("span");
+      var b = el("b", null, t.subject);
+      if (s[t.id] !== t.updated_at && ((staff && t.status === "open") || (!staff && t.status === "replied"))) b.appendChild(el("span", { class: "unread", title: "有新回覆" }));
+      mid.appendChild(b);
+      var m = el("span", { class: "m" });
+      m.appendChild(el("span", null, "#" + t.id));
+      m.appendChild(el("span", null, c[1]));
+      if (staff) m.appendChild(el("span", null, "玩家：" + ((names[t.user_id] || {}).display_name || "—")));
+      m.appendChild(el("span", null, "更新於 " + fmt(t.updated_at)));
+      mid.appendChild(m); a.appendChild(mid);
+      a.appendChild(el("span", { class: "tst " + st[1] }, st[0]));
+      box.appendChild(a);
+    });
+  }
+  document.getElementById("f-status").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return; filt.status = b.dataset.v;
+    [].forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); }); renderList();
+  });
+  (function () {
+    var sel = document.getElementById("f-cat"); sel.appendChild(el("option", { value: "" }, "全部類別"));
+    Object.keys(CATS).forEach(function (k) { sel.appendChild(el("option", { value: k }, CATS[k][0] + " " + CATS[k][1])); });
+    sel.addEventListener("change", function () { filt.cat = sel.value; renderList(); });
+  })();
+  document.getElementById("f-q").addEventListener("input", function (e) { filt.q = e.target.value.trim(); renderList(); });
+  document.getElementById("b-new").addEventListener("click", function () { location.hash = "#new"; });
+
+  /* ---------- 開新工單 ---------- */
+  function renderCats() {
+    var box = document.getElementById("cats"); box.innerHTML = "";
+    Object.keys(CATS).forEach(function (k) {
+      var c = CATS[k], b = el("button", { type: "button", class: "cat", "aria-pressed": String(newCat === k) });
+      b.appendChild(el("span", { class: "e", "aria-hidden": "true" }, c[0])); b.appendChild(el("b", null, c[1])); b.appendChild(el("span", null, c[2]));
+      b.addEventListener("click", function () {
+        newCat = k; renderCats();
+        var f = document.getElementById("nform"); f.hidden = false;
+        document.getElementById("n-legend").textContent = c[0] + " " + c[1];
+        document.getElementById("n-tip").textContent = c[3];
+        document.getElementById("n-subject").placeholder = k === "report" ? "例如：檢舉 John Doe 在銀行前 RDM" : "用一句話描述問題";
+        document.getElementById("n-subject").focus();
+      });
+      box.appendChild(b);
+    });
+  }
+  function renderNewFiles() {
+    var box = document.getElementById("n-filelist"); box.innerHTML = "";
+    newFiles.forEach(function (f, i) {
+      var c = el("span", { class: "chipf" }, (/pdf$/.test(f.type) ? "📄 " : "🖼️ ") + f.name);
+      var x = el("button", { type: "button", "aria-label": "移除" }, "✕"); x.addEventListener("click", function () { newFiles.splice(i, 1); renderNewFiles(); });
+      c.appendChild(x); box.appendChild(c);
+    });
+  }
+  function pickFiles(input, list, after) {
+    [].forEach.call(input.files, function (f) {
+      if (!/^image\/(png|jpeg|webp|gif)$|^application\/pdf$/.test(f.type)) { alert("「" + f.name + "」不是圖片或 PDF。"); return; }
+      if (f.size > 10485760) { alert("「" + f.name + "」超過 10 MB。"); return; }
+      list.push(f);
+    });
+    input.value = ""; after();
+  }
+  document.getElementById("n-attach").addEventListener("click", function () { document.getElementById("n-files").click(); });
+  document.getElementById("n-files").addEventListener("change", function () { pickFiles(this, newFiles, renderNewFiles); });
+  async function uploadFiles(ownerId, ticketId, files) {
+    var out = [];
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i], ext = (f.name.match(/\.[a-z0-9]+$/i) || [""])[0].toLowerCase();
+      var path = ownerId + "/" + ticketId + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ext;
+      var up = await bucket.upload(path, f, { contentType: f.type, upsert: false });
+      if (up.error) throw up.error;
+      out.push({ path: path, name: f.name, type: f.type, size: f.size });
+    }
+    return out;
+  }
+  document.getElementById("nform").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var subj = document.getElementById("n-subject").value.trim(), body = document.getElementById("n-body").value.trim(), msg = document.getElementById("n-msg");
+    msg.className = "form-msg";
+    if (!subj || body.length < 10) { msg.className = "form-msg err"; msg.textContent = !subj ? "請填寫主旨。" : "詳細說明至少 10 個字。"; return; }
+    var btn = document.getElementById("n-submit"); btn.disabled = true; msg.textContent = "送出中…";
+    try {
+      var t = await PSRP.client.from("tickets").insert({ category: newCat, subject: subj }).select().single();
+      if (t.error) throw t.error;
+      var atts = newFiles.length ? await uploadFiles(me.id, t.data.id, newFiles) : [];
+      var m = await PSRP.client.from("ticket_messages").insert({ ticket_id: t.data.id, body: body, attachments: atts });
+      if (m.error) throw m.error;
+      newFiles = []; newCat = null;
+      document.getElementById("nform").reset(); document.getElementById("nform").hidden = true; renderNewFiles();
+      msg.textContent = "";
+      await loadList();
+      location.hash = "#t" + t.data.id;
+    } catch (err) { msg.className = "form-msg err"; msg.textContent = "送出失敗：" + PSRP.errText(err); }
+    btn.disabled = false;
+  });
+
+  /* ---------- 工單對話 ---------- */
+  var curTicket = null, lastMsgId = 0, replyFiles = [];
+  async function signed(path) {
+    var r = await bucket.createSignedUrl(path, 3600);
+    return r.data ? r.data.signedUrl : "#";
+  }
+  async function msgNode(m) {
+    var mine = m.author_id === me.id, n = names[m.author_id] || {};
+    var w = el("div", { class: "msg " + (mine ? "me" : "them") + (m.is_staff ? " staff" : "") });
+    var who = el("div", { class: "who" });
+    if (m.is_staff) who.appendChild(el("span", { class: "badge" }, "管理團隊"));
+    who.appendChild(el("span", null, (mine ? "你" : (n.display_name || (m.is_staff ? "管理團隊" : "玩家"))) + " · " + fmt(m.created_at)));
+    w.appendChild(who);
+    if (m.body) w.appendChild(el("div", { class: "bub" }, m.body));
+    if ((m.attachments || []).length) {
+      var fs = el("div", { class: "files" });
+      for (var i = 0; i < m.attachments.length; i++) {
+        var f = m.attachments[i], u = await signed(f.path);
+        var a = el("a", { href: u, target: "_blank", rel: "noopener" });
+        if (/^image\//.test(f.type)) a.appendChild(el("img", { src: u, alt: f.name, loading: "lazy" }));
+        else a.appendChild(el("span", { class: "pdf" }, "📄 " + f.name));
+        fs.appendChild(a);
+      }
+      w.appendChild(fs);
+    }
+    return w;
+  }
+  async function openTicket(id) {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    show("v-ticket");
+    var v = document.getElementById("v-ticket"); v.innerHTML = '<p class="note">讀取中…</p>';
+    var r = await PSRP.client.from("tickets").select("*").eq("id", id).maybeSingle();
+    if (r.error || !r.data) { v.innerHTML = ""; v.appendChild(el("div", { class: "notice warn" }, "找不到這張工單，或你沒有權限查看。")); v.appendChild(el("a", { href: "#", class: "btn-sec", style: "text-decoration:none" }, "← 返回工單列表")); return; }
+    curTicket = r.data; lastMsgId = 0; replyFiles = [];
+    await loadNames([curTicket.user_id]);
+    v.innerHTML = "";
+    v.appendChild(el("p", null)).appendChild(el("a", { href: "#", class: "btn-sec", style: "text-decoration:none" }, "← 返回工單列表"));
+    var head = el("div", { class: "chat-head" });
+    var l = el("div");
+    l.appendChild(el("h2", null, curTicket.subject));
+    var m = el("div", { class: "m" });
+    var c = CATS[curTicket.category] || CATS.other, st = STATUS[curTicket.status];
+    m.appendChild(el("span", null, "#" + curTicket.id));
+    m.appendChild(el("span", null, c[0] + " " + c[1]));
+    m.appendChild(el("span", { class: "tst " + st[1], id: "t-status" }, st[0]));
+    if (staff) { var o = names[curTicket.user_id] || {}; m.appendChild(el("span", null, "玩家：" + (o.display_name || "—") + (o.discord ? "（Discord：" + o.discord + "）" : ""))); }
+    m.appendChild(el("span", null, "建立於 " + fmt(curTicket.created_at)));
+    l.appendChild(m); head.appendChild(l);
+    var acts = el("div", { class: "acts" });
+    if (curTicket.status !== "closed") {
+      var close = el("button", { type: "button", class: "btn-sec" }, staff ? "結案" : "問題已解決，結案");
+      close.addEventListener("click", function () { setStatus("closed"); });
+      acts.appendChild(close);
+    } else if (staff) {
+      var re = el("button", { type: "button", class: "btn-sec" }, "重新開啟");
+      re.addEventListener("click", function () { setStatus("open"); });
+      acts.appendChild(re);
+    }
+    head.appendChild(acts); v.appendChild(head);
+    var chat = el("div", { class: "chat", id: "chat", "aria-live": "polite" }); v.appendChild(chat);
+    v.appendChild(composer());
+    await pullMessages(true);
+    markSeen(curTicket);
+    pollTimer = setInterval(function () { pullMessages(false); }, 15000);
+  }
+  async function pullMessages(initial) {
+    if (!curTicket) return;
+    var r = await PSRP.client.from("ticket_messages").select("*").eq("ticket_id", curTicket.id).gt("id", lastMsgId).order("id");
+    if (r.error || !r.data.length) return;
+    await loadNames(r.data.map(function (x) { return x.author_id; }));
+    var chat = document.getElementById("chat"); if (!chat) return;
+    var atBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
+    for (var i = 0; i < r.data.length; i++) { chat.appendChild(await msgNode(r.data[i])); lastMsgId = r.data[i].id; }
+    if (initial || atBottom) chat.scrollTop = chat.scrollHeight;
+    if (!initial) { var t = await PSRP.client.from("tickets").select("*").eq("id", curTicket.id).maybeSingle(); if (t.data) { curTicket = t.data; var s = document.getElementById("t-status"); if (s) { s.textContent = STATUS[t.data.status][0]; s.className = "tst " + STATUS[t.data.status][1]; } markSeen(curTicket); } }
+  }
+  function composer() {
+    var box = el("div", { class: "composer" });
+    if (curTicket.status === "closed" && !staff) {
+      box.appendChild(el("div", { class: "closed-note" }, "這張工單已結案。如果問題還沒解決，請開一張新工單。"));
+      return box;
+    }
+    if (curTicket.status === "closed" && staff) box.appendChild(el("div", { class: "hint" }, "工單已結案，回覆不會自動重新開啟；需要的話請先按「重新開啟」。"));
+    var ta = el("textarea", { placeholder: staff ? "回覆玩家…（玩家若已連結 Discord，會收到 Bot 私訊通知）" : "補充說明或回覆管理團隊…", "aria-label": "回覆內容" });
+    var row = el("div", { class: "row" });
+    var att = el("div", { class: "att" });
+    var input = el("input", { type: "file", accept: "image/png,image/jpeg,image/webp,image/gif,application/pdf", multiple: "", hidden: "" });
+    var ab = el("button", { type: "button", class: "btn-sec" }, "📎 附件");
+    ab.addEventListener("click", function () { input.click(); });
+    var chips = el("span");
+    function rf() { chips.innerHTML = ""; replyFiles.forEach(function (f, i) { var c = el("span", { class: "chipf" }, f.name); var x = el("button", { type: "button" }, "✕"); x.addEventListener("click", function () { replyFiles.splice(i, 1); rf(); }); c.appendChild(x); chips.appendChild(c); }); }
+    input.addEventListener("change", function () { pickFiles(input, replyFiles, rf); });
+    att.appendChild(ab); att.appendChild(input); att.appendChild(chips);
+    var msg = el("span", { class: "form-msg", role: "status" });
+    var send = el("button", { type: "button", class: "btn-primary" }, "送出回覆");
+    async function doSend() {
+      var body = ta.value.trim();
+      if (!body && !replyFiles.length) return;
+      send.disabled = true; msg.className = "form-msg"; msg.textContent = "送出中…";
+      try {
+        var atts = replyFiles.length ? await uploadFiles(curTicket.user_id, curTicket.id, replyFiles) : [];
+        var r = await PSRP.client.from("ticket_messages").insert({ ticket_id: curTicket.id, body: body, attachments: atts });
+        if (r.error) throw r.error;
+        ta.value = ""; replyFiles = []; rf(); msg.textContent = "";
+        await pullMessages(false);
+        var chat = document.getElementById("chat"); chat.scrollTop = chat.scrollHeight;
+      } catch (err) { msg.className = "form-msg err"; msg.textContent = PSRP.errText(err); }
+      send.disabled = false;
+    }
+    send.addEventListener("click", doSend);
+    ta.addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); doSend(); } });
+    var right = el("div", { style: "display:flex;gap:10px;align-items:center" }); right.appendChild(msg); right.appendChild(el("span", { class: "hint" }, "Ctrl + Enter 送出")); right.appendChild(send);
+    row.appendChild(att); row.appendChild(right);
+    box.appendChild(ta); box.appendChild(row);
+    return box;
+  }
+  async function setStatus(s) {
+    if (s === "closed" && !confirm(staff ? "確定要結案這張工單？" : "確定問題已解決並結案？結案後無法再回覆。")) return;
+    var r = await PSRP.client.from("tickets").update({ status: s }).eq("id", curTicket.id);
+    if (r.error) { alert(PSRP.errText(r.error)); return; }
+    await loadList(); openTicket(curTicket.id);
+  }
+
+  /* ---------- 路由 ---------- */
+  function route() {
+    if (!me) return;
+    var h = location.hash, m = h.match(/^#t(\d+)$/);
+    if (m) { openTicket(parseInt(m[1], 10)); return; }
+    if (h === "#new") { show("v-new"); renderCats(); return; }
+    show("v-list"); renderList(); window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", route);
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    var gate = document.getElementById("gate");
+    if (!PSRP.client) { gate.appendChild(el("div", { class: "notice warn" }, "工單系統暫時無法使用。")); return; }
+    me = await PSRP.profile();
+    if (!me) { PSRP.mountAuthForm(gate, function () { location.reload(); }, "開工單前請先登入或註冊帳號。"); return; }
+    staff = PSRP.hasRole(me, "support");
+    if (staff) {
+      document.getElementById("ph-title").textContent = "工單管理";
+      document.getElementById("ph-desc").textContent = "所有玩家的工單都在這裡。開新工單時 Bot 會在 Discord 標記 Staff；你在這裡回覆後，玩家會收到 Bot 私訊。";
+      document.getElementById("f-status").querySelector('[data-v="open"]').click();
+      document.getElementById("b-new").textContent = "＋ 以自己身分開工單";
+    }
+    await loadList();
+    route();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
