@@ -40,6 +40,10 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
 .ann .band { background: var(--c); height: 8px; }
 .ann .nh { display: flex; gap: 16px; align-items: center; padding: 26px 34px 16px; border-bottom: 2px solid #1d2030; }
 .ann .seal { width: 58px; height: 58px; border-radius: 50%; border: 3px solid var(--c); display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; color: var(--c); font-size: 15px; letter-spacing: .04em; flex: 0 0 auto; background: #fff; }
+.ann .seal-img { width: 64px; height: 64px; object-fit: contain; flex: 0 0 auto; border-radius: 50%; }
+.ann .seal-img.sq { border-radius: 12px; }
+.dicon { width: 18px; height: 18px; object-fit: contain; vertical-align: -4px; border-radius: 50%; }
+.dicon.sq { border-radius: 4px; }
 .ann .org { font-family: var(--font-zh-display); font-weight: 900; font-size: 22px; line-height: 1.3; }
 .ann .org small { display: block; font-family: var(--font-display); font-weight: 600; letter-spacing: .14em; font-size: 12.5px; color: #555b70; text-transform: uppercase; }
 .ann .kind { margin-left: auto; font-family: var(--font-zh-display); font-weight: 900; font-size: 26px; letter-spacing: .3em; color: var(--c); white-space: nowrap; }
@@ -208,9 +212,9 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
 <script>
 (function () {
   var DEPTS = {
-    all:  { short: "PSRP", name: "Palm State RolePlay 管理團隊", en: "Server Administration", c: "#e8b85a", signer: "Palm State RolePlay 管理團隊" },
-    lapd: { short: "LAPD", name: "洛杉磯警察局", en: "Los Angeles Police Department", c: "#2f6fe0", signer: "洛杉磯警察局 局長室" },
-    lafd: { short: "LAFD", name: "洛杉磯消防局", en: "Los Angeles Fire Department", c: "#d8402f", signer: "洛杉磯消防局 局長室" },
+    all:  { short: "PSRP", name: "Palm State RolePlay 管理團隊", en: "Server Administration", c: "#e8b85a", signer: "Palm State RolePlay 管理團隊", icon: "/logo.jpg", sq: true },
+    lapd: { short: "LAPD", name: "洛杉磯警察局", en: "Los Angeles Police Department", c: "#2f6fe0", signer: "洛杉磯警察局 局長室", icon: "/assets/seal-lapd.png" },
+    lafd: { short: "LAFD", name: "洛杉磯消防局", en: "Los Angeles Fire Department", c: "#d8402f", signer: "洛杉磯消防局 局長室", icon: "/assets/seal-lafd.png" },
     ems:  { short: "EMS",  name: "緊急醫療服務處", en: "Emergency Medical Services", c: "#1f9e7d", signer: "緊急醫療服務處 處長室" }
   };
   var CATS = ["一般公告", "人事命令", "招募資訊", "勤務通報", "法規異動", "活動通知", "緊急通告"];
@@ -267,7 +271,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       card.appendChild(el("span", { class: "bar" }));
       var inn = el("span", { class: "in" });
       var top = el("span", { class: "ntop" });
-      top.innerHTML = (a.pinned ? '<span class="pin">📌 置頂</span>' : "") + '<span class="dtag">' + d.short + '</span><span class="ctag">' + esc(a.category) + "</span><span>" + esc(a.ref_no || "") + "</span><span>" + fmtDate(a.created_at) + "</span>" + ((a.attachments || []).length ? '<span class="att">📎 ' + a.attachments.length + "</span>" : "");
+      top.innerHTML = (a.pinned ? '<span class="pin">📌 置頂</span>' : "") + (d.icon ? '<img class="dicon' + (d.sq ? ' sq' : '') + '" src="' + d.icon + '" alt="">' : '') + '<span class="dtag">' + d.short + '</span><span class="ctag">' + esc(a.category) + "</span><span>" + esc(a.ref_no || "") + "</span><span>" + fmtDate(a.created_at) + "</span>" + ((a.attachments || []).length ? '<span class="att">📎 ' + a.attachments.length + "</span>" : "");
       inn.appendChild(top);
       var h = el("h3"); h.innerHTML = hl(a.title, terms); inn.appendChild(h);
       var snippet = a.summary || a.body.replace(/[#>*_`|\-]/g, " ").replace(/\s+/g, " ").slice(0, 160);
@@ -292,7 +296,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     var d = DEPTS[a.department], atts = a.attachments || [];
     var imgs = atts.filter(function (f) { return /^image\//.test(f.type); }), pdfs = atts.filter(function (f) { return f.type === "application/pdf"; });
     var h = '<article class="ann" style="--c:' + d.c + '"><div class="band"></div>' +
-      '<div class="nh"><div class="seal">' + d.short + '</div><div class="org">' + esc(d.name) + "<small>" + esc(d.en) + '</small></div><div class="kind">公告</div></div>' +
+      '<div class="nh">' + (d.icon ? '<img class="seal-img' + (d.sq ? ' sq' : '') + '" src="' + d.icon + '" alt="' + d.short + '">' : '<div class="seal">' + d.short + '</div>') + '<div class="org">' + esc(d.name) + "<small>" + esc(d.en) + '</small></div><div class="kind">公告</div></div>' +
       '<div class="facts"><div><b>字號</b>' + esc(a.ref_no || "（發布後產生）") + "</div><div><b>發布日期</b>" + fmtDate(a.created_at || new Date()) + "</div>" +
       (a.effective_date ? "<div><b>生效日期</b>" + a.effective_date.replace(/-/g, "/") + "</div>" : "") +
       "<div><b>類別</b>" + esc(a.category) + "</div></div>" +
