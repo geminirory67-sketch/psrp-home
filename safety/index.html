@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>公共安全 · Palm State RolePlay</title>
+<meta name="description" content="Palm State RolePlay 公共安全入口：洛杉磯警察局 LAPD、洛杉磯消防局 LAFD、緊急醫療服務 EMS。">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+.sh { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); background:
+  radial-gradient(900px 380px at 12% 30%, rgba(74,134,255,.16), transparent 60%),
+  radial-gradient(800px 360px at 55% 10%, rgba(255,75,58,.12), transparent 60%),
+  radial-gradient(800px 360px at 95% 40%, rgba(47,208,166,.12), transparent 60%),
+  linear-gradient(180deg, #151b36, #0d1124); }
+.sh .wrap { padding-block: 64px 54px; text-align: center; }
+.sh .k { font-family: var(--font-display); letter-spacing: .34em; font-size: 13px; color: var(--sun); font-weight: 600; }
+.sh h1 { margin: 10px 0 0; font-family: var(--font-zh-display); font-weight: 900; font-size: clamp(36px, 6vw, 62px); letter-spacing: .12em; }
+.sh .en { font-family: var(--font-display); font-weight: 700; letter-spacing: .28em; font-size: clamp(14px, 1.8vw, 18px); color: var(--muted); margin-top: 6px; }
+.sh p { max-width: 640px; margin: 18px auto 0; color: var(--muted); }
+.sh .seals { display: flex; justify-content: center; gap: 22px; margin-top: 26px; }
+.sh .seals img { width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
+
+.dgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: -28px; position: relative; z-index: 1; }
+.dc { --c: var(--gold); display: grid; grid-template-rows: auto auto 1fr auto; gap: 12px; text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 12px; padding: 26px 24px 22px; transition: transform .15s, border-color .15s, box-shadow .15s; }
+.dc:hover { transform: translateY(-3px); border-color: var(--c); box-shadow: 0 16px 34px rgba(0,0,0,.35); }
+.dc .dtop { display: flex; gap: 16px; align-items: center; }
+.dc .dtop img { width: 78px; height: 78px; object-fit: contain; flex: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,.4)); }
+.dc .ab { font-family: var(--font-display); font-weight: 700; letter-spacing: .16em; color: var(--c); font-size: 14px; }
+.dc h2 { margin: 2px 0 0; font-family: var(--font-zh-display); font-weight: 900; font-size: 24px; }
+.dc .en { font-family: var(--font-display); letter-spacing: .12em; font-size: 12.5px; color: var(--muted); text-transform: uppercase; }
+.dc p { margin: 0; color: #c8cde0; font-size: 14.5px; line-height: 1.7; }
+.dc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; align-content: start; }
+.dc li { font-size: 12.5px; background: var(--panel-2); border-radius: 4px; padding: 2px 8px; color: var(--muted); }
+.dc .go { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 14px; font-weight: 700; color: var(--c); font-size: 15px; }
+.dc .go small { color: var(--muted); font-weight: 400; font-size: 12.5px; }
+
+.more { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.more a, .more div { display: grid; gap: 4px; text-decoration: none; color: var(--ink); background: var(--night-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.more a:hover { border-color: var(--gold); }
+.more b { font-size: 15.5px; } .more small { color: var(--muted); font-size: 13px; line-height: 1.55; }
+.more .soon { border-style: dashed; opacity: .75; }
+.n911 { margin-top: 26px; display: flex; gap: 18px; align-items: center; background: #2a1012; border: 1px solid #5a2228; border-radius: 12px; padding: 18px 22px; }
+.n911 b { font-family: var(--font-display); font-size: 40px; color: #ff6b5e; letter-spacing: .06em; line-height: 1; }
+.n911 p { margin: 0; color: #f0c9c5; font-size: 14.5px; }
+@media (max-width: 960px) { .dgrid { grid-template-columns: 1fr; margin-top: 20px; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/rules/">伺服器規則</a>
+      <a href="/news/">公告</a>
+      <a href="/whitelist/">白名單</a>
+      <a href="/apply/">公職招募</a>
+      <a href="/support/">工單</a>
+      <a href="https://law.psrp2.com/">加州法典</a>
+      <a href="/safety/" aria-current="page">公共安全</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<section class="sh">
+  <div class="wrap">
+    <div class="k">CITY OF LOS ANGELES · PALM STATE</div>
+    <h1>公共安全</h1>
+    <div class="en">LOS ANGELES PUBLIC SAFETY</div>
+    <p>警察、消防與緊急醫療，是城市運作的第一線。選擇部門進入它的官方網站，查看部門公告、組織、階級與招募資訊；部門成員登入後可以使用勤務工具與內部公告。</p>
+    <div class="seals"><img src="/assets/seal-lapd.png" alt=""><img src="/assets/seal-lafd.png" alt=""><img src="/assets/ems-star.svg" alt=""></div>
+  </div>
+</section>
+
+<main class="page" style="padding-top:0">
+  <div class="wrap">
+    <div class="dgrid">
+      <a class="dc" href="/pd/" style="--c: var(--lapd)">
+        <div class="dtop"><img src="/assets/seal-lapd.png" alt="LAPD 警徽"><div><div class="ab">LAPD</div><h2>洛杉磯警察局</h2><div class="en">Los Angeles Police Department</div></div></div>
+        <p>巡邏、交通執法、刑事偵查與特勤任務。依加州法典執法，所有行動都要經得起法庭檢驗。</p>
+        <ul><li>勤務表 Deployment</li><li>部門手冊</li><li>無線電代碼</li><li>SWAT · K9 · AIR</li></ul>
+        <div class="go">進入 LAPD 官網 →<small>To Protect and to Serve</small></div>
+      </a>
+      <a class="dc" href="/fd/" style="--c: var(--lafd)">
+        <div class="dtop"><img src="/assets/seal-lafd.png" alt="LAFD 徽章"><div><div class="ab">LAFD</div><h2>洛杉磯消防局</h2><div class="en">Los Angeles Fire Department</div></div></div>
+        <p>建築火災、山林野火、車禍救援與危險物品處理。從雲梯車到救援直升機，全城的火場都歸你們管。</p>
+        <ul><li>消防車組</li><li>雲梯救援</li><li>都市搜救</li><li>危險物品</li></ul>
+        <div class="go">進入 LAFD 官網 →<small>Courage · Integrity · Pride</small></div>
+      </a>
+      <a class="dc" href="/ems/" style="--c: var(--ems)">
+        <div class="dtop"><img src="/assets/ems-star.svg" alt="生命之星"><div><div class="ab">EMS</div><h2>緊急醫療服務</h2><div class="en">Emergency Medical Services</div></div></div>
+        <p>救護車在第一時間抵達現場，急診室接手搶救。槍擊、車禍、用藥過量，每一通 911 都是與時間賽跑。</p>
+        <ul><li>救護車隊</li><li>急診部</li><li>外科</li><li>空中救護</li></ul>
+        <div class="go">進入 EMS 官網 →<small>Every Second Counts</small></div>
+      </a>
+    </div>
+
+    <div class="n911"><b>911</b><p>遊戲內遇到緊急狀況，請使用手機撥打 911 聯絡派遣中心。網站上的部門公告與資訊僅供角色扮演使用，並非真實政府機關。</p></div>
+
+    <div class="more">
+      <a href="/apply/"><b>公職招募</b><small>申請加入 LAPD、LAFD 或 EMS，審核進度會由 Discord 通知。</small></a>
+      <a href="https://law.psrp2.com/"><b>加州法典</b><small>罪名、條號與刑度查詢，執法與司法的共同依據。</small></a>
+      <a href="/news/"><b>伺服器公告</b><small>管理團隊的官方公告；各部門公告在部門網站內。</small></a>
+      <div class="soon"><b>更多部門即將加入</b><small>法院、地檢署等公職單位之後也會放在這裡。</small></div>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>© 2026 Palm State RolePlay。版權所有。</span>
+    <span><a href="/">首頁</a> · <a href="/apply/">公職招募</a> · <a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></span>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>if (window.PSRP) PSRP.mountAccountChip(document.getElementById("account"));</script>
+</body>
+</html>
