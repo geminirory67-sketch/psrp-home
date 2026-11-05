@@ -65,6 +65,28 @@ a { color: inherit; }
 .stars { position: absolute; inset: 0; z-index: 0; background-image: radial-gradient(1px 1px at 12% 18%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 32% 8%, #fff6 50%, transparent 51%), radial-gradient(1.5px 1.5px at 58% 14%, #fff9 50%, transparent 51%), radial-gradient(1px 1px at 74% 24%, #fff5 50%, transparent 51%), radial-gradient(1px 1px at 88% 10%, #fff7 50%, transparent 51%), radial-gradient(1px 1px at 46% 28%, #fff4 50%, transparent 51%); }
 .sun { position: absolute; z-index: 0; left: 50%; bottom: 70px; width: min(520px, 80vw); aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle at 50% 45%, #ffd27a 0%, #ff9a4a 45%, rgba(255,110,70,0) 70%); opacity: .9; }
 .city { position: absolute; z-index: 1; left: 0; right: 0; bottom: -1px; width: 100%; height: auto; display: block; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: 56px; align-items: center; }
+.hero-panel { display: grid; gap: 14px; }
+.hp-card { background: rgba(13,17,36,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 18px 20px; box-shadow: 0 18px 40px rgba(0,0,0,.3); }
+.hp-card h2 { margin: 0 0 12px; font-size: 13px; letter-spacing: .16em; color: var(--sun); font-family: var(--font-display); text-transform: uppercase; font-weight: 700; }
+.hp-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
+.hp-steps li { display: grid; grid-template-columns: 30px 1fr; gap: 0 12px; counter-increment: s; }
+.hp-steps li::before { content: counter(s); grid-row: span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--sun); color: #1b1405; font-weight: 700; font-family: var(--font-display); }
+.hp-steps b { font-size: 15px; } .hp-steps span { color: var(--muted); font-size: 13px; }
+.hp-cta { display: block; margin-top: 14px; text-align: center; text-decoration: none; background: var(--gold); color: #1b1405; font-weight: 700; border-radius: 8px; padding: 10px; }
+.hp-cta:hover { filter: brightness(1.06); }
+.hp-feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.hp-feed a { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; text-decoration: none; color: var(--ink); padding: 7px 8px; border-radius: 8px; }
+.hp-feed a:hover { background: rgba(255,255,255,.06); }
+.hp-feed .tg { grid-row: span 2; align-self: start; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 4px; margin-top: 2px; }
+.hp-feed .tg.n { background: #4a3a12; color: var(--gold); } .hp-feed .tg.f { background: #1d2a52; color: #8db4ff; }
+.hp-feed b { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hp-feed small { color: var(--muted); font-size: 12px; }
+.hp-feed .muted { color: var(--muted); font-size: 13.5px; padding: 6px 8px; }
+.hp-links { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 10px; }
+.hp-links a { font-size: 13px; color: var(--ink); text-decoration: none; padding: 4px 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; }
+.hp-links a:hover { border-color: var(--sun); }
+@media (max-width: 980px) { .hero-grid { grid-template-columns: 1fr; gap: 32px; } .hero-panel { max-width: 560px; } }
 .hero-logo { display: block; width: clamp(88px, 12vw, 120px); height: auto; border-radius: 18px; box-shadow: 0 12px 40px rgba(0,0,0,.45); margin-bottom: 22px; }
 .kicker { font-family: var(--font-display); letter-spacing: .32em; font-size: 15px; color: var(--gold); text-transform: uppercase; margin: 0 0 14px; font-weight: 600; }
 .hero h1 { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; line-height: .92; letter-spacing: .01em; font-size: clamp(54px, 10vw, 128px); text-wrap: balance; }
@@ -211,7 +233,8 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
   <section class="hero" aria-labelledby="h1">
     <div class="stars" aria-hidden="true"></div>
     <div class="sun" aria-hidden="true"></div>
-    <div class="wrap">
+    <div class="wrap hero-grid">
+      <div class="hero-main">
       <img class="hero-logo" src="logo.jpg" alt="Palm State RolePlay logo" width="120" height="120">
       <p class="kicker">FiveM · Los Angeles · Serious RolePlay</p>
       <h1 id="h1">Palm State<span>RolePlay</span></h1>
@@ -230,6 +253,23 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <span class="pill">城市經濟系統</span>
         <span class="pill">中文社群</span>
       </div>
+      </div>
+      <aside class="hero-panel" aria-label="快速開始與最新動態">
+        <div class="hp-card">
+          <h2>三步驟進城</h2>
+          <ol class="hp-steps">
+            <li><b>加入 Discord</b><span>認識社群、接收審核與活動通知</span></li>
+            <li><b>申請白名單</b><span>在網站填寫申請表與 RP 素養測驗</span></li>
+            <li><b>通過面試</b><span>自動拿到身分組，開始你的故事</span></li>
+          </ol>
+          <a class="hp-cta" href="/whitelist/">立即申請白名單 →</a>
+        </div>
+        <div class="hp-card">
+          <h2>最新動態</h2>
+          <ul class="hp-feed" id="hp-feed"><li class="muted">讀取中…</li></ul>
+          <div class="hp-links"><a href="/news/">公告</a><a href="/forums/">論壇</a><a href="/chat/">聊天室</a><a href="/safety/">公共安全</a></div>
+        </div>
+      </aside>
     </div>
     <svg class="city" viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <!-- far skyline -->
@@ -474,6 +514,29 @@ if (window.PSRP) PSRP.mountAccountChip(document.getElementById("account"));
     box.appendChild(card);
   });
   document.getElementById("news").hidden = false;
+})();
+/* 首頁右側：最新公告與論壇文章 */
+(async function () {
+  var box = document.getElementById("hp-feed");
+  if (!window.PSRP || !PSRP.client) { box.innerHTML = '<li class="muted">暫時無法讀取。</li>'; return; }
+  function ago(d) { var s = (Date.now() - new Date(d).getTime()) / 1000; if (s < 3600) return Math.max(1, Math.floor(s / 60)) + " 分鐘前"; if (s < 86400) return Math.floor(s / 3600) + " 小時前"; if (s < 86400 * 30) return Math.floor(s / 86400) + " 天前"; var x = new Date(d); return x.getFullYear() + "/" + (x.getMonth() + 1) + "/" + x.getDate(); }
+  var r = await Promise.all([
+    PSRP.client.from("announcements").select("id, title, created_at").eq("department", "all").order("created_at", { ascending: false }).limit(3),
+    PSRP.client.from("forum_threads").select("id, title, last_post_at, reply_count").eq("deleted", false).order("last_post_at", { ascending: false }).limit(5)
+  ]);
+  var items = [];
+  (r[0].data || []).forEach(function (a) { items.push({ t: "n", label: "公告", title: a.title, at: a.created_at, href: "/news/#n" + a.id }); });
+  (r[1].data || []).forEach(function (f) { items.push({ t: "f", label: "論壇", title: f.title, at: f.last_post_at, href: "/forums/#t/" + f.id + "/last", extra: f.reply_count ? f.reply_count + " 則回覆" : "" }); });
+  items.sort(function (a, b) { return a.at < b.at ? 1 : -1; });
+  box.innerHTML = "";
+  if (!items.length) { box.innerHTML = '<li class="muted">還沒有新動態，來<a href="/forums/" style="color:var(--sun)">論壇</a>發第一篇文章吧！</li>'; return; }
+  items.slice(0, 5).forEach(function (it) {
+    var li = PSRP.el("li"), a = PSRP.el("a", { href: it.href });
+    a.appendChild(PSRP.el("span", { class: "tg " + it.t }, it.label));
+    a.appendChild(PSRP.el("b", null, it.title));
+    a.appendChild(PSRP.el("small", null, ago(it.at) + (it.extra ? " · " + it.extra : "")));
+    li.appendChild(a); box.appendChild(li);
+  });
 })();
 (function () {
   var b = document.getElementById("menu"), l = document.getElementById("links");
