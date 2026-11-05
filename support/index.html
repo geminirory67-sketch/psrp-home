@@ -82,6 +82,7 @@
       <a href="/">首頁</a>
       <a href="/rules/">伺服器規則</a>
       <a href="/news/">公告</a>
+      <a href="/whitelist/">白名單</a>
       <a href="/apply/">公職招募</a>
       <a href="/support/" aria-current="page">工單</a>
       <a href="https://law.psrp2.com/">加州法典</a>
@@ -137,6 +138,11 @@
             <div class="att" id="n-filelist" style="margin-top:8px"></div>
           </div>
         </fieldset>
+        <fieldset>
+          <legend>匿名選項</legend>
+          <label class="check"><input type="checkbox" id="n-anon"> <span><b>匿名送出</b>：管理團隊在網站上看不到這張工單是誰開的，回覆時也只會顯示「匿名玩家」。你仍然可以在這裡看到回覆，並收到 Discord 私訊通知。</span></label>
+          <p class="hint" id="n-anon-tip">處分申訴、帳號問題通常需要知道你是誰才能處理，建議不要匿名。</p>
+        </fieldset>
         <p class="form-msg" id="n-msg" role="status"></p>
         <button type="submit" class="btn-primary" id="n-submit">送出工單</button>
       </form>
@@ -189,10 +195,10 @@
 
   /* ---------- 列表 ---------- */
   async function loadList() {
-    var r = await PSRP.client.from("tickets").select("*").order("updated_at", { ascending: false }).limit(500);
+    var r = staff ? await PSRP.client.rpc("staff_tickets") : await PSRP.client.from("tickets").select("*").order("updated_at", { ascending: false }).limit(500);
     if (r.error) { document.getElementById("list").innerHTML = ""; document.getElementById("list").appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
     tickets = r.data;
-    if (staff) await loadNames(tickets.map(function (t) { return t.user_id; }));
+    if (staff) await loadNames(tickets.map(function (t) { return t.user_id; }).filter(Boolean));
     renderList();
   }
   function renderList() {
@@ -204,7 +210,7 @@
       if (filt.cat && t.category !== filt.cat) return false;
       if (q) {
         var n = names[t.user_id] || {};
-        var hay = (t.subject + " " + t.id + " " + (n.display_name || "") + " " + (n.discord || "")).toLowerCase();
+        var hay = (t.subject + " " + t.id + " " + (t.anonymous ? "匿名" : (n.display_name || "") + " " + (n.discord || ""))).toLowerCase();
         if (hay.indexOf(q) === -1) return false;
       }
       return true;
@@ -224,7 +230,8 @@
       var m = el("span", { class: "m" });
       m.appendChild(el("span", null, "#" + t.id));
       m.appendChild(el("span", null, c[1]));
-      if (staff) m.appendChild(el("span", null, "玩家：" + ((names[t.user_id] || {}).display_name || "—")));
+      if (staff) m.appendChild(el("span", null, t.anonymous ? "🕶️ 匿名玩家" : "玩家：" + ((names[t.user_id] || {}).display_name || "—")));
+      else if (t.anonymous) m.appendChild(el("span", null, "🕶️ 匿名"));
       m.appendChild(el("span", null, "更新於 " + fmt(t.updated_at)));
       mid.appendChild(m); a.appendChild(mid);
       a.appendChild(el("span", { class: "tst " + st[1] }, st[0]));
@@ -278,11 +285,11 @@
   }
   document.getElementById("n-attach").addEventListener("click", function () { document.getElementById("n-files").click(); });
   document.getElementById("n-files").addEventListener("change", function () { pickFiles(this, newFiles, renderNewFiles); });
-  async function uploadFiles(ownerId, ticketId, files) {
+  async function uploadFiles(ticketId, files) {
     var out = [];
     for (var i = 0; i < files.length; i++) {
       var f = files[i], ext = (f.name.match(/\.[a-z0-9]+$/i) || [""])[0].toLowerCase();
-      var path = ownerId + "/" + ticketId + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ext;
+      var path = "t/" + ticketId + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ext;
       var up = await bucket.upload(path, f, { contentType: f.type, upsert: false });
       if (up.error) throw up.error;
       out.push({ path: path, name: f.name, type: f.type, size: f.size });
@@ -296,9 +303,9 @@
     if (!subj || body.length < 10) { msg.className = "form-msg err"; msg.textContent = !subj ? "請填寫主旨。" : "詳細說明至少 10 個字。"; return; }
     var btn = document.getElementById("n-submit"); btn.disabled = true; msg.textContent = "送出中…";
     try {
-      var t = await PSRP.client.from("tickets").insert({ category: newCat, subject: subj }).select().single();
+      var t = await PSRP.client.from("tickets").insert({ category: newCat, subject: subj, anonymous: document.getElementById("n-anon").checked }).select().single();
       if (t.error) throw t.error;
-      var atts = newFiles.length ? await uploadFiles(me.id, t.data.id, newFiles) : [];
+      var atts = newFiles.length ? await uploadFiles(t.data.id, newFiles) : [];
       var m = await PSRP.client.from("ticket_messages").insert({ ticket_id: t.data.id, body: body, attachments: atts });
       if (m.error) throw m.error;
       newFiles = []; newCat = null;
@@ -318,10 +325,11 @@
   }
   async function msgNode(m) {
     var mine = m.author_id === me.id, n = names[m.author_id] || {};
+    var anonOwner = !m.author_id;
     var w = el("div", { class: "msg " + (mine ? "me" : "them") + (m.is_staff ? " staff" : "") });
     var who = el("div", { class: "who" });
     if (m.is_staff) who.appendChild(el("span", { class: "badge" }, "管理團隊"));
-    who.appendChild(el("span", null, (mine ? "你" : (n.display_name || (m.is_staff ? "管理團隊" : "玩家"))) + " · " + fmt(m.created_at)));
+    who.appendChild(el("span", null, (mine ? "你" : anonOwner ? "🕶️ 匿名玩家" : (n.display_name || (m.is_staff ? "管理團隊" : "玩家"))) + " · " + fmt(m.created_at)));
     w.appendChild(who);
     if (m.body) w.appendChild(el("div", { class: "bub" }, m.body));
     if ((m.attachments || []).length) {
@@ -341,10 +349,12 @@
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
     show("v-ticket");
     var v = document.getElementById("v-ticket"); v.innerHTML = '<p class="note">讀取中…</p>';
-    var r = await PSRP.client.from("tickets").select("*").eq("id", id).maybeSingle();
+    var r;
+    if (staff) { var all = await PSRP.client.rpc("staff_tickets"); r = { error: all.error, data: (all.data || []).filter(function (x) { return x.id === id; })[0] || null }; }
+    else r = await PSRP.client.from("tickets").select("*").eq("id", id).maybeSingle();
     if (r.error || !r.data) { v.innerHTML = ""; v.appendChild(el("div", { class: "notice warn" }, "找不到這張工單，或你沒有權限查看。")); v.appendChild(el("a", { href: "#", class: "btn-sec", style: "text-decoration:none" }, "← 返回工單列表")); return; }
     curTicket = r.data; lastMsgId = 0; replyFiles = [];
-    await loadNames([curTicket.user_id]);
+    if (curTicket.user_id) await loadNames([curTicket.user_id]);
     v.innerHTML = "";
     v.appendChild(el("p", null)).appendChild(el("a", { href: "#", class: "btn-sec", style: "text-decoration:none" }, "← 返回工單列表"));
     var head = el("div", { class: "chat-head" });
@@ -355,7 +365,8 @@
     m.appendChild(el("span", null, "#" + curTicket.id));
     m.appendChild(el("span", null, c[0] + " " + c[1]));
     m.appendChild(el("span", { class: "tst " + st[1], id: "t-status" }, st[0]));
-    if (staff) { var o = names[curTicket.user_id] || {}; m.appendChild(el("span", null, "玩家：" + (o.display_name || "—") + (o.discord ? "（Discord：" + o.discord + "）" : ""))); }
+    if (curTicket.anonymous) m.appendChild(el("span", null, staff ? "🕶️ 匿名工單（無法得知發起人）" : "🕶️ 匿名送出"));
+    else if (staff) { var o = names[curTicket.user_id] || {}; m.appendChild(el("span", null, "玩家：" + (o.display_name || "—") + (o.discord ? "（Discord：" + o.discord + "）" : ""))); }
     m.appendChild(el("span", null, "建立於 " + fmt(curTicket.created_at)));
     l.appendChild(m); head.appendChild(l);
     var acts = el("div", { class: "acts" });
@@ -377,14 +388,15 @@
   }
   async function pullMessages(initial) {
     if (!curTicket) return;
-    var r = await PSRP.client.from("ticket_messages").select("*").eq("ticket_id", curTicket.id).gt("id", lastMsgId).order("id");
+    var r = staff ? await PSRP.client.rpc("staff_ticket_messages", { tid: curTicket.id, after_id: lastMsgId })
+                  : await PSRP.client.from("ticket_messages").select("*").eq("ticket_id", curTicket.id).gt("id", lastMsgId).order("id");
     if (r.error || !r.data.length) return;
-    await loadNames(r.data.map(function (x) { return x.author_id; }));
+    await loadNames(r.data.map(function (x) { return x.author_id; }).filter(Boolean));
     var chat = document.getElementById("chat"); if (!chat) return;
     var atBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
     for (var i = 0; i < r.data.length; i++) { chat.appendChild(await msgNode(r.data[i])); lastMsgId = r.data[i].id; }
     if (initial || atBottom) chat.scrollTop = chat.scrollHeight;
-    if (!initial) { var t = await PSRP.client.from("tickets").select("*").eq("id", curTicket.id).maybeSingle(); if (t.data) { curTicket = t.data; var s = document.getElementById("t-status"); if (s) { s.textContent = STATUS[t.data.status][0]; s.className = "tst " + STATUS[t.data.status][1]; } markSeen(curTicket); } }
+    if (!initial) { var t; if (staff) { var all = await PSRP.client.rpc("staff_tickets"); t = { data: (all.data || []).filter(function (x) { return x.id === curTicket.id; })[0] }; } else t = await PSRP.client.from("tickets").select("*").eq("id", curTicket.id).maybeSingle(); if (t.data) { curTicket = t.data; var s = document.getElementById("t-status"); if (s) { s.textContent = STATUS[t.data.status][0]; s.className = "tst " + STATUS[t.data.status][1]; } markSeen(curTicket); } }
   }
   function composer() {
     var box = el("div", { class: "composer" });
@@ -410,7 +422,7 @@
       if (!body && !replyFiles.length) return;
       send.disabled = true; msg.className = "form-msg"; msg.textContent = "送出中…";
       try {
-        var atts = replyFiles.length ? await uploadFiles(curTicket.user_id, curTicket.id, replyFiles) : [];
+        var atts = replyFiles.length ? await uploadFiles(curTicket.id, replyFiles) : [];
         var r = await PSRP.client.from("ticket_messages").insert({ ticket_id: curTicket.id, body: body, attachments: atts });
         if (r.error) throw r.error;
         ta.value = ""; replyFiles = []; rf(); msg.textContent = "";
@@ -428,7 +440,8 @@
   }
   async function setStatus(s) {
     if (s === "closed" && !confirm(staff ? "確定要結案這張工單？" : "確定問題已解決並結案？結案後無法再回覆。")) return;
-    var r = await PSRP.client.from("tickets").update({ status: s }).eq("id", curTicket.id);
+    var r = (staff && curTicket.user_id !== me.id) ? await PSRP.client.rpc("staff_set_ticket_status", { tid: curTicket.id, new_status: s })
+                                                   : await PSRP.client.from("tickets").update({ status: s }).eq("id", curTicket.id);
     if (r.error) { alert(PSRP.errText(r.error)); return; }
     await loadList(); openTicket(curTicket.id);
   }
