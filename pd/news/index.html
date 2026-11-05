@@ -114,14 +114,14 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
 </style>
 </head>
 <body class="pd">
-<div class="pd-util"><div class="in"><span>Official Portal · Los Angeles Police Department · Palm State RolePlay</span><a href="/">← 返回 Palm State 主站</a></div></div>
-<header class="pdh"><div class="in"><a class="brand" href="/pd/"><img src="/assets/seal-lapd.png" alt="LAPD 警徽"><span><b>LAPD</b><small>LOS ANGELES POLICE DEPT.</small></span></a><nav aria-label="LAPD 選單"><a href="/pd/">首頁</a><a href="/pd/news/" aria-current="page">部門公告</a><a href="/pd/deployment/">勤務表</a><a href="/pd/manual/">部門手冊</a><a href="/pd/#codes">無線電代碼</a><a href="/apply/?dept=lapd">加入 LAPD</a><a href="https://law.psrp2.com/">加州法典</a></nav><div class="account" id="account"></div></div></header>
+<div class="pd-util"><div class="in"><span>Official Portal · Los Angeles Police Department · Palm State RolePlay</span><span style="display:flex;gap:16px"><a href="/safety/">← 公共安全</a><a href="/">Palm State 主站</a></span></div></div>
+<header class="pdh"><div class="in"><a class="brand" href="/pd/"><img src="/assets/seal-lapd.png" alt="LAPD 徽章"><span><b>LAPD</b><small>LOS ANGELES POLICE DEPT.</small></span></a><nav aria-label="LAPD 選單"><a href="/pd/">首頁</a><a href="/pd/news/" aria-current="page">部門公告</a><a href="/pd/deployment/">勤務表</a><a href="/pd/manual/">部門手冊</a><a href="/pd/#codes">無線電代碼</a><a href="/apply/?dept=lapd">加入 LAPD</a><a href="https://law.psrp2.com/">加州法典</a></nav><div class="account" id="account"></div></div></header>
 
 <section class="phead" id="phead">
   <div class="wrap">
     <span class="k">LAPD Bulletins</span>
     <h1>部門公告</h1>
-    <p>洛杉磯警察局的人事命令、勤務通報與招募資訊。標示 🔒 的是僅限 LAPD 成員閱讀的內部公告。</p>
+    <p>洛杉磯警察局的對外公告、人事命令、勤務通報與招募資訊。標示 🔒 的是僅限 LAPD 成員閱讀的內部公告。</p>
     <div class="meta" id="post-slot"></div>
   </div>
 </section>
@@ -202,7 +202,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   </div>
 </main>
 
-<footer class="pdf"><div class="in"><img src="/assets/seal-lapd.png" alt=""><div><b>LOS ANGELES POLICE DEPARTMENT</b><span class="motto">TO PROTECT AND TO SERVE · 保護與服務</span><small>Palm State RolePlay 角色扮演用途，並非真實警政機關或官方網站。</small></div><nav><a href="/pd/">LAPD 首頁</a><a href="/news/">伺服器公告</a><a href="/rules/">伺服器規則</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><a href="/">Palm State 主站</a></nav></div></footer>
+<footer class="pdf"><div class="in"><img src="/assets/seal-lapd.png" alt=""><div><b>LOS ANGELES POLICE DEPARTMENT</b><span class="motto">TO PROTECT AND TO SERVE · 保護與服務</span><small>Palm State RolePlay 角色扮演用途，並非真實政府機關或官方網站。</small></div><nav><a href="/pd/">LAPD 首頁</a><a href="/safety/">公共安全</a><a href="/news/">伺服器公告</a><a href="/rules/">伺服器規則</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><a href="/">Palm State 主站</a></nav></div></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="/assets/config.js"></script>
@@ -224,7 +224,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   var all = [], me = null, shown = PAGE, filt = { dept: "", cat: "", q: "" }, editing = null, files = [];
   var bucket = PSRP.client ? PSRP.client.storage.from("announcements") : null;
   var ibucket = PSRP.client ? PSRP.client.storage.from("ann-internal") : null;
-  var PD = window.PD_DEPT || "";
+  var PD = window.PD_DEPT || "", ONLY = PD || "all";
   function bucketFor(a) { return a && a.visibility === "internal" ? ibucket : bucket; }
   function isInt(a) { return a.visibility === "internal"; }
 
@@ -236,13 +236,13 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     if (d === "all") return PSRP.hasRole(me, "admin");
     return PSRP.hasRole(me, { lapd: "police_cmd", lafd: "fire_cmd", ems: "ems_cmd" }[d]);
   }
-  function myDepts() { return Object.keys(DEPTS).filter(function (d) { return (!PD || d === PD) && canManage(d); }); }
+  function myDepts() { return Object.keys(DEPTS).filter(function (d) { return d === ONLY && canManage(d); }); }
 
   /* ---------- 讀取 ---------- */
   async function load() {
     var r = await PSRP.client.from("announcements").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(1000);
     if (r.error) { document.getElementById("count").textContent = "讀取失敗：" + PSRP.errText(r.error); return; }
-    all = PD ? r.data.filter(function (a) { return a.department === PD; }) : r.data;
+    all = r.data.filter(function (a) { return a.department === ONLY; });
     all.forEach(function (a) { a._hay = [a.title, a.summary, a.body, a.ref_no, a.category, DEPTS[a.department].name, DEPTS[a.department].short, a.signer, isInt(a) ? "內部 internal" : "公開"].join("\n").toLowerCase(); });
     var priv = []; all.forEach(function (a) { if (isInt(a)) (a.attachments || []).forEach(function (f) { if (f.path) priv.push(f); }); });
     if (priv.length) {
@@ -504,7 +504,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   /* ---------- 啟動 ---------- */
   async function start() {
     catChips();
-    if (PD) { filt.dept = PD; document.getElementById("f-dept").hidden = true; }
+    filt.dept = ONLY; document.getElementById("f-dept").hidden = true;
     if (!PSRP.client) { document.getElementById("count").textContent = "公告系統暫時無法使用。"; return; }
     PSRP.mountAccountChip(document.getElementById("account"));
     me = await PSRP.profile();
@@ -512,6 +512,11 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       var b = el("button", { type: "button", class: "btn-primary" }, "＋ 發布公告");
       b.addEventListener("click", function () { openCompose(null); });
       document.getElementById("post-slot").appendChild(b);
+    }
+    if (!PD && me && myDepts().length === 0) {
+      var home = { police_cmd: ["/pd/news/", "LAPD"], fire_cmd: ["/fd/news/", "LAFD"], ems_cmd: ["/ems/news/", "EMS"] }, links = [];
+      Object.keys(home).forEach(function (r) { if (PSRP.hasRole(me, r)) links.push(home[r]); });
+      links.forEach(function (x) { var a = el("a", { class: "btn-sec", href: x[0], style: "text-decoration:none" }, "到 " + x[1] + " 部門網站發布公告 →"); document.getElementById("post-slot").appendChild(a); });
     }
     load();
   }
