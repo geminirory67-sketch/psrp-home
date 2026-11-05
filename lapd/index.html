@@ -3,7 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+.homebar .edit-doc-btn { background: var(--gold); color: #141414; padding: 3px 10px; border-radius: 4px; font-weight: 700; font-size: 12px; letter-spacing: .04em; }
+.homebar .edit-doc-btn:hover { color: #000; }
+.locked { max-width: 560px; margin: 60px auto; text-align: center; line-height: 1.8; }
+.locked h2 { font-size: 26px; margin-bottom: 8px; }
+.locked a.btn { display: inline-block; margin-top: 14px; padding: 10px 20px; border-radius: 8px; background: #f5b942; color: #111; font-weight: 700; text-decoration: none; }
+body.is-locked .bar, body.is-locked .tools, body.is-locked .side, body.is-locked .jump { display: none !important; }
+body.is-locked .content { display: block !important; }
+body.is-locked .layout { display: block; }
+.doc-updated { font-size: 12px; opacity: .75; }
+</style>
 </head>
 <body>
 <title>LAPD 部門手冊 · Palm State RolePlay</title>
@@ -190,7 +200,7 @@ blockquote { margin: 0 0 12px; padding: 8px 14px; border-left: 3px solid var(--l
 
 <header class="mast">
   <div class="wrap">
-    <p class="kicker homebar"><a class="home" href="https://psrp2.com/"><img src="/logo.jpg" alt="" width="28" height="28">← PALM STATE ROLEPLAY 首頁</a><a href="https://law.psrp2.com/">加州法典 →</a><a class="dc" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></p>
+    <p class="kicker homebar"><a class="home" href="https://psrp2.com/"><img src="/logo.jpg" alt="" width="28" height="28">← PALM STATE ROLEPLAY 首頁</a><a href="/rules/">伺服器規則 →</a><a href="/news/">公告 →</a><a href="https://law.psrp2.com/">加州法典 →</a><a class="dc" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><span id="editslot"></span></p>
     <h1>LAPD 部門手冊<small>Department Manual · 僅限 LAPD 成員</small></h1>
     <div class="scope"><b>僅適用於 Palm State RolePlay</b><span>Roleplay use only</span></div>
   </div>
@@ -484,17 +494,12 @@ window.__initBook = function () {
 };
 </script>
 
-<style>
-.locked { max-width: 560px; margin: 60px auto; text-align: center; line-height: 1.8; }
-.locked h2 { font-size: 26px; margin-bottom: 8px; }
-.locked a.btn { display: inline-block; margin-top: 14px; padding: 10px 20px; border-radius: 8px; background: #f5b942; color: #111; font-weight: 700; text-decoration: none; }
-body.is-locked .bar, body.is-locked .tools, body.is-locked .side, body.is-locked .jump { display: none !important; }
-body.is-locked #book-lapd { display: block !important; }
-body.is-locked .layout { display: block; }
-</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="/assets/config.js"></script>
 <script src="/assets/auth.js"></script>
+<script src="/assets/marked.js"></script>
+<script src="/assets/mdbook.js"></script>
+<script src="/assets/docs.js"></script>
 <script>
 (async function () {
   document.body.classList.add("is-locked");
@@ -509,14 +514,18 @@ body.is-locked .layout { display: block; }
   var me = await PSRP.profile();
   if (!me) { lock("僅限 LAPD 成員", "部門手冊只開放給 LAPD 成員。請先登入你的帳號。", "/apply/?next=/lapd/", "登入／註冊"); return; }
   if (!PSRP.hasRole(me, "police")) { lock("需要 LAPD 身分組", "你的帳號（" + (me.display_name || me.email) + "）目前沒有 LAPD 身分組。通過招募審核後，管理團隊會開通權限。", "/apply/", "前往公職招募"); return; }
-  var r = await PSRP.client.from("documents").select("body, nav").eq("slug", "lapd").maybeSingle();
-  if (r.error || !r.data) { lock("找不到手冊", r.error ? PSRP.errText(r.error) : "管理團隊尚未上傳手冊內容。"); return; }
-  var parts = (r.data.nav || "").split("<!--OPTS-->");
-  document.querySelector('.nav[data-for="lapd"]').innerHTML = parts[0] || "";
-  document.querySelector('.jump[data-for="lapd"]').insertAdjacentHTML("beforeend", parts[1] || "");
-  document.getElementById("book-lapd").innerHTML = r.data.body;
+  var d;
+  try { d = await PSRPDocs.get("lapd", { cache: false, timeout: 6000 }); } catch (e) { lock("讀取失敗", PSRP.errText(e)); return; }
+  if (!d) { lock("找不到手冊", "管理團隊尚未上傳手冊內容。"); return; }
+  var html, navH, optH;
+  if (d.source) { var r = PSRPMd.renderBook(d.source, "d"); html = r.html; navH = PSRPMd.navHtml(r.nav); optH = PSRPMd.navOpts(r.nav); }
+  else { var parts = (d.nav || "").split("<!--OPTS-->"); html = d.body; navH = parts[0] || ""; optH = parts[1] || ""; }
+  document.querySelector('.nav[data-for="lapd"]').innerHTML = navH;
+  document.querySelector('.jump[data-for="lapd"]').insertAdjacentHTML("beforeend", optH);
+  document.getElementById("book-lapd").innerHTML = html;
   document.body.classList.remove("is-locked");
   window.__initBook();
+  PSRPDocs.editButton(document.getElementById("editslot"), "lapd", d.editor_role || "police_cmd");
 })();
 </script>
 </body>
