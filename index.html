@@ -115,6 +115,16 @@ section.block { padding-block: clamp(64px, 9vw, 104px); }
 .feat p { margin: 0; color: var(--muted); font-size: 15px; }
 
 /* manuals */
+.latest { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.lcard { text-decoration: none; color: inherit; display: grid; gap: 8px; padding: 20px; border-radius: 12px; background: linear-gradient(160deg, #1d2550, #151b36); border: 1px solid var(--line); border-top: 4px solid var(--c); transition: transform .15s ease, border-color .15s ease; }
+.lcard:hover { transform: translateY(-2px); border-color: var(--gold); border-top-color: var(--c); }
+.lcard .m { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+.lcard .m b { color: var(--c); font-family: var(--font-display); letter-spacing: .08em; }
+.lcard h3 { margin: 0; font-size: 18px; line-height: 1.45; }
+.lcard p { margin: 0; color: #cdd2e6; font-size: 14.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.latest-more { margin-top: 18px; }
+.latest-more a { color: var(--gold); text-decoration: none; font-weight: 700; }
+[hidden] { display: none !important; }
 .docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
 .acct { display: inline-flex; gap: 6px; align-items: center; margin-left: 6px; font-size: 13.5px; }
 .acct a, .acct button { font: inherit; font-size: 13.5px; color: var(--ink); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; text-decoration: none; white-space: nowrap; }
@@ -180,7 +190,8 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
     <nav class="links" id="links" aria-label="主選單">
       <a href="#depts">部門</a>
       <a href="#jobs">職業</a>
-      <a href="/rules/">伺服器規則</a>
+      <a href="/rules/">規則</a>
+      <a href="/news/">公告</a>
       <a href="/apply/">公職招募</a>
       <a class="doc" href="https://law.psrp2.com/">加州法典</a>
       <a class="doc" href="/lapd/">LAPD 手冊</a>
@@ -327,6 +338,18 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
     </div>
   </section>
 
+  <section class="block" id="news" aria-labelledby="news-h" hidden>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">Latest Notices</span>
+        <h2 id="news-h">最新公告</h2>
+        <p>管理團隊與各公職部門的正式公告。</p>
+      </div>
+      <div class="latest" id="latest"></div>
+      <p class="latest-more"><a href="/news/">查看全部公告 →</a></p>
+    </div>
+  </section>
+
   <section class="block" id="docs" aria-labelledby="docs-h">
     <div class="wrap">
       <div class="sec-head">
@@ -407,6 +430,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <li><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></li>
         <li><a href="https://law.psrp2.com/">加州法典</a></li>
         <li><a href="/rules/">伺服器規則</a></li>
+        <li><a href="/news/">公告</a></li>
         <li><a href="/apply/">公職招募</a></li>
         <li><a href="/lapd/">LAPD 部門手冊（成員限定）</a></li>
       </ul>
@@ -427,6 +451,25 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
 <script src="/assets/auth.js"></script>
 <script>
 if (window.PSRP) PSRP.mountAccountChip(document.getElementById("account"));
+(async function () {
+  if (!window.PSRP || !PSRP.client) return;
+  var C = { all: ["PSRP", "#e8b85a"], lapd: ["LAPD", "#4a86ff"], lafd: ["LAFD", "#ff4b3a"], ems: ["EMS", "#2fd0a6"] };
+  var r = await PSRP.client.from("announcements").select("id, department, category, title, summary, body, created_at, pinned").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(3);
+  if (r.error || !r.data.length) return;
+  var box = document.getElementById("latest");
+  r.data.forEach(function (a) {
+    var c = C[a.department] || C.all, d = new Date(a.created_at);
+    var card = PSRP.el("a", { class: "lcard", href: "/news/#n" + a.id, style: "--c:" + c[1] });
+    var m = PSRP.el("span", { class: "m" });
+    m.appendChild(PSRP.el("b", null, c[0])); m.appendChild(PSRP.el("span", null, a.category));
+    m.appendChild(PSRP.el("span", null, d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate()));
+    if (a.pinned) m.appendChild(PSRP.el("span", null, "📌 置頂"));
+    card.appendChild(m); card.appendChild(PSRP.el("h3", null, a.title));
+    card.appendChild(PSRP.el("p", null, a.summary || a.body.replace(/[#>*_`|\-]/g, " ").replace(/\s+/g, " ").slice(0, 120)));
+    box.appendChild(card);
+  });
+  document.getElementById("news").hidden = false;
+})();
 (function () {
   var b = document.getElementById("menu"), l = document.getElementById("links");
   b.addEventListener("click", function () { var o = l.classList.toggle("open"); b.setAttribute("aria-expanded", String(o)); });
