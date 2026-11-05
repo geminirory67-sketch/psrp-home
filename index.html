@@ -9,6 +9,8 @@
 <meta property="og:description" content="以洛杉磯為舞台的 FiveM 角色扮演伺服器。警察、消防、醫護、司法與城市經濟。">
 <meta property="og:url" content="https://psrp2.com/">
 <meta name="theme-color" content="#0d1124">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta property="og:image" content="https://psrp2.com/logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
@@ -46,7 +48,7 @@ a { color: inherit; }
 .top { position: sticky; top: 0; z-index: 30; background: rgba(13,17,36,.86); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); padding-top: env(safe-area-inset-top, 0px); }
 .top .wrap { display: flex; align-items: center; gap: 18px; height: 64px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
-.brand svg { flex: none; }
+.brand .logo { flex: none; border-radius: 8px; display: block; }
 .brand b { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: .06em; text-transform: uppercase; line-height: 1; }
 .brand small { display: block; font-size: 11px; color: var(--muted); letter-spacing: .14em; font-weight: 500; }
 .links { display: flex; gap: 4px; align-items: center; }
@@ -63,6 +65,7 @@ a { color: inherit; }
 .stars { position: absolute; inset: 0; z-index: 0; background-image: radial-gradient(1px 1px at 12% 18%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 32% 8%, #fff6 50%, transparent 51%), radial-gradient(1.5px 1.5px at 58% 14%, #fff9 50%, transparent 51%), radial-gradient(1px 1px at 74% 24%, #fff5 50%, transparent 51%), radial-gradient(1px 1px at 88% 10%, #fff7 50%, transparent 51%), radial-gradient(1px 1px at 46% 28%, #fff4 50%, transparent 51%); }
 .sun { position: absolute; z-index: 0; left: 50%; bottom: 70px; width: min(520px, 80vw); aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle at 50% 45%, #ffd27a 0%, #ff9a4a 45%, rgba(255,110,70,0) 70%); opacity: .9; }
 .city { position: absolute; z-index: 1; left: 0; right: 0; bottom: -1px; width: 100%; height: auto; display: block; }
+.hero-logo { display: block; width: clamp(88px, 12vw, 120px); height: auto; border-radius: 18px; box-shadow: 0 12px 40px rgba(0,0,0,.45); margin-bottom: 22px; }
 .kicker { font-family: var(--font-display); letter-spacing: .32em; font-size: 15px; color: var(--gold); text-transform: uppercase; margin: 0 0 14px; font-weight: 600; }
 .hero h1 { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; line-height: .92; letter-spacing: .01em; font-size: clamp(54px, 10vw, 128px); text-wrap: balance; }
 .hero h1 span { display: block; color: transparent; -webkit-text-stroke: 2px #fff; }
@@ -83,7 +86,7 @@ section.block { padding-block: clamp(64px, 9vw, 104px); }
 .sec-head p { margin: 4px 0 0; color: var(--muted); }
 
 /* departments: dispatch board */
-.depts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.depts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 .dept { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 20px; display: grid; gap: 12px; align-content: start; overflow: hidden; }
 .dept::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--c); }
 .dept-top { display: flex; align-items: center; gap: 14px; padding-right: 84px; }
@@ -97,6 +100,13 @@ section.block { padding-block: clamp(64px, 9vw, 104px); }
 .dept a.more { justify-self: start; font-size: 14px; color: var(--c); text-decoration: none; font-weight: 700; }
 .dept a.more:hover { text-decoration: underline; }
 
+
+.jobgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.job { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--civ); border-radius: 10px; padding: 16px 18px; }
+.job b { font-size: 17px; }
+.job span { display: block; font-family: var(--font-display); letter-spacing: .14em; text-transform: uppercase; font-size: 13px; color: var(--civ); margin: 2px 0 6px; font-weight: 600; }
+.job p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.note { margin: 18px 0 0; color: var(--muted); font-size: 13.5px; }
 /* city strip */
 .strip { background: var(--night-2); border-block: 1px solid var(--line); }
 .feats { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 28px; }
@@ -156,15 +166,16 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="Palm State RolePlay 首頁">
-      <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#ff8a3d"/><path d="M20 38 C21 30 21 22 19.5 15" stroke="#0d1124" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M19.5 15 C14 11 9 12 6 16 M19.5 15 C16 9 11 8 8 9 M19.5 15 C22 9 27 8 31 10 M19.5 15 C25 11 30 13 33 17 M19.5 15 C19 10 20 6 22 4" stroke="#0d1124" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      <img src="logo.jpg" alt="" width="40" height="40" class="logo">
       <span><b>Palm State</b><small>ROLEPLAY · LOS ANGELES</small></span>
     </a>
     <nav class="links" id="links" aria-label="主選單">
       <a href="#depts">部門</a>
+      <a href="#jobs">職業</a>
       <a href="#city">城市生活</a>
       <a href="#join">如何加入</a>
-      <a class="doc" href="https://law.psrp2.com/#law">加州法典</a>
-      <a class="doc" href="https://law.psrp2.com/#lapd">LAPD 手冊</a>
+      <a class="doc" href="https://law.psrp2.com/">加州法典</a>
+      <a class="doc" href="https://law.psrp2.com/lapd/">LAPD 手冊</a>
     </nav>
     <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="links">選單</button>
     <a class="btn-discord" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">
@@ -179,10 +190,11 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
     <div class="stars" aria-hidden="true"></div>
     <div class="sun" aria-hidden="true"></div>
     <div class="wrap">
-      <p class="kicker">FiveM · Los Angeles · DOJ RolePlay</p>
+      <img class="hero-logo" src="logo.jpg" alt="Palm State RolePlay logo" width="120" height="120">
+      <p class="kicker">FiveM · Los Angeles · Serious RolePlay</p>
       <h1 id="h1">Palm State<span>RolePlay</span></h1>
       <p class="tagline">在洛杉磯，寫下你的故事。</p>
-      <p class="sub">以洛杉磯為舞台的角色扮演伺服器。穿上制服守護城市、衝進火場救人、在急診室與時間賽跑，或在法庭上為正義辯論；也可以經營生意，在這座天使之城闖出名號。</p>
+      <p class="sub">以洛杉磯為舞台的角色扮演伺服器。穿上制服守護城市、衝進火場救人、在急診室與時間賽跑；也可以從計程車司機、技師做起，開店創業，在這座天使之城闖出名號。</p>
       <div class="cta">
         <a class="btn-discord" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.6 5.3A17 17 0 0 0 15.4 4l-.5 1a15.6 15.6 0 0 0-5.8 0L8.6 4a17 17 0 0 0-4.2 1.3C1.7 9.3 1 13.2 1.3 17a17 17 0 0 0 5.2 2.6l1.1-1.8c-.6-.2-1.2-.5-1.8-.9l.4-.3a12.2 12.2 0 0 0 11.6 0l.4.3c-.6.4-1.2.7-1.8.9l1.1 1.8a17 17 0 0 0 5.2-2.6c.4-4.4-.7-8.3-3.1-11.7ZM8.7 14.7c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Zm6.6 0c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Z"/></svg>
@@ -192,7 +204,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       </div>
       <div class="pills">
         <span class="pill">真實加州法條</span>
-        <span class="pill">完整 DOJ 司法流程</span>
+        <span class="pill">多元職業</span>
         <span class="pill">城市經濟系統</span>
         <span class="pill">中文社群</span>
       </div>
@@ -222,7 +234,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
   <section class="block" id="depts" aria-labelledby="depts-h">
     <div class="wrap">
       <div class="sec-head">
-        <span class="k">Public Safety &amp; Justice</span>
+        <span class="k">Public Safety</span>
         <h2 id="depts-h">選擇你的崗位</h2>
         <p>每個部門都有完整的階級、訓練與標準作業程序。從學院新生做起，一路晉升到指揮職。</p>
       </div>
@@ -235,7 +247,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
           </div>
           <p>巡邏、交通執法、刑事偵查與特勤任務。依加州法條執法，所有行動都要經得起法庭檢驗。</p>
           <ul><li>巡邏</li><li>刑事偵查</li><li>SWAT</li><li>K9</li><li>空中支援</li><li>交通局</li></ul>
-          <a class="more" href="https://law.psrp2.com/#lapd">閱讀 LAPD 部門手冊 →</a>
+          <a class="more" href="https://law.psrp2.com/lapd/">閱讀 LAPD 部門手冊 →</a>
         </article>
         <article class="dept" style="--c: var(--lafd)">
           <span class="code">ALL HANDS</span>
@@ -255,16 +267,6 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
           <p>救護車在第一時間抵達現場，急診室接手搶救。槍擊、車禍、用藥過量，每一通 911 都是與時間賽跑。</p>
           <ul><li>救護車</li><li>急診室</li><li>外科</li><li>醫護訓練</li></ul>
         </article>
-        <article class="dept" style="--c: var(--doj)">
-          <span class="code">COURT 101</span>
-          <div class="dept-top">
-            <div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M7 21h10M4 7h16M12 4.5 4 7M12 4.5 20 7"/><path d="M4 7 1.5 13a3 3 0 0 0 5 0L4 7Zm16 0-2.5 6a3 3 0 0 0 5 0L20 7Z"/></svg></div>
-            <h3>司法部<span class="en">DOJ &amp; Courts</span></h3>
-          </div>
-          <p>法官、地方檢察官、公設辯護人與律師。逮捕之後才是故事的開始：提審、預審、陪審團與判決。</p>
-          <ul><li>法官</li><li>地檢署</li><li>公設辯護人</li><li>私人律師</li></ul>
-          <a class="more" href="https://law.psrp2.com/#law">查閱加州法典 →</a>
-        </article>
         <article class="dept" style="--c: var(--civ)">
           <span class="code">CITY HALL</span>
           <div class="dept-top">
@@ -273,8 +275,31 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
           </div>
           <p>開餐廳、修車廠、夜店或物流公司，申請執照、僱用員工、繳稅賺錢。城市的經濟由市民撐起來。</p>
           <ul><li>創業</li><li>職業</li><li>不動產</li><li>媒體</li></ul>
+          <a class="more" href="#jobs">看看有哪些職業 →</a>
         </article>
       </div>
+    </div>
+  </section>
+
+
+  <section class="block jobs" id="jobs" aria-labelledby="jobs-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">Economy &amp; Careers</span>
+        <h2 id="jobs-h">不穿制服，也有很多路可以走</h2>
+        <p>城市有完整的經濟系統。市民可以打工存錢、考取執照、開設自己的店面，薪水、物價與稅收都在同一個經濟體系裡流動。</p>
+      </div>
+      <div class="jobgrid">
+        <div class="job"><b>交通運輸</b><span>Transport</span><p>計程車、巴士司機、貨運與物流，跑遍整個洛杉磯。</p></div>
+        <div class="job"><b>汽車產業</b><span>Automotive</span><p>修車技師、改裝廠、拖吊、汽車銷售。</p></div>
+        <div class="job"><b>餐飲服務</b><span>Food &amp; Drink</span><p>餐廳、咖啡廳、餐車、酒吧與夜店。</p></div>
+        <div class="job"><b>零售商店</b><span>Retail</span><p>便利商店、服飾店、五金行與各式商店。</p></div>
+        <div class="job"><b>不動產</b><span>Real Estate</span><p>房屋買賣、租賃仲介、物業管理。</p></div>
+        <div class="job"><b>媒體娛樂</b><span>Media</span><p>新聞記者、電台主持、活動策劃。</p></div>
+        <div class="job"><b>勞動工作</b><span>Labor</span><p>工地、伐木、採礦、捕魚與農場，靠雙手賺錢。</p></div>
+        <div class="job"><b>自行創業</b><span>Business Owner</span><p>申請營業執照、僱用員工、經營自己的公司。</p></div>
+      </div>
+      <p class="note">實際開放的職業與薪資以 Discord 公告為準。</p>
     </div>
   </section>
 
@@ -285,7 +310,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <h2 id="city-h">一座真實運作的城市</h2>
       </div>
       <div class="feats">
-        <div class="feat"><h4><small>Law</small>真實法條，真實後果</h4><p>犯罪、交通、民事全部依照加州法典，刑期與罰金都有依據，判決由法庭決定。</p></div>
+        <div class="feat"><h4><small>Law</small>真實法條，真實後果</h4><p>犯罪、交通、民事全部依照加州法典，罰金與刑期都有依據可查。</p></div>
         <div class="feat"><h4><small>Economy</small>有價值的經濟</h4><p>工作、經商、置產與執照制度，每一分錢都要自己賺，也要繳稅。</p></div>
         <div class="feat"><h4><small>Dispatch</small>完整勤務流程</h4><p>統一的無線電代碼、呼號與派遣，警消醫護在同一個頻道協同出勤。</p></div>
         <div class="feat"><h4><small>Story</small>角色優先</h4><p>每個角色都有自己的故事線。我們重視沉浸感，也重視玩家之間的尊重。</p></div>
@@ -298,10 +323,10 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       <div class="sec-head">
         <span class="k">Reference Library</span>
         <h2 id="docs-h">法規資料庫</h2>
-        <p>執法、檢察、辯護與審判都以這兩份文件為準，可以用中文、英文或條號即時搜尋。</p>
+        <p>執法與遊戲內的法律問題都以這兩份文件為準，可以用中文、英文或條號即時搜尋。</p>
       </div>
       <div class="docs">
-        <a class="docc" href="https://law.psrp2.com/#law">
+        <a class="docc" href="https://law.psrp2.com/">
           <span class="spine" style="--b: #b88a2e" aria-hidden="true"></span>
           <span>
             <h3>加州法典</h3>
@@ -310,7 +335,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
             <span class="go">開啟法典 →</span>
           </span>
         </a>
-        <a class="docc" href="https://law.psrp2.com/#lapd">
+        <a class="docc" href="https://law.psrp2.com/lapd/">
           <span class="spine" style="--b: #2f5fb8" aria-hidden="true"></span>
           <span>
             <h3>LAPD 部門手冊</h3>
@@ -353,8 +378,8 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       <p>以洛杉磯為舞台的 FiveM 角色扮演伺服器。</p>
       <ul>
         <li><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></li>
-        <li><a href="https://law.psrp2.com/#law">加州法典</a></li>
-        <li><a href="https://law.psrp2.com/#lapd">LAPD 部門手冊</a></li>
+        <li><a href="https://law.psrp2.com/">加州法典</a></li>
+        <li><a href="https://law.psrp2.com/lapd/">LAPD 部門手冊</a></li>
       </ul>
     </div>
     <div>
