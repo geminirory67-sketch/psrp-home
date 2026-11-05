@@ -124,7 +124,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       <a href="/apply/">公職招募</a>
       <a href="/support/">工單</a>
       <a href="https://law.psrp2.com/">加州法典</a>
-      <a href="/pd/">LAPD 警察局</a>
+      <a href="/safety/">公共安全</a>
     </nav>
     <div class="account" id="account"></div>
   </div>
@@ -134,7 +134,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   <div class="wrap">
     <span class="k">Public Notices</span>
     <h1>公告欄</h1>
-    <p>伺服器管理團隊與各公職部門的正式公告。可以用關鍵字、字號或部門快速搜尋。</p>
+    <p>Palm State RolePlay 管理團隊的伺服器官方公告。各公職部門的公告請到<a href="/safety/" style="color:var(--gold)">公共安全</a>內的部門網站查看。</p>
     <div class="meta" id="post-slot"></div>
   </div>
 </section>
@@ -241,7 +241,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   var all = [], me = null, shown = PAGE, filt = { dept: "", cat: "", q: "" }, editing = null, files = [];
   var bucket = PSRP.client ? PSRP.client.storage.from("announcements") : null;
   var ibucket = PSRP.client ? PSRP.client.storage.from("ann-internal") : null;
-  var PD = window.PD_DEPT || "";
+  var PD = window.PD_DEPT || "", ONLY = PD || "all";
   function bucketFor(a) { return a && a.visibility === "internal" ? ibucket : bucket; }
   function isInt(a) { return a.visibility === "internal"; }
 
@@ -253,13 +253,13 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     if (d === "all") return PSRP.hasRole(me, "admin");
     return PSRP.hasRole(me, { lapd: "police_cmd", lafd: "fire_cmd", ems: "ems_cmd" }[d]);
   }
-  function myDepts() { return Object.keys(DEPTS).filter(function (d) { return (!PD || d === PD) && canManage(d); }); }
+  function myDepts() { return Object.keys(DEPTS).filter(function (d) { return d === ONLY && canManage(d); }); }
 
   /* ---------- 讀取 ---------- */
   async function load() {
     var r = await PSRP.client.from("announcements").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(1000);
     if (r.error) { document.getElementById("count").textContent = "讀取失敗：" + PSRP.errText(r.error); return; }
-    all = PD ? r.data.filter(function (a) { return a.department === PD; }) : r.data;
+    all = r.data.filter(function (a) { return a.department === ONLY; });
     all.forEach(function (a) { a._hay = [a.title, a.summary, a.body, a.ref_no, a.category, DEPTS[a.department].name, DEPTS[a.department].short, a.signer, isInt(a) ? "內部 internal" : "公開"].join("\n").toLowerCase(); });
     var priv = []; all.forEach(function (a) { if (isInt(a)) (a.attachments || []).forEach(function (f) { if (f.path) priv.push(f); }); });
     if (priv.length) {
@@ -521,7 +521,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   /* ---------- 啟動 ---------- */
   async function start() {
     catChips();
-    if (PD) { filt.dept = PD; document.getElementById("f-dept").hidden = true; }
+    filt.dept = ONLY; document.getElementById("f-dept").hidden = true;
     if (!PSRP.client) { document.getElementById("count").textContent = "公告系統暫時無法使用。"; return; }
     PSRP.mountAccountChip(document.getElementById("account"));
     me = await PSRP.profile();
@@ -529,6 +529,11 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
       var b = el("button", { type: "button", class: "btn-primary" }, "＋ 發布公告");
       b.addEventListener("click", function () { openCompose(null); });
       document.getElementById("post-slot").appendChild(b);
+    }
+    if (!PD && me && myDepts().length === 0) {
+      var home = { police_cmd: ["/pd/news/", "LAPD"], fire_cmd: ["/fd/news/", "LAFD"], ems_cmd: ["/ems/news/", "EMS"] }, links = [];
+      Object.keys(home).forEach(function (r) { if (PSRP.hasRole(me, r)) links.push(home[r]); });
+      links.forEach(function (x) { var a = el("a", { class: "btn-sec", href: x[0], style: "text-decoration:none" }, "到 " + x[1] + " 部門網站發布公告 →"); document.getElementById("post-slot").appendChild(a); });
     }
     load();
   }
