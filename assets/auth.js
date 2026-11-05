@@ -1,6 +1,27 @@
 /* Palm State RolePlay — 共用帳號模組 */
 (function () {
   var cfg = window.PSRP_CONFIG || {};
+
+  /* 登入狀態保存：預設關閉瀏覽器就登出；勾選「保持登入」則保留 7 天 */
+  var REMEMBER_KEY = "psrp-remember-until", REMEMBER_DAYS = 7;
+  (function enforceSession() {
+    try {
+      var alive = /(?:^|;\s*)psrp_alive=1/.test(document.cookie);
+      var until = parseInt(localStorage.getItem(REMEMBER_KEY) || "0", 10) || 0;
+      var expired = until && until < Date.now();
+      if ((!alive && !until) || expired) {
+        Object.keys(localStorage).forEach(function (k) { if (/^sb-.*-auth-token/.test(k)) localStorage.removeItem(k); });
+        localStorage.removeItem(REMEMBER_KEY);
+      }
+      document.cookie = "psrp_alive=1; path=/; SameSite=Lax" + (location.protocol === "https:" ? "; Secure" : "");
+    } catch (e) { /* 瀏覽器不允許儲存時略過 */ }
+  })();
+  function setRemember(on) {
+    try {
+      if (on) localStorage.setItem(REMEMBER_KEY, String(Date.now() + REMEMBER_DAYS * 86400000));
+      else localStorage.removeItem(REMEMBER_KEY);
+    } catch (e) { /* 略過 */ }
+  }
   var ready = !!(cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase);
   var client = ready ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
 
@@ -52,7 +73,7 @@
     if (r.error) throw r.error;
     return r.data;
   }
-  async function signOut() { if (client) await client.auth.signOut(); location.reload(); }
+  async function signOut() { setRemember(false); if (client) await client.auth.signOut(); location.reload(); }
 
   function el(tag, attrs, text) {
     var e = document.createElement(tag);
@@ -92,6 +113,10 @@
     var msg = el("p", { class: "form-msg", role: "status" });
     var btn = el("button", { type: "submit", class: "btn-primary" }, "登入");
     var forgot = el("button", { type: "button", class: "auth-forgot" }, "忘記密碼？");
+    var remWrap = el("label", { class: "check" });
+    var rem = el("input", { type: "checkbox", id: "au-remember" });
+    remWrap.appendChild(rem); remWrap.appendChild(el("span", null, "保持登入 7 天（公用電腦請勿勾選）"));
+    form.appendChild(remWrap);
     form.appendChild(msg); form.appendChild(btn); form.appendChild(forgot);
     box.appendChild(form);
     forgot.addEventListener("click", async function () {
@@ -128,10 +153,10 @@
       }
       btn.disabled = true;
       try {
-        if (mode === "login") { await signIn(email, pw); onDone && onDone(); }
+        if (mode === "login") { await signIn(email, pw); setRemember(rem.checked); onDone && onDone(); }
         else {
           var d = await signUp(email, pw, fName.input.value.trim(), fDc.input.value.trim());
-          if (d.session) { onDone && onDone(); }
+          if (d.session) { setRemember(rem.checked); onDone && onDone(); }
           else { msg.className = "form-msg ok"; msg.textContent = "帳號已建立。請到信箱點擊確認信中的連結，然後回來登入。"; setMode("login"); fEmail.input.value = email; }
         }
       } catch (err) { msg.className = "form-msg err"; msg.textContent = errText(err); }
