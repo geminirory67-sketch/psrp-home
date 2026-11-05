@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>編輯申請表 · Palm State RolePlay</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+body { overflow-x: hidden; }
+main.wrap { max-width: 1500px; }
+.ed-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.ed-head h1 { margin: 0; font-family: var(--font-zh-display); font-size: 22px; }
+.ed-head .st { color: var(--muted); font-size: 13.5px; }
+.ed-head .acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.dirty-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--sun); margin-right: 6px; }
+.ed { display: grid; grid-template-columns: 240px minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; padding: 14px 0 30px; height: calc(100vh - 150px); min-height: 560px; }
+.chlist { overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+.chlist button.ch { display: block; width: 100%; text-align: left; background: none; border: 0; color: var(--muted); font: inherit; font-size: 13.5px; padding: 8px 10px; border-radius: 6px; cursor: pointer; line-height: 1.45; }
+.chlist button.ch small { display: block; font-size: 12px; opacity: .75; }
+.chlist button.ch:hover { background: var(--panel-2); color: var(--ink); }
+.chlist button.ch[aria-current="true"] { background: var(--panel-2); color: var(--ink); box-shadow: inset 3px 0 0 var(--gold); }
+.chlist .chctl { display: flex; gap: 4px; padding: 2px 4px 8px 12px; }
+.chlist .chctl button, .qh button { font: inherit; font-size: 12px; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+.chlist .chctl button:disabled, .qh button:disabled { opacity: .35; cursor: default; }
+.chlist .chctl .del, .qh .del { color: #ff8a7a; }
+.chlist .chctl .del { margin-left: auto; }
+.chlist .add { width: 100%; margin-top: 8px; }
+.chlist .sep { height: 1px; background: var(--line); margin: 6px 4px; }
+.pane { display: flex; flex-direction: column; min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.pane .ph { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.pane .ph b { color: var(--ink); font-size: 14px; }
+.qedit { flex: 1; min-height: 0; overflow: auto; padding: 14px; display: grid; gap: 12px; align-content: start; background: var(--night-2); }
+.qedit .fld > span { font-size: 13px; color: var(--muted); }
+.qedit .fld input, .qedit .fld select, .qedit .fld textarea { font-size: 14px; padding: 7px 10px; }
+.qedit .fld textarea { min-height: 60px; }
+.secbox { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.qc { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.qc:focus-within { border-left-color: var(--gold); }
+.qh { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; }
+.qh .qn { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--gold); min-width: 22px; }
+.qh select { font: inherit; font-size: 13px; background: var(--night); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; }
+.qh label { display: inline-flex; gap: 5px; align-items: center; color: var(--muted); cursor: pointer; }
+.qh label input { accent-color: var(--gold); }
+.qh .sp { flex: 1; }
+.qrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.qid { font-size: 11.5px; color: var(--muted); font-family: ui-monospace, Menlo, Consolas, monospace; }
+.addq { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 10px; font-size: 13px; color: var(--muted); }
+.addq button { font: inherit; font-size: 13px; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.addq button:hover { border-color: var(--gold); }
+.pvwrap { flex: 1; min-height: 0; overflow: auto; padding: 16px; background: var(--night); }
+.pvwrap fieldset.cur { box-shadow: 0 0 0 2px var(--gold); }
+.pvwrap .appform { gap: 16px; }
+.modal { position: fixed; inset: 0; z-index: 90; background: rgba(5,8,20,.75); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal .box { background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 760px; max-height: 86vh; overflow: auto; padding: 20px; }
+.modal h3 { margin: 0 0 12px; }
+.hist { display: grid; gap: 8px; }
+.hist .row { display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--panel); border-radius: 8px; padding: 8px 12px; font-size: 14px; flex-wrap: wrap; }
+.helpbox { font-size: 14px; line-height: 1.8; }
+.helpbox code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; }
+@media (max-width: 1150px) {
+  .ed { grid-template-columns: 210px minmax(0, 1fr); height: auto; }
+  .ed .pane.src { height: 75vh; }
+  .ed .pane.pv { grid-column: 1 / -1; height: 70vh; }
+}
+@media (max-width: 760px) {
+  .ed { grid-template-columns: 1fr; }
+  .chlist { max-height: 220px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/rules/">伺服器規則</a>
+      <a href="/news/">公告</a>
+      <a href="/whitelist/">白名單</a>
+      <a href="/apply/">公職招募</a>
+      <a href="/admin/">管理後台</a>
+      <a href="/pd/">LAPD 警察局</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="gate"></div>
+  <div id="app" hidden>
+    <div class="ed-head">
+      <div>
+        <h1 id="doc-title">編輯申請表</h1>
+        <div class="st" id="status"></div>
+      </div>
+      <div class="acts">
+        <select id="doc-pick" class="btn-sec" aria-label="切換申請表"></select>
+        <button type="button" class="btn-sec" id="b-help">使用說明</button>
+        <button type="button" class="btn-sec" id="b-hist">修訂紀錄</button>
+        <a class="btn-sec" id="b-view" target="_blank" rel="noopener" style="text-decoration:none">查看頁面 ↗</a>
+        <button type="button" class="btn-primary" id="b-save">儲存並發布</button>
+      </div>
+    </div>
+    <div class="ed">
+      <nav class="chlist" id="chlist" aria-label="區塊"></nav>
+      <section class="pane src">
+        <div class="ph"><b id="ed-title">區塊</b><span id="ed-sub"></span></div>
+        <div class="qedit" id="qedit"></div>
+      </section>
+      <section class="pane pv">
+        <div class="ph"><b>即時預覽</b><span>玩家看到的樣子（預覽中填寫不會送出）</span></div>
+        <div class="pvwrap"><div class="appform" id="preview"></div></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/forms.js"></script>
+<script>
+(function () {
+  var FORMS = {
+    "form-whitelist": { title: "白名單申請表", view: "/whitelist/" },
+    "form-lapd": { title: "LAPD 申請表", view: "/apply/?dept=lapd" },
+    "form-lafd": { title: "LAFD 申請表", view: "/apply/?dept=lafd" },
+    "form-ems": { title: "EMS 申請表", view: "/apply/?dept=ems" }
+  };
+  var OTHER = { rules: "伺服器規則", law: "加州法典", lapd: "LAPD 部門手冊" };
+  var T = PSRPForm.TYPES, el = PSRP.el;
+  var slug = new URLSearchParams(location.search).get("doc") || "form-whitelist";
+  if (!FORMS[slug]) slug = "form-whitelist";
+  var doc = null, S = null, cur = -1, dirty = false, me = null, pvTimer = null;
+
+  function setStatus(t) { document.getElementById("status").innerHTML = (dirty ? '<span class="dirty-dot"></span>有未儲存的變更 · ' : "") + t; }
+  function lastSaved() { return doc ? "上次儲存：" + new Date(doc.updated_at).toLocaleString("zh-TW") : ""; }
+  function changed(full) {
+    if (!dirty) { dirty = true; setStatus(lastSaved()); }
+    if (full) renderList();
+    clearTimeout(pvTimer); pvTimer = setTimeout(preview, 200);
+  }
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+  function countQ(sec) { return (sec.questions || []).filter(function (q) { return q.type !== "note"; }).length; }
+
+  /* ---------- 左側：區塊清單 ---------- */
+  function renderList() {
+    var box = document.getElementById("chlist"); box.innerHTML = "";
+    var top = el("button", { type: "button", class: "ch", "aria-current": String(cur === -1) });
+    top.appendChild(document.createTextNode("📋 表單說明與按鈕"));
+    top.addEventListener("click", function () { select(-1); });
+    box.appendChild(top); box.appendChild(el("div", { class: "sep" }));
+    S.sections.forEach(function (sec, i) {
+      var b = el("button", { type: "button", class: "ch", "aria-current": String(i === cur) });
+      b.appendChild(document.createTextNode(sec.title || "（未命名區塊）"));
+      b.appendChild(el("small", null, countQ(sec) + " 題"));
+      b.addEventListener("click", function () { select(i); });
+      box.appendChild(b);
+      if (i === cur) {
+        var c = el("div", { class: "chctl" });
+        var up = el("button", { type: "button", title: "上移" }, "↑"), dn = el("button", { type: "button", title: "下移" }, "↓"), del = el("button", { type: "button", class: "del" }, "刪除區塊");
+        up.disabled = i === 0; dn.disabled = i === S.sections.length - 1;
+        up.addEventListener("click", function () { moveSec(i, i - 1); });
+        dn.addEventListener("click", function () { moveSec(i, i + 1); });
+        del.addEventListener("click", function () {
+          if (!confirm("刪除「" + (sec.title || "未命名區塊") + "」和裡面的 " + (sec.questions || []).length + " 題？\n（已送出的申請不受影響）")) return;
+          S.sections.splice(i, 1); cur = Math.min(i, S.sections.length - 1); changed(true); renderEditor();
+        });
+        c.appendChild(up); c.appendChild(dn); c.appendChild(del); box.appendChild(c);
+      }
+    });
+    var add = el("button", { type: "button", class: "btn-sec add" }, "＋ 新增區塊");
+    add.addEventListener("click", function () {
+      S.sections.push({ id: PSRPForm.uid("s_"), title: "新區塊", hint: "", questions: [] });
+      cur = S.sections.length - 1; changed(true); renderEditor();
+      var t = document.querySelector("#qedit .secbox input"); if (t) { t.focus(); t.select(); }
+    });
+    box.appendChild(add);
+  }
+  function moveSec(a, b) { var x = S.sections.splice(a, 1)[0]; S.sections.splice(b, 0, x); cur = b; changed(true); renderEditor(); }
+  function select(i) { cur = i; renderList(); renderEditor(); preview(); }
+
+  /* ---------- 中間：題目編輯 ---------- */
+  function fld(label, node, cls) { var l = el("label", { class: "fld" + (cls ? " " + cls : "") }); l.appendChild(el("span", null, label)); l.appendChild(node); return l; }
+  function txt(obj, key, opts) {
+    opts = opts || {};
+    var n = opts.area ? el("textarea", { rows: String(opts.rows || 2) }) : el("input", { type: opts.num ? "number" : "text" });
+    if (opts.ph) n.placeholder = opts.ph;
+    n.value = obj[key] == null ? "" : obj[key];
+    n.addEventListener("input", function () {
+      obj[key] = opts.num ? (n.value === "" ? "" : Number(n.value)) : n.value;
+      changed(!!opts.list);
+    });
+    return n;
+  }
+  function renderEditor() {
+    var box = document.getElementById("qedit"); box.innerHTML = "";
+    if (cur === -1) {
+      document.getElementById("ed-title").textContent = "表單說明與按鈕";
+      document.getElementById("ed-sub").textContent = "";
+      var sb = el("div", { class: "secbox" });
+      sb.appendChild(fld("表單最上方的說明（可留空）", txt(S, "intro", { area: true, rows: 4, ph: "例如：請用自己的話認真填寫，抄襲將直接不通過。" })));
+      sb.appendChild(fld("送出按鈕文字", txt(S, "submit", { ph: "送出申請" })));
+      box.appendChild(sb);
+      box.appendChild(el("p", { class: "note", style: "margin:0" }, "從左側選擇區塊來編輯題目。"));
+      return;
+    }
+    var sec = S.sections[cur];
+    document.getElementById("ed-title").textContent = sec.title || "（未命名區塊）";
+    document.getElementById("ed-sub").textContent = "· " + (sec.questions || []).length + " 個項目";
+    var sb2 = el("div", { class: "secbox" });
+    var tIn = txt(sec, "title", { list: true });
+    tIn.addEventListener("input", function () { document.getElementById("ed-title").textContent = sec.title || "（未命名區塊）"; });
+    sb2.appendChild(fld("區塊標題", tIn));
+    sb2.appendChild(fld("區塊說明（可留空）", txt(sec, "hint", { area: true, rows: 2, ph: "顯示在區塊標題下方的提示" })));
+    box.appendChild(sb2);
+    sec.questions = sec.questions || [];
+    sec.questions.forEach(function (q, i) { box.appendChild(card(sec, q, i)); });
+    var add = el("div", { class: "addq" });
+    add.appendChild(el("span", null, "＋ 新增："));
+    Object.keys(T).forEach(function (k) {
+      var b = el("button", { type: "button" }, T[k]);
+      b.addEventListener("click", function () {
+        var q = { id: PSRPForm.uid(), type: k, label: k === "checkbox" ? "我同意…" : k === "note" ? "說明文字" : "新題目", required: k !== "note" };
+        if (k === "select") q.options = ["選項一", "選項二"];
+        sec.questions.push(q); changed(true); renderEditor();
+        var cards = document.querySelectorAll("#qedit .qc"); var last = cards[cards.length - 1];
+        if (last) { last.scrollIntoView({ block: "center" }); var ta = last.querySelector("textarea"); if (ta) { ta.focus(); ta.select(); } }
+      });
+      add.appendChild(b);
+    });
+    box.appendChild(add);
+  }
+  function card(sec, q, i) {
+    var c = el("div", { class: "qc" }), hd = el("div", { class: "qh" });
+    hd.appendChild(el("span", { class: "qn" }, String(i + 1)));
+    var ty = el("select", { "aria-label": "題型" });
+    Object.keys(T).forEach(function (k) { ty.appendChild(el("option", { value: k }, T[k])); });
+    ty.value = q.type;
+    ty.addEventListener("change", function () {
+      q.type = ty.value;
+      if (q.type === "select" && !(q.options || []).length) q.options = ["選項一", "選項二"];
+      if (q.type === "note") q.required = false;
+      changed(true); renderEditor();
+    });
+    hd.appendChild(ty);
+    if (q.type !== "note") {
+      var rq = el("label"), rc = el("input", { type: "checkbox" }); rc.checked = q.required !== false;
+      rc.addEventListener("change", function () { q.required = rc.checked; changed(); });
+      rq.appendChild(rc); rq.appendChild(document.createTextNode("必填")); hd.appendChild(rq);
+    }
+    if (q.type !== "checkbox" && q.type !== "note") {
+      var hf = el("label"), hc = el("input", { type: "checkbox" }); hc.checked = !!q.half;
+      hc.addEventListener("change", function () { q.half = hc.checked; changed(); });
+      hf.appendChild(hc); hf.appendChild(document.createTextNode("半寬（兩題並排）")); hd.appendChild(hf);
+    }
+    hd.appendChild(el("span", { class: "sp" }));
+    var mv = el("select", { "aria-label": "移到其他區塊", title: "移到其他區塊" });
+    mv.appendChild(el("option", { value: "" }, "移到…"));
+    S.sections.forEach(function (s2, j) { if (j !== cur) mv.appendChild(el("option", { value: String(j) }, s2.title || "（未命名）")); });
+    mv.addEventListener("change", function () { if (mv.value === "") return; var j = Number(mv.value); sec.questions.splice(i, 1); S.sections[j].questions = S.sections[j].questions || []; S.sections[j].questions.push(q); changed(true); renderEditor(); });
+    if (S.sections.length > 1) hd.appendChild(mv);
+    var up = el("button", { type: "button", title: "上移" }, "↑"), dn = el("button", { type: "button", title: "下移" }, "↓"), cp = el("button", { type: "button", title: "複製這題" }, "複製"), del = el("button", { type: "button", class: "del", title: "刪除這題" }, "刪除");
+    up.disabled = i === 0; dn.disabled = i === sec.questions.length - 1;
+    up.addEventListener("click", function () { sec.questions.splice(i - 1, 0, sec.questions.splice(i, 1)[0]); changed(true); renderEditor(); });
+    dn.addEventListener("click", function () { sec.questions.splice(i + 1, 0, sec.questions.splice(i, 1)[0]); changed(true); renderEditor(); });
+    cp.addEventListener("click", function () { var n = clone(q); n.id = PSRPForm.uid(); sec.questions.splice(i + 1, 0, n); changed(true); renderEditor(); });
+    del.addEventListener("click", function () { if (!confirm("刪除這題？（已送出的申請仍會保留答案）")) return; sec.questions.splice(i, 1); changed(true); renderEditor(); });
+    [up, dn, cp, del].forEach(function (b) { hd.appendChild(b); });
+    c.appendChild(hd);
+
+    c.appendChild(fld(q.type === "checkbox" ? "勾選項目文字" : q.type === "note" ? "說明文字" : "題目", txt(q, "label", { area: true, rows: q.type === "note" ? 3 : 2 })));
+    if (q.type !== "checkbox" && q.type !== "note") {
+      var row = el("div", { class: "qrow" });
+      row.appendChild(fld("補充說明（可留空）", txt(q, "help", { ph: "顯示在題目下方的小字" })));
+      if (q.type !== "select") row.appendChild(fld("輸入框提示文字（可留空）", txt(q, "placeholder", { ph: "例如：John Carter" })));
+      c.appendChild(row);
+    }
+    if (q.type === "select") {
+      var op = el("textarea", { rows: "4" }); op.value = (q.options || []).join("\n");
+      op.addEventListener("input", function () { q.options = op.value.split("\n").map(function (x) { return x.trim(); }).filter(Boolean); changed(); });
+      c.appendChild(fld("選項（一行一個）", op));
+    }
+    if (q.type === "textarea") c.appendChild(fld("最少字數（0 或留空＝不限制）", txt(q, "min", { num: true, ph: "例如 200" })));
+    if (q.type === "number") {
+      var r2 = el("div", { class: "qrow" });
+      r2.appendChild(fld("最小值", txt(q, "min", { num: true }))); r2.appendChild(fld("最大值", txt(q, "max", { num: true })));
+      c.appendChild(r2);
+    }
+    c.appendChild(el("span", { class: "qid" }, "欄位代碼：" + q.id));
+    return c;
+  }
+
+  /* ---------- 右側：即時預覽 ---------- */
+  function preview() {
+    var pv = document.getElementById("preview");
+    PSRPForm.render(pv, S, { idPrefix: "pv-" });
+    var b = el("button", { type: "button", class: "btn-primary", disabled: "" }, S.submit || "送出申請"); pv.appendChild(b);
+    if (cur >= 0) {
+      var f = pv.querySelectorAll("fieldset")[cur];
+      if (f) { f.classList.add("cur"); f.scrollIntoView({ block: "nearest" }); }
+    }
+  }
+
+  /* ---------- 儲存、紀錄 ---------- */
+  function validate() {
+    var ids = {}, dup = "";
+    S.sections.forEach(function (s) { (s.questions || []).forEach(function (q) { if (ids[q.id]) dup = q.id; ids[q.id] = 1; if (q.type === "select" && !(q.options || []).length) dup = dup || "select:" + q.label; }); });
+    if (dup.indexOf("select:") === 0) return "下拉選單「" + dup.slice(7) + "」至少需要一個選項。";
+    if (dup) return "有重複的欄位代碼 " + dup + "，請刪除其中一題後重新新增。";
+    if (!S.sections.length) return "申請表至少需要一個區塊。";
+    return "";
+  }
+  async function save() {
+    var err = validate(); if (err) { alert(err); return; }
+    var btn = document.getElementById("b-save"); btn.disabled = true; setStatus("儲存中…");
+    var r = await PSRP.client.from("documents").update({ source: JSON.stringify(S, null, 1), updated_by: me.id, updated_at: new Date().toISOString() }).eq("slug", slug).eq("updated_at", doc.updated_at).select("updated_at").maybeSingle();
+    btn.disabled = false;
+    if (r.error) { setStatus("儲存失敗：" + PSRP.errText(r.error)); return; }
+    if (!r.data) { setStatus("儲存失敗：這份申請表剛被其他人修改過。請先複製你的變更，重新整理後再編輯。"); return; }
+    doc.updated_at = r.data.updated_at; dirty = false; setStatus("✓ 已發布 · " + lastSaved());
+  }
+  document.getElementById("b-save").addEventListener("click", save);
+  document.addEventListener("keydown", function (e) { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); save(); } });
+  window.addEventListener("beforeunload", function (e) { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+  function modal(title, content) {
+    var m = el("div", { class: "modal", role: "dialog", "aria-modal": "true" }), b = el("div", { class: "box" });
+    b.appendChild(el("h3", null, title)); b.appendChild(content);
+    var x = el("button", { type: "button", class: "btn-sec", style: "margin-top:14px" }, "關閉"); x.addEventListener("click", function () { m.remove(); });
+    b.appendChild(x); m.appendChild(b); document.body.appendChild(m);
+    m.addEventListener("click", function (e) { if (e.target === m) m.remove(); });
+    return m;
+  }
+  document.getElementById("b-help").addEventListener("click", function () {
+    var d = el("div", { class: "helpbox" });
+    d.innerHTML = "<p><b>題型</b>：短答（一行文字）、長答（多行，可設最少字數）、數字（可設範圍）、下拉選單（選項一行一個）、勾選同意（必須打勾才能送出）、說明文字（不用作答的段落）。</p>" +
+      "<p><b>半寬</b>：連續兩題都勾「半寬」會並排顯示，適合姓名、年齡這類短題目。</p>" +
+      "<p><b>連結與粗體</b>：題目裡可以寫 <code>[伺服器規則](/rules/)</code> 變成連結，<code>**文字**</code> 變粗體。</p>" +
+      "<p><b>欄位代碼</b>：每題有固定代碼，用來對應玩家的答案。<code>character_name</code>（角色姓名）會顯示在審核列表與 Discord 通知，<code>discord</code> 會自動帶入玩家的 Discord 名稱，請保留這兩題。</p>" +
+      "<p><b>不影響舊申請</b>：修改或刪除題目後，已送出的申請仍保留當時的題目與答案。每次儲存前的版本都會留在「修訂紀錄」，可以隨時還原。</p>";
+    modal("使用說明", d);
+  });
+  document.getElementById("b-hist").addEventListener("click", async function () {
+    var list = el("div", { class: "hist" }); list.appendChild(el("p", { class: "note" }, "讀取中…"));
+    var m = modal("修訂紀錄（最近 30 次）", list);
+    var r = await PSRP.client.from("document_history").select("id, source, edited_by, saved_at").eq("slug", slug).order("saved_at", { ascending: false }).limit(30);
+    list.innerHTML = "";
+    if (r.error || !r.data.length) { list.appendChild(el("p", { class: "note" }, r.error ? "讀取失敗。" : "還沒有修訂紀錄。")); return; }
+    var ids = r.data.map(function (h) { return h.edited_by; }).filter(Boolean), names = {};
+    if (ids.length) { var n = await PSRP.client.rpc("editor_names", { ids: ids }); (n.data || []).forEach(function (x) { names[x.id] = x.display_name; }); }
+    r.data.forEach(function (h) {
+      var row = el("div", { class: "row" }), qn = 0;
+      try { JSON.parse(h.source).sections.forEach(function (s) { qn += (s.questions || []).length; }); } catch (e) { return; }
+      row.appendChild(el("span", null, new Date(h.saved_at).toLocaleString("zh-TW") + " · " + (names[h.edited_by] || "未知") + " · " + qn + " 題"));
+      var b = el("button", { type: "button", class: "btn-sec" }, "載入這個版本");
+      b.addEventListener("click", function () {
+        if (dirty && !confirm("目前未儲存的變更會被取代，確定？")) return;
+        S = JSON.parse(h.source); cur = -1; m.remove(); changed(true); renderEditor();
+        setStatus("已載入舊版本，按「儲存並發布」才會生效 · " + lastSaved());
+      });
+      row.appendChild(b); list.appendChild(row);
+    });
+  });
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    var gate = document.getElementById("gate");
+    if (!PSRP.client) { gate.appendChild(el("div", { class: "notice warn" }, "帳號系統尚未啟用。")); return; }
+    me = await PSRP.profile();
+    if (!me) { PSRP.mountAuthForm(gate, function () { location.reload(); }, "編輯申請表僅限管理團隊，請先登入。"); return; }
+    var r = await PSRP.client.from("documents").select("slug, title, source, editor_role, updated_at").like("slug", "form-%");
+    var docs = (r.data || []).filter(function (d) { return FORMS[d.slug] && PSRP.hasRole(me, d.editor_role); });
+    doc = docs.filter(function (d) { return d.slug === slug; })[0];
+    if (!doc) {
+      var g = el("div", { class: "gate-msg" });
+      g.appendChild(el("h2", null, "沒有編輯權限"));
+      g.appendChild(el("p", { class: "note" }, r.data && r.data.length ? "申請表題目只有管理團隊可以編輯。" : "申請表資料尚未建立，請管理團隊先執行資料庫更新。"));
+      gate.appendChild(g); return;
+    }
+    try { S = JSON.parse(doc.source); } catch (e) { S = null; }
+    if (!S || !Array.isArray(S.sections)) S = { intro: "", submit: "送出申請", sections: [] };
+    var pick = document.getElementById("doc-pick");
+    Object.keys(FORMS).forEach(function (k) { if (docs.some(function (d) { return d.slug === k; })) pick.appendChild(el("option", { value: k }, "申請表：" + FORMS[k].title)); });
+    var og = el("optgroup", { label: "其他文件（法典式編輯器）" });
+    Object.keys(OTHER).forEach(function (k) { og.appendChild(el("option", { value: "doc:" + k }, OTHER[k])); });
+    pick.appendChild(og);
+    pick.value = slug;
+    pick.addEventListener("change", function () {
+      if (dirty && !confirm("有未儲存的變更，確定要離開？")) { pick.value = slug; return; }
+      dirty = false;
+      if (pick.value.indexOf("doc:") === 0) location.href = "/editor/?doc=" + pick.value.slice(4);
+      else location.search = "?doc=" + pick.value;
+    });
+    document.title = "編輯 " + FORMS[slug].title + " · Palm State RolePlay";
+    document.getElementById("doc-title").textContent = "編輯：" + FORMS[slug].title;
+    document.getElementById("b-view").href = FORMS[slug].view;
+    document.getElementById("app").hidden = false;
+    setStatus(lastSaved());
+    select(S.sections.length ? 0 : -1);
+  }
+  start();
+})();
+</script>
+</body>
+</html>
