@@ -62,58 +62,8 @@
 
       <form class="appform" id="form" novalidate hidden>
         <h2 class="section-title">白名單申請表</h2>
-        <fieldset>
-          <legend>一、基本資料</legend>
-          <div class="grid2">
-            <label class="fld" for="f-dc"><span>Discord 使用者名稱</span><input id="f-dc" name="discord" required></label>
-            <label class="fld" for="f-src"><span>從哪裡得知本伺服器？</span><select id="f-src" name="source" required><option value="">請選擇</option><option>朋友介紹</option><option>Discord 社群</option><option>YouTube／Twitch 實況</option><option>FiveM 伺服器列表</option><option>其他</option></select></label>
-            <label class="fld" for="f-hours"><span>每週可遊玩時數</span><select id="f-hours" name="weekly_hours" required><option value="">請選擇</option><option>5 小時以下</option><option>5–10 小時</option><option>10–20 小時</option><option>20 小時以上</option></select></label>
-            <label class="fld" for="f-times"><span>主要上線時段</span><input id="f-times" name="play_times" required placeholder="例如：平日晚上 8–12 點"></label>
-          </div>
-          <label class="check"><input type="checkbox" name="age_ok" required> <span>我已達到伺服器公告的年齡要求。</span></label>
-          <label class="check"><input type="checkbox" name="mic_ok" required> <span>我有可正常使用的麥克風，並能以中文進行語音角色扮演。</span></label>
-        </fieldset>
+        <div id="formbody" class="appform" style="margin-top:0"><p class="note">讀取申請表…</p></div>
 
-        <fieldset>
-          <legend>二、遊玩經驗</legend>
-          <div class="grid2">
-            <label class="fld" for="f-gta"><span>GTA V／FiveM 遊玩經驗</span><select id="f-gta" name="gta_experience" required><option value="">請選擇</option><option>未滿 3 個月</option><option>3 個月～1 年</option><option>1～3 年</option><option>3 年以上</option></select></label>
-            <label class="fld" for="f-rpy"><span>角色扮演（RP）經驗</span><select id="f-rpy" name="rp_level" required><option value="">請選擇</option><option>完全沒有，第一次玩 RP</option><option>玩過一點</option><option>有一定經驗</option><option>資深 RP 玩家</option></select></label>
-          </div>
-          <label class="fld" for="f-exp"><span>曾經待過哪些 RP 伺服器？擔任過什麼角色？</span><small>沒有經驗也沒關係，如實填寫即可。若曾在其他伺服器被封鎖，請說明原因。</small><textarea id="f-exp" name="rp_history" required></textarea></label>
-          <label class="fld" for="f-why"><span>為什麼想加入 Palm State RolePlay？</span><textarea id="f-why" name="motivation" required></textarea></label>
-        </fieldset>
-
-        <fieldset>
-          <legend>三、角色構想</legend>
-          <div class="grid2">
-            <label class="fld" for="f-cn"><span>角色姓名（名＋姓）</span><input id="f-cn" name="character_name" required placeholder="例如：Marcus Reed"></label>
-            <label class="fld" for="f-ca"><span>角色年齡</span><input id="f-ca" name="character_age" type="number" min="18" max="90" required></label>
-          </div>
-          <label class="fld" for="f-back"><span>角色背景故事</span><small>至少 200 字：出身、個性、為什麼來到洛杉磯、想過什麼樣的生活。</small><textarea id="f-back" name="backstory" required style="min-height:180px"></textarea><span class="charcount" id="cc">0 字</span></label>
-          <label class="fld" for="f-plan"><span>你希望你的角色在城市裡體驗什麼劇情？</span><textarea id="f-plan" name="story_plan" required></textarea></label>
-        </fieldset>
-
-        <fieldset>
-          <legend>四、RP 素養測驗</legend>
-          <p class="hint">請用自己的話回答，不需要背規則條文；抄襲他人答案將直接不通過。</p>
-          <label class="fld" for="q1"><span>1. 什麼是 Metagaming？請舉一個例子。</span><textarea id="q1" name="q_metagaming" required></textarea></label>
-          <label class="fld" for="q2"><span>2. 什麼是 Powergaming？請舉一個例子。</span><textarea id="q2" name="q_powergaming" required></textarea></label>
-          <label class="fld" for="q3"><span>3. 你的角色獨自一人，被三名持槍歹徒包圍並要求交出財物。你會怎麼做？為什麼？</span><textarea id="q3" name="q_fear_rp" required></textarea></label>
-          <label class="fld" for="q4"><span>4. 你的角色被殺後在醫院重生。你可以回去找殺你的人報仇嗎？請說明新生命規則（NLR）。</span><textarea id="q4" name="q_nlr" required></textarea></label>
-          <label class="fld" for="q5"><span>5. 什麼是 RDM 與 VDM？</span><textarea id="q5" name="q_rdm_vdm" required></textarea></label>
-          <label class="fld" for="q6"><span>6. 角色扮演進行中，你認為對方違反了規則。你應該怎麼處理？</span><textarea id="q6" name="q_rule_break" required></textarea></label>
-          <label class="fld" for="q7"><span>7. 你的角色被警察攔檢，你覺得警察的處理不合理。在遊戲中你會怎麼應對？</span><textarea id="q7" name="q_police_stop" required></textarea></label>
-          <label class="fld" for="q8"><span>8. IC 和 OOC 有什麼不同？什麼時候可以使用 OOC？</span><textarea id="q8" name="q_ic_ooc" required></textarea></label>
-        </fieldset>
-
-        <fieldset>
-          <legend>五、同意事項</legend>
-          <label class="check"><input type="checkbox" name="agree_rules" required> <span>我已完整閱讀並同意遵守<a href="/rules/" target="_blank">伺服器規則</a>，了解違規會依處分制度處理。</span></label>
-          <label class="check"><input type="checkbox" name="agree_interview" required> <span>我願意在 Discord 參加語音面試。</span></label>
-          <label class="check"><input type="checkbox" name="agree_respect" required> <span>我會尊重其他玩家與管理團隊，角色內的衝突不帶到現實。</span></label>
-          <label class="check"><input type="checkbox" name="agree_truth" required> <span>以上內容皆為本人填寫且屬實。</span></label>
-        </fieldset>
         <p class="form-msg" id="msg" role="status"></p>
         <button class="btn-primary" type="submit" id="submit">送出白名單申請</button>
       </form>
@@ -131,11 +81,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="/assets/config.js"></script>
 <script src="/assets/auth.js"></script>
+<script src="/assets/forms.js"></script>
 <script>
 (function () {
   var el = PSRP.el, me = null, form = document.getElementById("form"), msg = document.getElementById("msg");
-  var back = document.getElementById("f-back");
-  back.addEventListener("input", function () { document.getElementById("cc").textContent = back.value.trim().length + " 字"; });
+  var ctl = null;
 
   function renderDiscord() {
     var box = document.getElementById("dcbox"); box.innerHTML = "";
@@ -178,20 +128,15 @@
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault(); msg.className = "form-msg";
-    var miss = [].filter.call(form.querySelectorAll("[required]"), function (i) { return i.type === "checkbox" ? !i.checked : !String(i.value).trim(); });
-    if (miss.length) { msg.className = "form-msg err"; msg.textContent = "還有 " + miss.length + " 個欄位未填寫或未勾選。"; miss[0].focus(); return; }
-    if (back.value.trim().length < 200) { msg.className = "form-msg err"; msg.textContent = "角色背景故事至少 200 字，目前 " + back.value.trim().length + " 字。"; back.focus(); return; }
-    var answers = { _questions: {} };
-    [].forEach.call(form.elements, function (i) {
-      if (!i.name) return;
-      answers[i.name] = i.type === "checkbox" ? i.checked : i.value.trim();
-      var l = i.closest("label"); if (l) { var sp = l.querySelector("span"); if (sp) answers._questions[i.name] = sp.textContent; }
-    });
+    if (!ctl) return;
+    var res = ctl.collect();
+    if (!res.ok) { msg.className = "form-msg err"; msg.textContent = res.error; return; }
+    var answers = res.answers;
     var btn = document.getElementById("submit"); btn.disabled = true;
     var r = await PSRP.client.from("applications").insert({ department: "whitelist", answers: answers });
     btn.disabled = false;
     if (r.error) { msg.className = "form-msg err"; msg.textContent = PSRP.errText(r.error); return; }
-    form.reset(); document.getElementById("cc").textContent = "0 字";
+    form.reset();
     document.getElementById("flash").innerHTML = "";
     document.getElementById("flash").appendChild(el("div", { class: "notice ok" }, "申請已送出！管理團隊審核後會通知你面試時間。"));
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -204,8 +149,11 @@
     var gate = document.getElementById("gate");
     if (!me) { PSRP.mountAuthForm(gate, function () { location.reload(); }, "申請白名單前，請先註冊並登入網站帳號。"); return; }
     document.getElementById("portal").hidden = false;
-    document.getElementById("f-dc").value = me.discord || "";
     renderDiscord(); loadMine();
+    var sc = await PSRPForm.load("whitelist"), body = document.getElementById("formbody");
+    if (!sc) { body.innerHTML = '<div class="notice warn">申請表讀取失敗，請重新整理頁面再試。</div>'; return; }
+    ctl = PSRPForm.render(body, sc, { prefill: { discord: me.discord || "" } });
+    document.getElementById("submit").textContent = sc.submit || "送出白名單申請";
   }
   start();
 })();
