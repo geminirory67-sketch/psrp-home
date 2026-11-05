@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>我的帳號 · Palm State RolePlay</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+.pf { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+.card h2 { margin: 0 0 14px; font-size: 13px; letter-spacing: .14em; color: var(--sun); font-family: var(--font-display); text-transform: uppercase; }
+.me { text-align: center; display: grid; gap: 8px; justify-items: center; }
+.av { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; font-size: 40px; font-weight: 700; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.me .nm { font-size: 24px; font-weight: 700; margin-top: 6px; word-break: break-word; }
+.me .em { color: var(--muted); font-size: 14px; word-break: break-all; }
+.me .since { color: var(--muted); font-size: 13px; }
+.me .cd { font-size: 12.5px; color: var(--muted); }
+.side { display: grid; gap: 20px; }
+.main { display: grid; gap: 20px; }
+.roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.role { --c: var(--gold); display: grid; grid-template-columns: 10px 1fr; gap: 2px 12px; background: var(--night-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.role::before { content: ""; grid-row: span 2; border-radius: 4px; background: var(--c); }
+.role b { font-size: 15.5px; } .role span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.empty-role { color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+.dc { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.dc .s { display: flex; gap: 12px; align-items: center; }
+.dc .ic { width: 42px; height: 42px; border-radius: 10px; background: var(--discord); display: grid; place-items: center; color: #fff; flex: none; }
+.dc.ok .ic { background: var(--ok); }
+.dc b { display: block; } .dc small { color: var(--muted); font-size: 13px; }
+.btn-dc { background: var(--discord); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; font: inherit; font-weight: 700; cursor: pointer; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { display: grid; gap: 2px; text-decoration: none; color: var(--ink); background: var(--night-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+a.stat:hover { border-color: var(--gold); }
+.stat b { font-family: var(--font-display); font-size: 26px; line-height: 1.1; } .stat small { color: var(--muted); font-size: 13px; }
+.apps { display: grid; gap: 8px; }
+.apps .r { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--night-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.apps .r .note { margin-left: auto; }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 860px) { .pf { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/news/">公告</a>
+      <a href="/forums/">論壇</a>
+      <a href="/chat/">聊天室</a>
+      <a href="/safety/">公共安全</a>
+      <a href="/rules/">規則</a>
+      <a class="nav-cta" href="/whitelist/">白名單申請</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="wrap">
+    <div id="gate"></div>
+    <div class="pf" id="app" hidden>
+      <div class="side">
+        <section class="card me" aria-label="個人資料">
+          <div class="av" id="av"></div>
+          <div class="nm" id="nm"></div>
+          <div class="em" id="em"></div>
+          <div class="since" id="since"></div>
+          <button type="button" class="btn-sec" id="b-name">修改名稱</button>
+          <div class="cd" id="cd"></div>
+        </section>
+        <section class="card">
+          <h2>帳號</h2>
+          <div class="acts">
+            <button type="button" class="btn-sec" id="b-pw">變更密碼</button>
+            <button type="button" class="btn-sec" id="b-out">登出</button>
+          </div>
+          <p class="form-msg" id="pw-msg" role="status"></p>
+        </section>
+      </div>
+      <div class="main">
+        <section class="card">
+          <h2>我的身分組</h2>
+          <div class="roles" id="roles"></div>
+        </section>
+        <section class="card">
+          <h2>Discord</h2>
+          <div class="dc" id="dc"></div>
+        </section>
+        <section class="card">
+          <h2>我的動態</h2>
+          <div class="stats" id="stats"></div>
+        </section>
+        <section class="card">
+          <h2>我的申請</h2>
+          <div class="apps" id="apps"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap fgrid">
+    <div class="fb"><b>Palm State RolePlay</b><span>以洛杉磯為舞台的 FiveM 中文角色扮演伺服器。</span><span>© 2026 Palm State RolePlay。版權所有。</span></div>
+    <div><h4>社群</h4><a href="/news/">伺服器公告</a><a href="/forums/">論壇</a><a href="/chat/">聊天室</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></div>
+    <div><h4>加入我們</h4><a href="/whitelist/">白名單申請</a><a href="/apply/">公職招募</a><a href="/safety/">公共安全</a></div>
+    <div><h4>規範與協助</h4><a href="/rules/">伺服器規則</a><a href="https://law.psrp2.com/">加州法典</a><a href="/support/">工單客服</a></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var el = PSRP.el, db = PSRP.client, me = null;
+  var ROLES = {
+    admin: ["管理團隊", "伺服器最高管理權限", "#e8b85a"],
+    reviewer: ["招募審核", "可以審核白名單與公職申請", "#e8b85a"],
+    support: ["工單客服", "處理工單，管理論壇與聊天室", "#3ccf8e"],
+    member: ["白名單成員", "已通過白名單，可以進入城市", "#b98cff"],
+    civ: ["市民 CIV", "城市市民身分", "#b98cff"],
+    police: ["LAPD 員警", "洛杉磯警察局成員，可使用勤務表與部門手冊", "#4a86ff"],
+    police_cmd: ["LAPD 高層", "可發布 LAPD 公告、編輯手冊與勤務表", "#4a86ff"],
+    fire: ["LAFD 消防員", "洛杉磯消防局成員", "#ff4b3a"],
+    fire_cmd: ["LAFD 高層", "可發布 LAFD 公告", "#ff4b3a"],
+    ems: ["EMS 救護員", "緊急醫療服務成員", "#2fd0a6"],
+    ems_cmd: ["EMS 高層", "可發布 EMS 公告", "#2fd0a6"]
+  };
+  var COLORS = ["#4a86ff", "#e8b85a", "#3ccf8e", "#ff8a3d", "#b98cff", "#ff5c6c", "#2fd0a6", "#5865f2"];
+  function color(name) { var h = 0; String(name).split("").forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) >>> 0; }); return COLORS[h % COLORS.length]; }
+  function day(d) { var x = new Date(d); return x.getFullYear() + "/" + (x.getMonth() + 1) + "/" + x.getDate(); }
+
+  function renderMe() {
+    var n = me.display_name || "（未設定名稱）";
+    var av = document.getElementById("av"); av.textContent = n.trim().charAt(0).toUpperCase(); av.style.background = color(n);
+    document.getElementById("nm").textContent = n;
+    document.getElementById("em").textContent = me.email || "";
+    document.getElementById("since").textContent = me.created_at ? day(me.created_at) + " 加入" : "";
+    var cd = document.getElementById("cd"), b = document.getElementById("b-name");
+    var next = me.name_changed_at ? new Date(new Date(me.name_changed_at).getTime() + 30 * 86400e3) : null;
+    var locked = next && next > new Date() && !PSRP.hasRole(me, "admin") ;
+    b.disabled = !!locked;
+    cd.textContent = locked ? "每 30 天可修改一次，下次可修改：" + next.toLocaleString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "每 30 天可修改一次名稱";
+  }
+  function renderRoles() {
+    var box = document.getElementById("roles"); box.innerHTML = "";
+    var list = (me.roles || []).filter(function (r) { return ROLES[r]; });
+    if (!list.length) {
+      var d = el("div", { class: "empty-role" });
+      d.appendChild(document.createTextNode("你目前是一般玩家，還沒有任何身分組。通過白名單後會自動拿到「白名單成員」與「市民 CIV」。"));
+      d.appendChild(el("br"));
+      d.appendChild(el("a", { href: "/whitelist/", style: "color:var(--gold)" }, "前往白名單申請 →"));
+      box.appendChild(d); return;
+    }
+    list.forEach(function (r) { var c = el("div", { class: "role", style: "--c:" + ROLES[r][2] }); c.appendChild(el("b", null, ROLES[r][0])); c.appendChild(el("span", null, ROLES[r][1])); box.appendChild(c); });
+  }
+  function renderDiscord() {
+    var box = document.getElementById("dc"); box.innerHTML = ""; box.classList.toggle("ok", !!me.discord_id);
+    var s = el("div", { class: "s" }), ic = el("div", { class: "ic", "aria-hidden": "true" }, me.discord_id ? "✓" : "D"), t = el("div");
+    t.appendChild(el("b", null, me.discord_id ? "已綁定 Discord" : "尚未綁定 Discord"));
+    t.appendChild(el("small", null, me.discord_id ? (me.discord || "") + " · 審核結果與工單回覆會由 Bot 私訊你" : "綁定後才能收到審核通知，通過時自動給身分組"));
+    s.appendChild(ic); s.appendChild(t); box.appendChild(s);
+    if (!me.discord_id) {
+      var b = el("button", { type: "button", class: "btn-dc" }, "綁定 Discord");
+      b.addEventListener("click", async function () { b.disabled = true; var r = await db.auth.linkIdentity({ provider: "discord", options: { redirectTo: location.origin + "/profile/" } }); if (r.error) { b.disabled = false; alert(PSRP.errText(r.error)); } });
+      box.appendChild(b);
+    }
+  }
+  async function renderStats() {
+    var r = await Promise.all([
+      db.rpc("forum_authors", { ids: [me.id] }),
+      db.from("tickets").select("id", { count: "exact", head: true }).eq("user_id", me.id),
+      db.from("chat_messages").select("id", { count: "exact", head: true }).eq("user_id", me.id),
+      db.from("applications").select("id, department, status, created_at").eq("user_id", me.id).order("created_at", { ascending: false })
+    ]);
+    var box = document.getElementById("stats"); box.innerHTML = "";
+    function stat(n, label, href) { var a = el(href ? "a" : "div", { class: "stat" }); if (href) a.setAttribute("href", href); a.appendChild(el("b", null, String(n))); a.appendChild(el("small", null, label)); box.appendChild(a); }
+    stat(((r[0].data || [])[0] || {}).posts || 0, "論壇文章", "/forums/");
+    stat(r[2].count || 0, "聊天訊息", "/chat/");
+    stat(r[1].count || 0, "我的工單", "/support/");
+    stat((r[3].data || []).length, "申請紀錄", "#apps");
+    var ab = document.getElementById("apps"); ab.innerHTML = "";
+    if (!(r[3].data || []).length) { ab.appendChild(el("p", { class: "note", style: "margin:0" }, "還沒有送出任何申請。")); return; }
+    r[3].data.forEach(function (a) {
+      var row = el("div", { class: "r" });
+      row.appendChild(el("b", null, (PSRP.DEPT_NAMES[a.department] || a.department) + " #" + a.id));
+      row.appendChild(el("span", { class: "status st-" + a.status }, PSRP.STATUS_NAMES[a.status] || a.status));
+      row.appendChild(el("span", { class: "note" }, day(a.created_at)));
+      ab.appendChild(row);
+    });
+  }
+
+  document.getElementById("b-name").addEventListener("click", function () { PSRP.editName(me, function () { renderMe(); PSRP.mountAccountChip(document.getElementById("account")); }); });
+  document.getElementById("b-out").addEventListener("click", function () { PSRP.signOut(); });
+  document.getElementById("b-pw").addEventListener("click", async function () {
+    var m = document.getElementById("pw-msg"); m.className = "form-msg";
+    var r = await db.auth.resetPasswordForEmail(me.email, { redirectTo: location.origin + "/apply/" });
+    if (r.error) { m.className = "form-msg err"; m.textContent = PSRP.errText(r.error); return; }
+    m.className = "form-msg ok"; m.textContent = "已寄出變更密碼的信到 " + me.email + "，請到信箱點連結設定新密碼。";
+  });
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    var gate = document.getElementById("gate");
+    if (!db) { gate.appendChild(el("div", { class: "notice warn" }, "系統暫時無法使用。")); return; }
+    me = await PSRP.profile();
+    if (!me) { PSRP.mountAuthForm(gate, function () { location.reload(); }, "請先登入查看你的帳號。"); return; }
+    document.getElementById("app").hidden = false;
+    renderMe(); renderRoles(); renderDiscord(); renderStats();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
