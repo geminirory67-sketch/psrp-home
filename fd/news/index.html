@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>部門公告 · LAFD</title>
+<meta name="description" content="Palm State RolePlay 官方與各公職部門公告：洛杉磯警察局、消防局、緊急醫療。">
+<link rel="icon" type="image/png" href="/assets/seal-lafd.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/pd.css">
+<style>
+.newsbar { display: grid; gap: 12px; margin-bottom: 18px; }
+.searchbox { display: flex; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 4px 14px; }
+.searchbox:focus-within { border-color: var(--gold); }
+.searchbox input { flex: 1; min-width: 0; background: none; border: 0; color: var(--ink); font: inherit; font-size: 16px; padding: 10px 0; outline: none; }
+.searchbox svg { color: var(--muted); flex: 0 0 auto; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { font: inherit; font-size: 13.5px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.chips button[aria-pressed="true"] { color: #141414; background: var(--gold); border-color: var(--gold); font-weight: 700; }
+.newsmeta { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+.news-list { display: grid; gap: 12px; }
+.ncard { display: grid; grid-template-columns: 6px minmax(0, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color .15s; }
+.ncard:hover { border-color: var(--gold); }
+.ncard .bar { background: var(--c, var(--gold)); }
+.ncard .in { padding: 14px 18px; display: grid; gap: 6px; }
+.ncard .ntop { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.ncard h3 { margin: 0; font-size: 18px; line-height: 1.45; }
+.ncard p { margin: 0; color: var(--muted); font-size: 14.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dtag { font-family: var(--font-display); font-weight: 700; letter-spacing: .08em; color: var(--c); border: 1px solid var(--c); border-radius: 4px; padding: 0 6px; font-size: 12px; }
+.ctag { background: var(--panel-2); border-radius: 4px; padding: 1px 7px; color: var(--ink); }
+.pin { color: var(--gold); font-weight: 700; }
+.att { color: var(--muted); }
+mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; padding: 0 1px; }
+.empty-news { text-align: center; padding: 40px 10px; color: var(--muted); }
+
+/* 公告正式版面 */
+.itag { background: #3a1d1d; color: #ffb4a8; border: 1px solid #7a3a32; border-radius: 4px; padding: 0 7px; font-size: 12px; font-weight: 700; }
+.ann .stamp { margin: 14px 34px 0; padding: 8px 14px; border: 2px solid #b3261e; color: #b3261e; font-weight: 700; letter-spacing: .08em; font-size: 13.5px; border-radius: 4px; background: #fff3f1; }
+.visrow { display: grid; gap: 8px; margin-top: 12px; }
+.visrow > span { font-size: 14px; color: var(--muted); }
+.visopt { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.visopt label { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; background: var(--night); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; cursor: pointer; }
+.visopt label:has(input:checked) { border-color: var(--gold); background: var(--panel-2); }
+.visopt input { margin-top: 5px; accent-color: var(--gold); }
+.visopt b { font-size: 15px; } .visopt small { grid-column: 2; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.ann { background: #f7f5ef; color: #1d2030; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.35); overflow: hidden; max-width: 860px; margin: 0 auto; }
+.ann .band { background: var(--c); height: 8px; }
+.ann .nh { display: flex; gap: 16px; align-items: center; padding: 26px 34px 16px; border-bottom: 2px solid #1d2030; }
+.ann .seal { width: 58px; height: 58px; border-radius: 50%; border: 3px solid var(--c); display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; color: var(--c); font-size: 15px; letter-spacing: .04em; flex: 0 0 auto; background: #fff; }
+.ann .seal-img { width: 64px; height: 64px; object-fit: contain; flex: 0 0 auto; border-radius: 50%; }
+.ann .seal-img.sq { border-radius: 12px; }
+.dicon { width: 18px; height: 18px; object-fit: contain; vertical-align: -4px; border-radius: 50%; }
+.dicon.sq { border-radius: 4px; }
+.ann .org { font-family: var(--font-zh-display); font-weight: 900; font-size: 22px; line-height: 1.3; }
+.ann .org small { display: block; font-family: var(--font-display); font-weight: 600; letter-spacing: .14em; font-size: 12.5px; color: #555b70; text-transform: uppercase; }
+.ann .kind { margin-left: auto; font-family: var(--font-zh-display); font-weight: 900; font-size: 26px; letter-spacing: .3em; color: var(--c); white-space: nowrap; }
+.ann .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0; border-bottom: 1px solid #d8d4c8; }
+.ann .facts div { padding: 10px 34px; font-size: 13.5px; border-right: 1px solid #e3dfd3; }
+.ann .facts b { display: block; font-size: 11.5px; letter-spacing: .1em; color: #6b7086; font-weight: 700; }
+.ann .nb { padding: 26px 34px 30px; }
+.ann h1 { font-family: var(--font-zh-display); font-weight: 900; font-size: clamp(24px, 3.4vw, 32px); line-height: 1.35; margin: 0 0 16px; color: #11131c; }
+.ann .sum { border-left: 4px solid var(--c); background: #eeeadf; padding: 12px 16px; margin: 0 0 22px; font-weight: 500; line-height: 1.75; }
+.ann .sum b { display: block; font-size: 12px; letter-spacing: .12em; color: #6b7086; margin-bottom: 2px; }
+.ann .txt { font-size: 16px; line-height: 1.9; }
+.ann .txt h2, .ann .txt h3 { font-family: var(--font-zh-display); font-size: 19px; margin: 22px 0 8px; color: #11131c; }
+.ann .txt p { margin: 0 0 12px; }
+.ann .txt ul, .ann .txt ol { padding-left: 1.4em; margin: 0 0 12px; }
+.ann .txt a { color: #1f4fb8; }
+.ann .txt table { border-collapse: collapse; width: 100%; margin: 8px 0 16px; font-size: 14.5px; }
+.ann .txt th, .ann .txt td { border: 1px solid #cfcabd; padding: 7px 10px; text-align: left; }
+.ann .txt th { background: #e6e1d4; }
+.ann .txt .tw { border: 0; background: none; border-radius: 0; overflow-x: auto; margin: 0; }
+.ann .txt th, .ann .txt td { white-space: normal; color: #1d2030; font-size: 14.5px; letter-spacing: 0; text-transform: none; font-weight: 400; }
+.ann .txt th { font-weight: 700; }
+.ann .txt blockquote { margin: 0 0 12px; padding: 8px 14px; border-left: 3px solid #b9b3a3; color: #444a5e; }
+.ann .files { margin-top: 24px; display: grid; gap: 12px; }
+.ann .files h4 { margin: 0; font-size: 13px; letter-spacing: .12em; color: #6b7086; }
+.ann .imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.ann .imgs a { display: block; border: 1px solid #d8d4c8; border-radius: 6px; overflow: hidden; background: #fff; }
+.ann .imgs img { display: block; width: 100%; height: 180px; object-fit: cover; }
+.ann .pdf { display: flex; align-items: center; gap: 12px; border: 1px solid #d8d4c8; background: #fff; border-radius: 6px; padding: 10px 14px; text-decoration: none; color: #1d2030; }
+.ann .pdf .ic { background: #c8372d; color: #fff; font-weight: 700; font-size: 12px; border-radius: 4px; padding: 6px 7px; font-family: var(--font-display); letter-spacing: .06em; }
+.ann .pdf span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ann .pdf small { color: #6b7086; }
+.ann .pdfview { width: 100%; height: 70vh; border: 1px solid #d8d4c8; border-radius: 6px; background: #fff; }
+.ann .sign { margin-top: 30px; text-align: right; font-family: var(--font-zh-display); font-weight: 700; font-size: 17px; line-height: 1.8; }
+.ann .sign small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 13px; color: #6b7086; }
+.ann .nf { border-top: 1px solid #d8d4c8; padding: 12px 34px; font-size: 12px; color: #6b7086; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .ann .nh, .ann .nb { padding-left: 18px; padding-right: 18px; }
+  .ann .facts div { padding: 8px 18px; }
+  .ann .nf { padding: 12px 18px; }
+  .ann .kind { display: none; }
+}
+.detail-actions { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; max-width: 860px; margin: 0 auto 14px; }
+.detail-actions .r { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* 發布表單 */
+.compose { display: grid; gap: 16px; }
+.toolbar { display: flex; gap: 6px; flex-wrap: wrap; }
+.toolbar button { font: inherit; font-size: 13px; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.dropzone { border: 2px dashed var(--line); border-radius: 10px; padding: 18px; text-align: center; color: var(--muted); cursor: pointer; }
+.dropzone.over { border-color: var(--gold); color: var(--ink); }
+.filelist { display: grid; gap: 6px; }
+.filelist .f { display: flex; align-items: center; gap: 10px; background: var(--panel-2); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
+.filelist .f img { width: 44px; height: 44px; object-fit: cover; border-radius: 4px; }
+.filelist .f span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filelist .f button { background: none; border: 0; color: var(--muted); cursor: pointer; font: inherit; }
+.preview-wrap { background: #0a0d1c; border-radius: 12px; padding: 20px 10px; }
+.hint { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body class="fd">
+<div class="pd-util"><div class="in"><span>Official Portal · Los Angeles Fire Department · Palm State RolePlay</span><span style="display:flex;gap:16px"><a href="/safety/">← 公共安全</a><a href="/">Palm State 主站</a></span></div></div>
+<header class="pdh"><div class="in"><a class="brand" href="/fd/"><img src="/assets/seal-lafd.png" alt="LAFD 徽章"><span><b>LAFD</b><small>LOS ANGELES FIRE DEPT.</small></span></a><nav aria-label="LAFD 選單"><a href="/fd/">首頁</a><a href="/fd/news/" aria-current="page">部門公告</a><a href="/fd/#org">組織與單位</a><a href="/fd/#ranks">階級制度</a><a href="/apply/?dept=lafd">加入 LAFD</a></nav><div class="account" id="account"></div></div></header>
+
+<section class="phead" id="phead">
+  <div class="wrap">
+    <span class="k">LAFD Bulletins</span>
+    <h1>部門公告</h1>
+    <p>洛杉磯消防局的對外公告、人事命令、勤務通報與招募資訊。標示 🔒 的是僅限 LAFD 成員閱讀的內部公告。</p>
+    <div class="meta" id="post-slot"></div>
+  </div>
+</section>
+
+<main class="page">
+  <div class="wrap">
+    <section id="view-list">
+      <div class="newsbar">
+        <label class="searchbox" for="q">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input id="q" type="search" placeholder="搜尋標題、內容、字號，例如：招募、交通管制、LAPD-2026" autocomplete="off" aria-label="搜尋公告">
+        </label>
+        <div class="chips" id="f-dept" aria-label="部門">
+          <button type="button" data-v="" aria-pressed="true">全部</button>
+          <button type="button" data-v="all" aria-pressed="false">伺服器</button>
+          <button type="button" data-v="lapd" aria-pressed="false">LAPD</button>
+          <button type="button" data-v="lafd" aria-pressed="false">LAFD</button>
+          <button type="button" data-v="ems" aria-pressed="false">EMS</button>
+        </div>
+        <div class="chips" id="f-cat" aria-label="類別"></div>
+        <div class="newsmeta"><span id="count">讀取中…</span></div>
+      </div>
+      <div class="news-list" id="list"></div>
+      <p style="text-align:center;margin-top:16px"><button type="button" class="btn-sec" id="more" hidden>載入更多</button></p>
+    </section>
+
+    <section id="view-detail" hidden></section>
+
+    <section id="view-compose" hidden>
+      <div class="detail-actions"><button type="button" class="btn-sec" id="c-back">← 返回部門公告</button></div>
+      <h2 class="section-title" id="c-title">發布公告</h2>
+      <form class="compose appform" id="cform" novalidate>
+        <fieldset>
+          <legend>基本資訊</legend>
+          <div class="grid2">
+            <label class="fld" for="c-dept"><span>發布單位</span><select id="c-dept" required></select></label>
+            <label class="fld" for="c-cat"><span>類別</span><select id="c-cat" required></select></label>
+            <label class="fld" for="c-eff"><span>生效日期（可留空）</span><input id="c-eff" type="date"></label>
+            <label class="fld" for="c-signer"><span>署名</span><input id="c-signer" placeholder="例如：洛杉磯警察局 局長室"></label>
+          </div>
+          <label class="fld" for="c-tt"><span>標題</span><input id="c-tt" maxlength="120" required placeholder="例如：LAPD 第三期學院訓練招募公告"></label>
+          <label class="fld" for="c-sum"><span>重點摘要（一兩句話，會顯示在列表與公告最上方）</span><textarea id="c-sum" style="min-height:70px" placeholder="例如：即日起至 11/20 開放報名，名額 12 名，錄取者將於 11/25 開始受訓。"></textarea></label>
+          <label class="check"><input type="checkbox" id="c-pin"> <span>置頂這則公告</span></label>
+          <div class="visrow" id="c-vis-row">
+            <span>公開範圍</span>
+            <div class="visopt">
+              <label><input type="radio" name="c-vis" value="public" checked><b>🌐 對外公開</b><small>所有人都看得到，包含未登入的市民。會發到部門的公開 Discord 頻道。</small></label>
+              <label><input type="radio" name="c-vis" value="internal"><b>🔒 僅限部門內部</b><small>只有擁有該部門身分組的成員看得到，附件也不會公開。只會發到部門的「內部」Discord 頻道。</small></label>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>公告內文</legend>
+          <div class="toolbar" id="c-tools">
+            <button type="button" data-ins="## 小標題\n">小標題</button>
+            <button type="button" data-wrap="**">粗體</button>
+            <button type="button" data-ins="- 項目一\n- 項目二\n">條列</button>
+            <button type="button" data-ins="1. 第一點\n2. 第二點\n">編號</button>
+            <button type="button" data-ins="| 項目 | 內容 |\n| --- | --- |\n| 時間 | 2026/11/20 20:00 |\n| 地點 | Mission Row 警局 |\n">表格</button>
+            <button type="button" data-ins="> 注意事項\n">引言</button>
+          </div>
+          <label class="fld" for="c-body"><span class="hint">直接輸入文字即可，按 Enter 換行、空一行分段。上方按鈕可插入格式，不懂格式也沒關係，版面會自動排好。</span><textarea id="c-body" style="min-height:260px"></textarea></label>
+        </fieldset>
+        <fieldset>
+          <legend>附件（圖片、PDF，每個檔案 10 MB 以內）</legend>
+          <div class="dropzone" id="drop" tabindex="0" role="button">點這裡選擇檔案，或把檔案拖曳進來</div>
+          <input type="file" id="c-files" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf" multiple hidden>
+          <div class="filelist" id="c-filelist"></div>
+        </fieldset>
+        <p class="form-msg" id="c-msg" role="status"></p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn-sec" id="c-preview">預覽</button>
+          <button type="submit" class="btn-primary" id="c-submit">發布公告</button>
+        </div>
+      </form>
+      <div id="c-prev" style="margin-top:22px" hidden></div>
+    </section>
+  </div>
+</main>
+
+<footer class="pdf"><div class="in"><img src="/assets/seal-lafd.png" alt=""><div><b>LOS ANGELES FIRE DEPARTMENT</b><span class="motto">SERVING WITH COURAGE, INTEGRITY & PRIDE</span><small>Palm State RolePlay 角色扮演用途，並非真實政府機關或官方網站。</small></div><nav><a href="/fd/">LAFD 首頁</a><a href="/safety/">公共安全</a><a href="/news/">伺服器公告</a><a href="/rules/">伺服器規則</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><a href="/">Palm State 主站</a></nav></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/marked.js"></script>
+<script src="/assets/mdbook.js"></script>
+<script>window.PD_DEPT = "lafd";</script>
+<script>
+(function () {
+  var DEPTS = {
+    all:  { short: "PSRP", name: "Palm State RolePlay 管理團隊", en: "Server Administration", c: "#e8b85a", signer: "Palm State RolePlay 管理團隊", icon: "/logo.jpg", sq: true },
+    lapd: { short: "LAPD", name: "洛杉磯警察局", en: "Los Angeles Police Department", c: "#2f6fe0", signer: "洛杉磯警察局 局長室", icon: "/assets/seal-lapd.png" },
+    lafd: { short: "LAFD", name: "洛杉磯消防局", en: "Los Angeles Fire Department", c: "#d8402f", signer: "洛杉磯消防局 局長室", icon: "/assets/seal-lafd.png" },
+    ems:  { short: "EMS",  name: "緊急醫療服務處", en: "Emergency Medical Services", c: "#1f9e7d", signer: "緊急醫療服務處 處長室" }
+  };
+  var CATS = ["一般公告", "人事命令", "招募資訊", "勤務通報", "法規異動", "活動通知", "緊急通告"];
+  var PAGE = 20;
+  var esc = PSRPMd.esc, el = PSRP.el;
+  var all = [], me = null, shown = PAGE, filt = { dept: "", cat: "", q: "" }, editing = null, files = [];
+  var bucket = PSRP.client ? PSRP.client.storage.from("announcements") : null;
+  var ibucket = PSRP.client ? PSRP.client.storage.from("ann-internal") : null;
+  var PD = window.PD_DEPT || "", ONLY = PD || "all";
+  function bucketFor(a) { return a && a.visibility === "internal" ? ibucket : bucket; }
+  function isInt(a) { return a.visibility === "internal"; }
+
+  function fileUrl(path) { return bucket.getPublicUrl(path).data.publicUrl; }
+  function fmtDate(d) { var x = new Date(d); return x.getFullYear() + "/" + String(x.getMonth() + 1).padStart(2, "0") + "/" + String(x.getDate()).padStart(2, "0"); }
+  function fmtSize(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
+  function canManage(d) {
+    if (!me) return false;
+    if (d === "all") return PSRP.hasRole(me, "admin");
+    return PSRP.hasRole(me, { lapd: "police_cmd", lafd: "fire_cmd", ems: "ems_cmd" }[d]);
+  }
+  function myDepts() { return Object.keys(DEPTS).filter(function (d) { return d === ONLY && canManage(d); }); }
+
+  /* ---------- 讀取 ---------- */
+  async function load() {
+    var r = await PSRP.client.from("announcements").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(1000);
+    if (r.error) { document.getElementById("count").textContent = "讀取失敗：" + PSRP.errText(r.error); return; }
+    all = r.data.filter(function (a) { return a.department === ONLY; });
+    all.forEach(function (a) { a._hay = [a.title, a.summary, a.body, a.ref_no, a.category, DEPTS[a.department].name, DEPTS[a.department].short, a.signer, isInt(a) ? "內部 internal" : "公開"].join("\n").toLowerCase(); });
+    var priv = []; all.forEach(function (a) { if (isInt(a)) (a.attachments || []).forEach(function (f) { if (f.path) priv.push(f); }); });
+    if (priv.length) {
+      var sg = await ibucket.createSignedUrls(priv.map(function (f) { return f.path; }), 3600);
+      (sg.data || []).forEach(function (x, i) { if (x.signedUrl) priv[i].url = x.signedUrl; });
+    }
+    route();
+  }
+
+  /* ---------- 列表 ---------- */
+  function catChips() {
+    var box = document.getElementById("f-cat"); box.innerHTML = "";
+    [""].concat(CATS).forEach(function (c) {
+      var b = el("button", { type: "button", "data-v": c, "aria-pressed": String(filt.cat === c) }, c || "全部類別");
+      box.appendChild(b);
+    });
+  }
+  function hl(text, terms) {
+    var s = esc(text);
+    terms.forEach(function (t) { if (!t) return; var re = new RegExp(esc(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"); s = s.replace(re, function (m) { return "<mark>" + m + "</mark>"; }); });
+    return s;
+  }
+  function renderList() {
+    var terms = filt.q.toLowerCase().split(/\s+/).filter(Boolean);
+    var res = all.filter(function (a) {
+      return (!filt.dept || a.department === filt.dept) && (!filt.cat || a.category === filt.cat) && terms.every(function (t) { return a._hay.indexOf(t) !== -1; });
+    });
+    var list = document.getElementById("list"); list.innerHTML = "";
+    document.getElementById("count").textContent = all.length ? "共 " + res.length + " 則公告" + (res.length !== all.length ? "（全部 " + all.length + " 則）" : "") : "";
+    if (!res.length) {
+      list.appendChild(el("div", { class: "empty-news" }, all.length ? "找不到符合的公告，試試其他關鍵字。" : "目前還沒有公告。"));
+    }
+    res.slice(0, shown).forEach(function (a) {
+      var d = DEPTS[a.department];
+      var card = el("a", { class: "ncard", href: "#n" + a.id, style: "--c:" + d.c });
+      card.appendChild(el("span", { class: "bar" }));
+      var inn = el("span", { class: "in" });
+      var top = el("span", { class: "ntop" });
+      top.innerHTML = (a.pinned ? '<span class="pin">📌 置頂</span>' : "") + (d.icon ? '<img class="dicon' + (d.sq ? ' sq' : '') + '" src="' + d.icon + '" alt="">' : '') + '<span class="dtag">' + d.short + '</span>' + (isInt(a) ? '<span class="itag">🔒 內部</span>' : '') + '<span class="ctag">' + esc(a.category) + "</span><span>" + esc(a.ref_no || "") + "</span><span>" + fmtDate(a.created_at) + "</span>" + ((a.attachments || []).length ? '<span class="att">📎 ' + a.attachments.length + "</span>" : "");
+      inn.appendChild(top);
+      var h = el("h3"); h.innerHTML = hl(a.title, terms); inn.appendChild(h);
+      var snippet = a.summary || a.body.replace(/[#>*_`|\-]/g, " ").replace(/\s+/g, " ").slice(0, 160);
+      var p = el("p"); p.innerHTML = hl(snippet, terms); inn.appendChild(p);
+      card.appendChild(inn); list.appendChild(card);
+    });
+    document.getElementById("more").hidden = res.length <= shown;
+  }
+  document.getElementById("q").addEventListener("input", function (e) { filt.q = e.target.value.trim(); shown = PAGE; renderList(); });
+  document.getElementById("f-dept").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return; filt.dept = b.dataset.v; shown = PAGE;
+    [].forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); }); renderList();
+  });
+  document.getElementById("f-cat").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return; filt.cat = b.dataset.v; shown = PAGE;
+    [].forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); }); renderList();
+  });
+  document.getElementById("more").addEventListener("click", function () { shown += PAGE; renderList(); });
+
+  /* ---------- 公告正式版面 ---------- */
+  function noticeHtml(a) {
+    var d = DEPTS[a.department], atts = a.attachments || [];
+    var imgs = atts.filter(function (f) { return /^image\//.test(f.type); }), pdfs = atts.filter(function (f) { return f.type === "application/pdf"; });
+    var h = '<article class="ann" style="--c:' + d.c + '"><div class="band"></div>' +
+      '<div class="nh">' + (d.icon ? '<img class="seal-img' + (d.sq ? ' sq' : '') + '" src="' + d.icon + '" alt="' + d.short + '">' : '<div class="seal">' + d.short + '</div>') + '<div class="org">' + esc(d.name) + "<small>" + esc(d.en) + '</small></div><div class="kind">公告</div></div>' +
+      '<div class="facts"><div><b>字號</b>' + esc(a.ref_no || "（發布後產生）") + "</div><div><b>發布日期</b>" + fmtDate(a.created_at || new Date()) + "</div>" +
+      (a.effective_date ? "<div><b>生效日期</b>" + a.effective_date.replace(/-/g, "/") + "</div>" : "") +
+      "<div><b>類別</b>" + esc(a.category) + "</div></div>" +
+      (isInt(a) ? '<div class="stamp">🔒 INTERNAL · 僅限 ' + esc(d.short) + ' 內部成員閱讀，請勿截圖或外流</div>' : "") +
+      '<div class="nb"><h1>' + esc(a.title) + "</h1>" +
+      (a.summary ? '<div class="sum"><b>重點摘要</b>' + esc(a.summary).replace(/\n/g, "<br>") + "</div>" : "") +
+      '<div class="txt">' + PSRPMd.renderNotice(a.body) + "</div>";
+    if (atts.length) {
+      h += '<div class="files"><h4>附件</h4>';
+      if (imgs.length) h += '<div class="imgs">' + imgs.map(function (f) { var u = f.url || fileUrl(f.path); return '<a href="' + esc(u) + '" target="_blank" rel="noopener"><img src="' + esc(u) + '" alt="' + esc(f.name) + '" loading="lazy"></a>'; }).join("") + "</div>";
+      pdfs.forEach(function (f, i) {
+        var u = f.url || fileUrl(f.path);
+        h += '<a class="pdf" href="' + esc(u) + '" target="_blank" rel="noopener"><span class="ic">PDF</span><span>' + esc(f.name) + "</span><small>" + (f.size ? fmtSize(f.size) : "") + " · 開啟</small></a>";
+        if (i === 0) h += '<object class="pdfview" data="' + esc(u) + '#view=FitH" type="application/pdf"><a href="' + esc(u) + '" target="_blank" rel="noopener">開啟 PDF</a></object>';
+      });
+      h += "</div>";
+    }
+    h += '<div class="sign">' + esc(a.signer || d.signer) + "<small>謹此公告</small></div></div>" +
+      '<div class="nf"><span>Palm State RolePlay · 角色扮演內容</span><span>psrp2.com/' + (PD ? "pd/" : "") + 'news/#n' + (a.id || "") + "</span></div></article>";
+    return h;
+  }
+  function showDetail(id) {
+    var a = all.filter(function (x) { return String(x.id) === String(id); })[0];
+    var v = document.getElementById("view-detail"); v.innerHTML = "";
+    var bar = el("div", { class: "detail-actions" });
+    var back = el("a", { class: "btn-sec", href: "#", style: "text-decoration:none" }, "← 返回部門公告"); bar.appendChild(back);
+    var right = el("div", { class: "r" });
+    if (a) {
+      var copy = el("button", { type: "button", class: "btn-sec" }, "複製連結");
+      copy.addEventListener("click", function () { navigator.clipboard && navigator.clipboard.writeText(location.href); copy.textContent = "已複製"; });
+      right.appendChild(copy);
+      if (canManage(a.department)) {
+        var ed = el("button", { type: "button", class: "btn-sec" }, "編輯");
+        ed.addEventListener("click", function () { openCompose(a); });
+        var del = el("button", { type: "button", class: "btn-sec btn-bad" }, "刪除");
+        del.addEventListener("click", async function () {
+          if (!confirm("確定要刪除「" + a.title + "」？刪除後無法復原。")) return;
+          var r = await PSRP.client.from("announcements").delete().eq("id", a.id);
+          if (r.error) { alert(PSRP.errText(r.error)); return; }
+          var paths = (a.attachments || []).map(function (f) { return f.path; }).filter(Boolean);
+          if (paths.length) await bucketFor(a).remove(paths);
+          location.hash = ""; load();
+        });
+        right.appendChild(ed); right.appendChild(del);
+      }
+    }
+    bar.appendChild(right); v.appendChild(bar);
+    if (!a) { v.appendChild(el("div", { class: "empty-news" }, "找不到這則公告，可能已被刪除。")); }
+    else { var w = el("div"); w.innerHTML = noticeHtml(a); v.appendChild(w); document.title = a.title + " · LAFD 部門公告"; }
+  }
+
+  /* ---------- 路由 ---------- */
+  function route() {
+    var m = location.hash.match(/^#n(\d+)$/);
+    document.getElementById("view-list").hidden = !!m;
+    document.getElementById("view-detail").hidden = !m;
+    document.getElementById("view-compose").hidden = true;
+    document.getElementById("phead").hidden = !!m;
+    if (m) { showDetail(m[1]); window.scrollTo(0, 0); }
+    else { document.title = "部門公告 · LAFD"; renderList(); }
+  }
+  window.addEventListener("hashchange", route);
+
+  /* ---------- 發布／編輯 ---------- */
+  var f = {
+    dept: document.getElementById("c-dept"), cat: document.getElementById("c-cat"), eff: document.getElementById("c-eff"),
+    signer: document.getElementById("c-signer"), title: document.getElementById("c-tt"), sum: document.getElementById("c-sum"),
+    pin: document.getElementById("c-pin"), body: document.getElementById("c-body"), msg: document.getElementById("c-msg")
+  };
+  CATS.forEach(function (c) { f.cat.appendChild(el("option", { value: c }, c)); });
+  var lastAutoSigner = "";
+  function getVis() { var x = document.querySelector('input[name="c-vis"]:checked'); return f.dept.value === "all" ? "public" : (x ? x.value : "public"); }
+  function setVis(v, lock) {
+    [].forEach.call(document.querySelectorAll('input[name="c-vis"]'), function (x) { x.checked = x.value === v; x.disabled = lock; });
+    document.getElementById("c-vis-row").hidden = f.dept.value === "all";
+  }
+  f.dept.addEventListener("change", function () {
+    document.getElementById("c-vis-row").hidden = f.dept.value === "all";
+    if (!f.signer.value || f.signer.value === lastAutoSigner) { f.signer.value = lastAutoSigner = DEPTS[f.dept.value].signer; }
+  });
+  function openCompose(a) {
+    editing = a || null; files = a ? (a.attachments || []).map(function (x) { return Object.assign({ existing: true }, x); }) : [];
+    f.dept.innerHTML = "";
+    myDepts().forEach(function (d) { f.dept.appendChild(el("option", { value: d }, DEPTS[d].short + " · " + DEPTS[d].name)); });
+    f.dept.value = a ? a.department : myDepts()[0];
+    f.dept.disabled = !!a;
+    f.cat.value = a ? a.category : CATS[0];
+    f.eff.value = a && a.effective_date ? a.effective_date : "";
+    f.title.value = a ? a.title : ""; f.sum.value = a ? a.summary : ""; f.body.value = a ? a.body : "";
+    f.pin.checked = a ? a.pinned : false;
+    setVis(a ? (a.visibility || "public") : "public", !!a);
+    f.signer.value = lastAutoSigner = a ? a.signer : DEPTS[f.dept.value].signer;
+    f.msg.textContent = ""; f.msg.className = "form-msg";
+    document.getElementById("c-title").textContent = a ? "編輯公告 " + (a.ref_no || "") : "發布公告";
+    document.getElementById("c-submit").textContent = a ? "儲存變更" : "發布公告";
+    document.getElementById("c-prev").hidden = true;
+    renderFiles();
+    ["view-list", "view-detail", "phead"].forEach(function (id) { document.getElementById(id).hidden = true; });
+    document.getElementById("view-compose").hidden = false;
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("c-back").addEventListener("click", function () {
+    if ((f.title.value || f.body.value) && !confirm("尚未發布的內容會遺失，確定要離開？")) return;
+    route();
+  });
+  document.getElementById("c-tools").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var t = f.body, s = t.selectionStart, en = t.selectionEnd, v = t.value, ins;
+    if (b.dataset.wrap) { var w = b.dataset.wrap; ins = w + (v.slice(s, en) || "粗體文字") + w; }
+    else { ins = (s > 0 && v[s - 1] !== "\n" ? "\n\n" : "") + b.dataset.ins.replace(/\\n/g, "\n"); }
+    t.value = v.slice(0, s) + ins + v.slice(en); t.focus(); t.selectionStart = t.selectionEnd = s + ins.length;
+  });
+  /* 附件 */
+  var input = document.getElementById("c-files"), drop = document.getElementById("drop");
+  drop.addEventListener("click", function () { input.click(); });
+  drop.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+  drop.addEventListener("dragover", function (e) { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", function () { drop.classList.remove("over"); });
+  drop.addEventListener("drop", function (e) { e.preventDefault(); drop.classList.remove("over"); addFiles(e.dataTransfer.files); });
+  input.addEventListener("change", function () { addFiles(input.files); input.value = ""; });
+  function addFiles(list) {
+    [].forEach.call(list, function (file) {
+      if (!/^image\/(png|jpeg|webp|gif)$|^application\/pdf$/.test(file.type)) { alert("「" + file.name + "」不是圖片或 PDF，已略過。"); return; }
+      if (file.size > 10485760) { alert("「" + file.name + "」超過 10 MB，已略過。"); return; }
+      files.push({ file: file, name: file.name, type: file.type, size: file.size, url: URL.createObjectURL(file) });
+    });
+    renderFiles();
+  }
+  function renderFiles() {
+    var box = document.getElementById("c-filelist"); box.innerHTML = "";
+    files.forEach(function (x, i) {
+      var row = el("div", { class: "f" });
+      if (/^image\//.test(x.type)) row.appendChild(el("img", { src: x.url || fileUrl(x.path), alt: "" }));
+      else row.appendChild(el("b", { style: "color:#ff6b5e;font-size:12px" }, "PDF"));
+      row.appendChild(el("span", null, x.name + (x.size ? "（" + fmtSize(x.size) + "）" : "")));
+      var rm = el("button", { type: "button", "aria-label": "移除" }, "✕ 移除");
+      rm.addEventListener("click", function () { files.splice(i, 1); renderFiles(); });
+      row.appendChild(rm); box.appendChild(row);
+    });
+  }
+  function draft() {
+    return {
+      id: editing && editing.id, ref_no: editing && editing.ref_no, created_at: editing ? editing.created_at : new Date().toISOString(),
+      department: f.dept.value, category: f.cat.value, effective_date: f.eff.value || null, signer: f.signer.value.trim(),
+      title: f.title.value.trim(), summary: f.sum.value.trim(), body: f.body.value, pinned: f.pin.checked, visibility: editing ? (editing.visibility || "public") : getVis(),
+      attachments: files.map(function (x) { return { path: x.path, url: x.url, name: x.name, type: x.type, size: x.size }; })
+    };
+  }
+  document.getElementById("c-preview").addEventListener("click", function () {
+    var p = document.getElementById("c-prev"); p.hidden = false;
+    p.innerHTML = '<h2 class="section-title">預覽</h2><div class="preview-wrap">' + noticeHtml(draft()) + "</div>";
+    p.scrollIntoView({ behavior: "smooth" });
+  });
+  document.getElementById("cform").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var d = draft(), btn = document.getElementById("c-submit");
+    f.msg.className = "form-msg";
+    if (!d.title) { f.msg.className = "form-msg err"; f.msg.textContent = "請填寫標題。"; f.title.focus(); return; }
+    if (!d.body.trim() && !d.summary && !files.length) { f.msg.className = "form-msg err"; f.msg.textContent = "請填寫內文、摘要或附上檔案。"; return; }
+    btn.disabled = true;
+    try {
+      var uploaded = [];
+      for (var i = 0; i < files.length; i++) {
+        var x = files[i];
+        if (x.existing) { uploaded.push({ path: x.path, name: x.name, type: x.type, size: x.size }); continue; }
+        f.msg.textContent = "上傳附件 " + (i + 1) + "/" + files.length + "…";
+        var ext = (x.name.match(/\.[a-z0-9]+$/i) || [""])[0].toLowerCase();
+        var path = d.department + "/" + new Date().toISOString().slice(0, 10) + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ext;
+        var up = await bucketFor(d).upload(path, x.file, { contentType: x.type, upsert: false });
+        if (up.error) throw up.error;
+        x.existing = true; x.path = path; delete x.file;
+        uploaded.push({ path: path, name: x.name, type: x.type, size: x.size });
+      }
+      var row = { category: d.category, effective_date: d.effective_date, signer: d.signer, title: d.title, summary: d.summary, body: d.body, pinned: d.pinned, attachments: uploaded };
+      var r;
+      if (editing) {
+        row.updated_at = new Date().toISOString();
+        r = await PSRP.client.from("announcements").update(row).eq("id", editing.id).select().single();
+        var removed = (editing.attachments || []).filter(function (o) { return !uploaded.some(function (u) { return u.path === o.path; }); }).map(function (o) { return o.path; });
+        if (!r.error && removed.length) await bucketFor(editing).remove(removed);
+      } else {
+        row.department = d.department; row.visibility = d.visibility;
+        r = await PSRP.client.from("announcements").insert(row).select().single();
+      }
+      if (r.error) throw r.error;
+      f.title.value = ""; f.body.value = "";
+      await load();
+      location.hash = "#n" + r.data.id; route();
+    } catch (err) {
+      f.msg.className = "form-msg err"; f.msg.textContent = "發布失敗：" + PSRP.errText(err);
+    }
+    btn.disabled = false;
+  });
+
+  /* ---------- 啟動 ---------- */
+  async function start() {
+    catChips();
+    filt.dept = ONLY; document.getElementById("f-dept").hidden = true;
+    if (!PSRP.client) { document.getElementById("count").textContent = "公告系統暫時無法使用。"; return; }
+    PSRP.mountAccountChip(document.getElementById("account"));
+    me = await PSRP.profile();
+    if (myDepts().length) {
+      var b = el("button", { type: "button", class: "btn-primary" }, "＋ 發布公告");
+      b.addEventListener("click", function () { openCompose(null); });
+      document.getElementById("post-slot").appendChild(b);
+    }
+    if (!PD && me && myDepts().length === 0) {
+      var home = { police_cmd: ["/pd/news/", "LAPD"], fire_cmd: ["/fd/news/", "LAFD"], ems_cmd: ["/ems/news/", "EMS"] }, links = [];
+      Object.keys(home).forEach(function (r) { if (PSRP.hasRole(me, r)) links.push(home[r]); });
+      links.forEach(function (x) { var a = el("a", { class: "btn-sec", href: x[0], style: "text-decoration:none" }, "到 " + x[1] + " 部門網站發布公告 →"); document.getElementById("post-slot").appendChild(a); });
+    }
+    load();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
