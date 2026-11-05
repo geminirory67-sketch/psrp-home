@@ -18,6 +18,7 @@
     <nav class="navl" aria-label="主選單">
       <a href="/">首頁</a>
       <a href="/rules/" aria-current="page">伺服器規則</a>
+      <a href="/news/">公告</a>
       <a href="/apply/">公職招募</a>
       <a href="https://law.psrp2.com/">加州法典</a>
       <a href="/lapd/">LAPD 手冊</a>
@@ -39,7 +40,8 @@
   <div class="wrap layout">
     <nav class="toc" aria-label="規則目錄">
       <h4>目錄</h4>
-      <ol>
+      <div id="editslot"></div>
+      <ol id="rules-toc">
         <li><a href="#general">第一章 總則</a></li>
         <li><a href="#community">第二章 社群行為</a></li>
         <li><a href="#core">第三章 角色扮演核心規則</a></li>
@@ -57,7 +59,7 @@
       </ol>
     </nav>
 
-    <article class="prose">
+    <article class="prose" id="rules-body">
 
       <h2 id="general"><small>Chapter 1</small>第一章 總則</h2>
       <div class="rule"><h4><code>1.1</code>適用範圍</h4><p>本規則適用於遊戲伺服器、官方 Discord 及所有以 Palm State RolePlay 名義經營的平台。在任何一處違規，處分效力及於全部平台。</p></div>
@@ -233,6 +235,23 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="/assets/config.js"></script>
 <script src="/assets/auth.js"></script>
-<script>PSRP.mountAccountChip(document.getElementById("account"));</script>
+<script src="/assets/marked.js"></script>
+<script src="/assets/mdbook.js"></script>
+<script src="/assets/docs.js"></script>
+<script>
+PSRP.mountAccountChip(document.getElementById("account"));
+(async function () {
+  try {
+    var d = await PSRPDocs.get("rules", { cache: true, timeout: 3000 });
+    if (d && d.source) {
+      var r = PSRPMd.renderRules(d.source);
+      document.getElementById("rules-body").innerHTML = r.html;
+      document.getElementById("rules-toc").innerHTML = r.toc.map(function (t) { return '<li><a href="#' + t[0] + '">' + PSRPMd.esc(t[1]) + "</a></li>"; }).join("");
+      if (location.hash) { var el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView(); }
+    }
+  } catch (e) { console.warn("使用內建版本", e); }
+  PSRPDocs.editButton(document.getElementById("editslot"), "rules", "admin");
+})();
+</script>
 </body>
 </html>
