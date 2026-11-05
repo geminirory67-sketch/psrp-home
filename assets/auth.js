@@ -175,7 +175,9 @@
       var a = el("a", { href: "/apply/", class: "chip-login" }, "登入／註冊");
       container.appendChild(a); return;
     }
-    var name = el("span", { class: "chip-name" }, p.display_name || p.email);
+    var name = el("button", { type: "button", class: "chip-name", title: "修改顯示名稱", style: "background:none;border:0;padding:4px 2px;font:inherit;font-weight:500;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:5px" }, p.display_name || p.email);
+    name.appendChild(el("span", { "aria-hidden": "true", style: "font-size:11px;opacity:.6" }, "✎"));
+    name.addEventListener("click", function () { editName(p, function () { mountAccountChip(container); }); });
     container.appendChild(name);
     if (hasRole(p, "reviewer")) container.appendChild(el("a", { href: "/admin/", class: "chip-link" }, "管理後台"));
     else if (hasRole(p, "support")) container.appendChild(el("a", { href: "/support/", class: "chip-link" }, "工單管理"));
@@ -183,6 +185,42 @@
     var out = el("button", { type: "button", class: "chip-out" }, "登出");
     out.addEventListener("click", signOut);
     container.appendChild(out);
+  }
+
+  /* 修改自己的顯示名稱（論壇、聊天室與網站上顯示的名字） */
+  function editName(p, done) {
+    if (document.getElementById("psrp-name")) return;
+    var wrap = el("div", { id: "psrp-name", role: "dialog", "aria-modal": "true", "aria-label": "修改顯示名稱", style: "position:fixed;inset:0;z-index:100;background:rgba(5,8,20,.75);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'Noto Sans TC',system-ui,sans-serif" });
+    var card = el("form", { novalidate: "", style: "width:100%;max-width:420px;background:#151b36;color:#eef0f7;border:1px solid #2b3460;border-radius:12px;padding:22px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.5)" });
+    card.appendChild(el("h2", { style: "margin:0;font-size:20px" }, "修改顯示名稱"));
+    card.appendChild(el("p", { style: "margin:0;color:#a3abc8;font-size:14px;line-height:1.6" }, "這個名字會顯示在網站右上角、論壇與聊天室。之後發的文章和訊息會用新名字，已經發過的不會改變。"));
+    var inp = el("input", { maxlength: "24", autocomplete: "nickname", "aria-label": "顯示名稱", style: "width:100%;box-sizing:border-box;font:inherit;font-size:16px;color:#eef0f7;background:#0d1124;border:1px solid #2b3460;border-radius:8px;padding:10px 12px" });
+    inp.value = p.display_name || "";
+    card.appendChild(inp);
+    var msg = el("p", { role: "status", style: "margin:0;min-height:1.2em;font-size:13.5px;color:#ff5c6c" });
+    card.appendChild(msg);
+    var row = el("div", { style: "display:flex;gap:8px;justify-content:flex-end" });
+    var cancel = el("button", { type: "button", style: "font:inherit;background:none;border:1px solid #2b3460;color:#eef0f7;border-radius:8px;padding:8px 16px;cursor:pointer" }, "取消");
+    var ok = el("button", { type: "submit", style: "font:inherit;font-weight:700;background:#e8b85a;border:0;color:#1b1405;border-radius:8px;padding:8px 18px;cursor:pointer" }, "儲存");
+    row.appendChild(cancel); row.appendChild(ok); card.appendChild(row);
+    wrap.appendChild(card); document.body.appendChild(wrap);
+    function close() { wrap.remove(); document.removeEventListener("keydown", onKey); }
+    function onKey(e) { if (e.key === "Escape") close(); }
+    document.addEventListener("keydown", onKey);
+    cancel.addEventListener("click", close);
+    wrap.addEventListener("click", function (e) { if (e.target === wrap) close(); });
+    card.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var v = inp.value.replace(/\s+/g, " ").trim();
+      if (v.length < 2) { msg.textContent = "名稱至少 2 個字。"; inp.focus(); return; }
+      if (v === p.display_name) { close(); return; }
+      ok.disabled = true; msg.textContent = "";
+      var r = await client.from("profiles").update({ display_name: v }).eq("id", p.id);
+      ok.disabled = false;
+      if (r.error) { msg.textContent = "儲存失敗：" + errText(r.error); return; }
+      p.display_name = v; close(); if (done) done();
+    });
+    setTimeout(function () { inp.focus(); inp.select(); }, 30);
   }
 
   /* 從重設密碼信回來時，顯示設定新密碼的視窗 */
