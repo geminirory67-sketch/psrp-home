@@ -14,6 +14,8 @@
     if (/Email not confirmed/i.test(m)) return "請先到信箱點擊確認信中的連結，再登入。";
     if (/User already registered/i.test(m)) return "這個 Email 已經註冊過，請直接登入。";
     if (/Password should be at least/i.test(m)) return "密碼至少需要 8 個字元。";
+    if (/only request this after|security purposes/i.test(m)) return "請稍等一分鐘再重新寄送。";
+    if (/New password should be different/i.test(m)) return "新密碼不能和舊密碼相同。";
     if (/rate limit/i.test(m)) return "操作太頻繁，請稍候幾分鐘再試。";
     if (/duplicate key|one_open_application/i.test(m)) return "你在這個部門已經有一份審核中的申請。";
     return m || "發生錯誤，請稍後再試。";
@@ -87,11 +89,23 @@
     form.appendChild(fName.wrap); form.appendChild(fDc.wrap); form.appendChild(fEmail.wrap); form.appendChild(fPw.wrap);
     var msg = el("p", { class: "form-msg", role: "status" });
     var btn = el("button", { type: "submit", class: "btn-primary" }, "登入");
-    form.appendChild(msg); form.appendChild(btn);
+    var forgot = el("button", { type: "button", class: "auth-forgot" }, "忘記密碼？");
+    form.appendChild(msg); form.appendChild(btn); form.appendChild(forgot);
     box.appendChild(form);
+    forgot.addEventListener("click", async function () {
+      var email = fEmail.input.value.trim();
+      msg.className = "form-msg";
+      if (!email) { msg.className = "form-msg err"; msg.textContent = "請先在上方輸入你的 Email，再按「忘記密碼？」。"; fEmail.input.focus(); return; }
+      forgot.disabled = true;
+      var r = await client.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/apply/" });
+      forgot.disabled = false;
+      if (r.error) { msg.className = "form-msg err"; msg.textContent = errText(r.error); return; }
+      msg.className = "form-msg ok"; msg.textContent = "如果這個 Email 有註冊過，重設密碼的信已寄出，請到信箱查看（也請檢查垃圾郵件）。";
+    });
     container.appendChild(box);
     function setMode(m) {
       mode = m;
+      forgot.hidden = m !== "login";
       tLogin.className = m === "login" ? "on" : ""; tReg.className = m === "reg" ? "on" : "";
       fName.wrap.hidden = m === "login"; fDc.wrap.hidden = m === "login";
       fPw.input.setAttribute("autocomplete", m === "login" ? "current-password" : "new-password");
@@ -142,6 +156,35 @@
     out.addEventListener("click", signOut);
     container.appendChild(out);
   }
+
+  /* 從重設密碼信回來時，顯示設定新密碼的視窗 */
+  function showRecovery() {
+    if (document.getElementById("psrp-recovery")) return;
+    var wrap = el("div", { id: "psrp-recovery", style: "position:fixed;inset:0;z-index:100;background:rgba(5,8,20,.75);display:flex;align-items:center;justify-content:center;padding:16px" });
+    var card = el("form", { class: "auth-card", style: "width:100%;max-width:420px;margin:0", novalidate: "" });
+    card.appendChild(el("h2", { style: "margin:0 0 6px;font-size:22px" }, "設定新密碼"));
+    card.appendChild(el("p", { class: "auth-intro" }, "請輸入你的新密碼（至少 8 個字元）。"));
+    var lab = el("label", { class: "fld", for: "rc-pw" }); lab.appendChild(el("span", null, "新密碼"));
+    var pw = el("input", { id: "rc-pw", type: "password", autocomplete: "new-password", required: "" }); lab.appendChild(pw);
+    var lab2 = el("label", { class: "fld", for: "rc-pw2" }); lab2.appendChild(el("span", null, "再輸入一次"));
+    var pw2 = el("input", { id: "rc-pw2", type: "password", autocomplete: "new-password", required: "" }); lab2.appendChild(pw2);
+    var m = el("p", { class: "form-msg", role: "status" });
+    var b = el("button", { type: "submit", class: "btn-primary" }, "更新密碼");
+    [lab, lab2, m, b].forEach(function (x) { card.appendChild(x); });
+    wrap.appendChild(card); document.body.appendChild(wrap); pw.focus();
+    card.addEventListener("submit", async function (e) {
+      e.preventDefault(); m.className = "form-msg";
+      if (pw.value.length < 8) { m.className = "form-msg err"; m.textContent = "密碼至少需要 8 個字元。"; return; }
+      if (pw.value !== pw2.value) { m.className = "form-msg err"; m.textContent = "兩次輸入的密碼不一樣。"; return; }
+      b.disabled = true;
+      var r = await client.auth.updateUser({ password: pw.value });
+      b.disabled = false;
+      if (r.error) { m.className = "form-msg err"; m.textContent = errText(r.error); return; }
+      m.className = "form-msg ok"; m.textContent = "密碼已更新！";
+      setTimeout(function () { wrap.remove(); location.replace(location.pathname); }, 1200);
+    });
+  }
+  if (client) client.auth.onAuthStateChange(function (ev) { if (ev === "PASSWORD_RECOVERY") showRecovery(); });
 
   window.PSRP = {
     client: client, ready: !!client, session: session, profile: profile, hasRole: hasRole,

@@ -173,3 +173,6 @@ legend { font-size: 15px; color: var(--gold-soft, #f5d58a); }
 .top .navl { flex: 1 1 auto; min-width: 0; justify-content: flex-end; }
 .top .account { flex: 0 0 auto; flex-wrap: nowrap; white-space: nowrap; }
 @media (max-width: 900px) { .top .wrap { flex-wrap: wrap; } }
+
+.auth-forgot { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13.5px; cursor: pointer; padding: 4px 0; text-decoration: underline; justify-self: start; }
+.auth-forgot:hover { color: var(--ink); }
