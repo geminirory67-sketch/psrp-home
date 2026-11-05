@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>洛杉磯消防局 LAFD · Palm State RolePlay</title>
+<meta name="description" content="Palm State RolePlay 洛杉磯消防局入口：部門公告、組織、階級與招募資訊。">
+<link rel="icon" type="image/png" href="/assets/seal-lafd.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/pd.css">
+<style>
+.hero { position: relative; overflow: hidden; background: radial-gradient(1200px 500px at 15% 40%, color-mix(in srgb, var(--acc) 14%, transparent), transparent 60%), linear-gradient(180deg, var(--hdr) 0%, var(--night) 100%); border-bottom: 1px solid var(--line); }
+.hero::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 80px); pointer-events: none; }
+.hero .wrap { position: relative; z-index: 1; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 44px; align-items: center; padding-block: 56px 52px; }
+.hero .seal { width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(0 12px 30px rgba(0,0,0,.5)); }
+.hero .k { font-family: var(--font-display); letter-spacing: .3em; font-size: 13px; color: var(--acc); font-weight: 600; }
+.hero h1 { margin: 8px 0 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 5.2vw, 62px); line-height: 1; letter-spacing: .04em; }
+.hero .zh { font-family: var(--font-zh-display); font-weight: 900; font-size: clamp(24px, 3vw, 34px); letter-spacing: .2em; margin-top: 10px; }
+.hero .motto { display: inline-block; margin-top: 16px; padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--acc) 50%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--acc) 50%, transparent); font-family: var(--font-display); letter-spacing: .3em; color: var(--acc); font-size: 15px; font-weight: 600; }
+.hero p { color: var(--muted); max-width: 640px; margin: 16px 0 0; }
+.ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+.ctas a { text-decoration: none; padding: 11px 20px; border-radius: 4px; font-weight: 700; font-size: 15px; border: 1px solid var(--line); color: var(--ink); background: rgba(255,255,255,.03); }
+.ctas a.pri { background: var(--acc); color: #111; border-color: var(--acc); }
+.ctas a:hover { border-color: var(--acc); }
+.band { padding-block: 44px 8px; }
+.h2 { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 0 0 18px; }
+.h2 h2 { margin: 0; font-family: var(--font-zh-display); font-weight: 900; font-size: 28px; }
+.h2 span { font-family: var(--font-display); letter-spacing: .24em; color: var(--acc); font-size: 13px; font-weight: 600; text-transform: uppercase; }
+.h2 a { margin-left: auto; color: var(--muted); font-size: 14px; }
+.mem { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--acc); border-radius: 8px; padding: 20px 22px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.tile { display: grid; gap: 4px; text-decoration: none; background: var(--night-2); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; color: var(--ink); }
+a.tile:hover { border-color: var(--acc); }
+.tile b { font-size: 16px; } .tile small { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.tile.cmd { border-style: dashed; } .tile.cmd b::before { content: "★ "; color: var(--acc); }
+.tile.soon { opacity: .6; }
+.loginbox { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.bul { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.bc { display: grid; gap: 6px; text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--acc); border-radius: 6px; padding: 14px 16px; }
+.bc.int { border-top-color: #e0584a; }
+.bc:hover { border-color: var(--acc); }
+.bc .m { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.bc .m .i { color: #ffb4a8; font-weight: 700; }
+.bc h3 { margin: 0; font-size: 16.5px; line-height: 1.45; }
+.bc p { margin: 0; color: var(--muted); font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.org { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.oc { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+.oc .ab { display: inline-block; font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 13px; color: #111; background: var(--acc); border-radius: 3px; padding: 1px 8px; }
+.oc h3 { margin: 8px 0 2px; font-size: 17px; }
+.oc .en { font-family: var(--font-display); letter-spacing: .12em; font-size: 12.5px; color: var(--muted); text-transform: uppercase; }
+.oc p { margin: 8px 0 0; color: var(--ink); opacity: .85; font-size: 14px; line-height: 1.65; }
+.cols2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+table.ref { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--panel); border: 1px solid var(--line); }
+.ref th, .ref td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.ref th { background: var(--panel-2); font-size: 12px; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+.ref td:first-child { font-family: "IBM Plex Mono", monospace; font-weight: 600; white-space: nowrap; color: var(--acc); }
+.ref tr:last-child td { border-bottom: 0; }
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); counter-reset: s; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 0; padding: 0; }
+.steps li { list-style: none; padding: 18px 16px; border-right: 1px solid var(--line); counter-increment: s; }
+.steps li:last-child { border-right: 0; }
+.steps li::before { content: "0" counter(s); display: block; font-family: var(--font-display); font-weight: 700; font-size: 28px; color: var(--acc); line-height: 1; }
+.steps b { display: block; margin-top: 8px; } .steps small { color: var(--muted); font-size: 13px; line-height: 1.55; display: block; margin-top: 4px; }
+@media (max-width: 900px) {
+  .hero .wrap { grid-template-columns: 1fr; gap: 18px; padding-block: 34px; text-align: center; }
+  .hero .seal { width: 150px; height: 150px; margin: 0 auto; }
+  .hero p { margin-inline: auto; } .ctas { justify-content: center; }
+  .cols2 { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; } .steps li { border-right: 0; border-bottom: 1px solid var(--line); }
+}
+</style>
+</head>
+<body class="fd">
+<div class="pd-util"><div class="in"><span>Official Portal · Los Angeles Fire Department · Palm State RolePlay</span><span style="display:flex;gap:16px"><a href="/safety/">← 公共安全</a><a href="/">Palm State 主站</a></span></div></div>
+<header class="pdh"><div class="in"><a class="brand" href="/fd/"><img src="/assets/seal-lafd.png" alt="LAFD 徽章"><span><b>LAFD</b><small>LOS ANGELES FIRE DEPT.</small></span></a><nav aria-label="LAFD 選單"><a href="/fd/" aria-current="page">首頁</a><a href="/fd/news/">部門公告</a><a href="/fd/#org">組織與單位</a><a href="/fd/#ranks">階級制度</a><a href="/apply/?dept=lafd">加入 LAFD</a></nav><div class="account" id="account"></div></div></header>
+
+<section class="hero">
+  <div class="wrap">
+    <img class="seal" src="/assets/seal-lafd.png" alt="LAFD 徽章">
+    <div>
+      <div class="k">PALM STATE · CITY OF LOS ANGELES</div>
+      <h1>LOS ANGELES FIRE<br>DEPARTMENT</h1>
+      <div class="zh">洛杉磯消防局</div>
+      <div class="motto">SERVING WITH COURAGE, INTEGRITY & PRIDE</div>
+      <p>建築火災、山林野火、車禍救援與危險物品處理。從雲梯車到救援直升機，全城的火場都歸你們管。</p>
+      <div class="ctas" id="ctas">
+        <a class="pri" href="/apply/?dept=lafd">加入 LAFD</a>
+        <a href="/fd/news/">部門公告</a>
+        <a href="/fd/#org">組織與單位</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <section class="band">
+      <div class="h2"><span>Members Area</span><h2>成員專區</h2></div>
+      <div class="mem" id="mem"><p class="note" style="margin:0">讀取中…</p></div>
+    </section>
+
+    <section class="band">
+      <div class="h2"><span>Bulletins</span><h2>最新部門公告</h2><a href="/fd/news/">全部公告 →</a></div>
+      <div class="bul" id="bul"><p class="note">讀取中…</p></div>
+    </section>
+
+    <section class="band" id="org">
+      <div class="h2"><span>Organization</span><h2>組織與勤務單位</h2></div>
+      <div class="org"><div class="oc"><span class="ab">CHIEF</span><h3>消防局長室</h3><div class="en">Office of the Fire Chief</div><p>全局最高指揮，負責人事命令、政策與部門規範。</p></div><div class="oc"><span class="ab">BC</span><h3>大隊指揮</h3><div class="en">Battalion Command</div><p>大隊長統籌轄區內各分隊，重大火災時擔任現場指揮官（IC）。</p></div><div class="oc"><span class="ab">E</span><h3>消防車組</h3><div class="en">Engine Company</div><p>水箱車與幫浦車，負責滅火、供水與初期救援，是火場第一線。</p></div><div class="oc"><span class="ab">T</span><h3>雲梯車組</h3><div class="en">Truck Company</div><p>雲梯與破壞器材，負責高樓救援、強制進入與排煙通風。</p></div><div class="oc"><span class="ab">RA</span><h3>救護車</h3><div class="en">Rescue Ambulance</div><p>消防體系的救護車，與 EMS 合作執行到院前救護與傷患後送。</p></div><div class="oc"><span class="ab">USAR</span><h3>都市搜救</h3><div class="en">Urban Search & Rescue</div><p>建築倒塌、受困與技術性救援，配備重型破壞與支撐器材。</p></div><div class="oc"><span class="ab">HM</span><h3>危險物品</h3><div class="en">Hazardous Materials</div><p>化學品外洩、毒性氣體與爆裂物疑慮現場的偵檢與處理。</p></div><div class="oc"><span class="ab">AIR</span><h3>空中消防</h3><div class="en">Air Operations</div><p>滅火直升機吊桶灑水、山林野火偵察與高空吊掛救援。</p></div></div>
+    </section>
+
+    <section class="band" id="ranks">
+      <div class="h2"><span>Rank Structure</span><h2>階級制度</h2></div>
+      <div class="cols2"><table class="ref"><thead><tr><th>縮寫</th><th>階級</th><th>職責</th></tr></thead><tbody><tr><td>CHIEF</td><td>Fire Chief 消防局長</td><td>全局指揮</td></tr><tr><td>DC</td><td>Deputy Chief 副局長</td><td>局處指揮</td></tr><tr><td>AC</td><td>Assistant Chief 助理局長</td><td>區域督導</td></tr><tr><td>BC</td><td>Battalion Chief 大隊長</td><td>大隊／火場指揮</td></tr><tr><td>CAPT II</td><td>Captain II 隊長</td><td>分隊長（雲梯／特種）</td></tr></tbody></table><table class="ref"><thead><tr><th>縮寫</th><th>階級</th><th>職責</th></tr></thead><tbody><tr><td>CAPT I</td><td>Captain I 副隊長</td><td>車組指揮</td></tr><tr><td>ENG</td><td>Engineer 車輛工程師</td><td>駕駛、幫浦與雲梯操作</td></tr><tr><td>FF III</td><td>Firefighter III 資深消防員</td><td>帶訓與專業技術</td></tr><tr><td>FF I/II</td><td>Firefighter I / II 消防員</td><td>滅火與救援</td></tr><tr><td>RCT</td><td>Recruit 學員</td><td>消防學院受訓中</td></tr></tbody></table></div>
+    </section>
+
+    <section class="band" id="join">
+      <div class="h2"><span>Recruitment</span><h2>加入 LAFD</h2><a href="/apply/?dept=lafd">立即申請 →</a></div>
+      <ol class="steps"><li><b>線上申請</b><small>先通過白名單，再到公職招募填寫 LAFD 申請表。</small></li><li><b>書面審核</b><small>高層審核角色背景與 RP 經驗，結果會私訊通知。</small></li><li><b>面試</b><small>Discord 語音面試，考核火場判斷與團隊合作。</small></li><li><b>消防學院</b><small>學習車組分工、器材操作、火場與救援程序。</small></li><li><b>試用上線</b><small>以 Firefighter I 身分隨隊出勤，通過後正式編組。</small></li></ol>
+    </section>
+  </div>
+</main>
+
+<footer class="pdf"><div class="in"><img src="/assets/seal-lafd.png" alt=""><div><b>LOS ANGELES FIRE DEPARTMENT</b><span class="motto">SERVING WITH COURAGE, INTEGRITY & PRIDE</span><small>Palm State RolePlay 角色扮演用途，並非真實政府機關或官方網站。</small></div><nav><a href="/fd/">LAFD 首頁</a><a href="/safety/">公共安全</a><a href="/news/">伺服器公告</a><a href="/rules/">伺服器規則</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><a href="/">Palm State 主站</a></nav></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var DEPT = "lafd", ROLE = "fire", CMD = "fire_cmd", BASE = "/fd/", SHORT = "LAFD";
+  var el = PSRP.el;
+  function tile(href, title, sub, cls) { var a = el(href ? "a" : "div", { class: "tile" + (cls ? " " + cls : ""), href: href || null }); if (!href) a.removeAttribute("href"); a.appendChild(el("b", null, title)); a.appendChild(el("small", null, sub)); return a; }
+  function fmt(d) { var x = new Date(d); return x.getFullYear() + "/" + String(x.getMonth() + 1).padStart(2, "0") + "/" + String(x.getDate()).padStart(2, "0"); }
+  async function bulletins() {
+    var box = document.getElementById("bul");
+    var r = await PSRP.client.from("announcements").select("id, title, summary, body, category, ref_no, created_at, visibility, pinned").eq("department", DEPT).order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(6);
+    box.innerHTML = "";
+    if (r.error || !r.data.length) { box.appendChild(el("p", { class: "note" }, r.error ? "公告暫時無法讀取。" : "目前還沒有 " + SHORT + " 公告。")); return; }
+    r.data.forEach(function (a) {
+      var c = el("a", { class: "bc" + (a.visibility === "internal" ? " int" : ""), href: BASE + "news/#n" + a.id });
+      var m = el("div", { class: "m" });
+      if (a.pinned) m.appendChild(el("span", null, "📌 置頂"));
+      if (a.visibility === "internal") m.appendChild(el("span", { class: "i" }, "🔒 內部"));
+      m.appendChild(el("span", null, a.category)); m.appendChild(el("span", null, a.ref_no || "")); m.appendChild(el("span", null, fmt(a.created_at)));
+      c.appendChild(m); c.appendChild(el("h3", null, a.title));
+      c.appendChild(el("p", null, a.summary || String(a.body || "").replace(/[#>*_`|\-]/g, " ").replace(/\s+/g, " ").slice(0, 120)));
+      box.appendChild(c);
+    });
+  }
+  function memberArea(me) {
+    var box = document.getElementById("mem"); box.innerHTML = "";
+    if (!me) {
+      var lb = el("div", { class: "loginbox" });
+      lb.appendChild(el("div", null, SHORT + " 成員登入後可以查看內部公告與部門工具。"));
+      lb.appendChild(el("a", { class: "chip-login", href: "/apply/?next=" + encodeURIComponent(BASE) }, "登入 / 註冊"));
+      box.appendChild(lb); return;
+    }
+    if (!PSRP.hasRole(me, ROLE)) {
+      var nb = el("div", { class: "loginbox" });
+      nb.appendChild(el("div", null, "你目前不是 " + SHORT + " 成員。通過招募與訓練後，就會開通成員專區。"));
+      nb.appendChild(el("a", { class: "chip-login", href: "/apply/?dept=" + DEPT }, "申請加入 " + SHORT));
+      box.appendChild(nb); return;
+    }
+    var t = el("div", { class: "tiles" });
+    t.appendChild(tile(BASE + "news/", "部門公告", "包含僅限內部的公告"));
+    t.appendChild(tile(BASE + "#ranks", "階級制度", "晉升與職責"));
+    t.appendChild(tile("https://law.psrp2.com/", "加州法典", "罪名、條號與刑度"));
+    t.appendChild(tile(null, "勤務表（即將推出）", "之後會和 LAPD 一樣用 Discord 指令上線", "soon"));
+    if (PSRP.hasRole(me, CMD)) t.appendChild(tile(BASE + "news/", "發布公告", "對外公開或僅限內部", "cmd"));
+    box.appendChild(t);
+  }
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    if (!PSRP.client) { document.getElementById("mem").textContent = "系統暫時無法使用。"; return; }
+    var me = await PSRP.profile();
+    memberArea(me); bulletins();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
