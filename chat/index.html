@@ -66,6 +66,21 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
 .compose .hint { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 .compose .err { color: var(--bad); }
 .empty { margin: auto; text-align: center; color: var(--muted); }
+.mgr { margin: 0 8px 8px; }
+.dlg { position: fixed; inset: 0; z-index: 100; background: rgba(5,8,20,.75); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.dlg .box { background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 860px; max-height: 88vh; display: flex; flex-direction: column; }
+.dlg header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.dlg header h3 { margin: 0; font-size: 18px; }
+.dlg .bd { overflow: auto; padding: 14px 20px; display: grid; gap: 10px; }
+.dlg .ft { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; padding: 14px 20px; border-top: 1px solid var(--line); }
+.crow { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(160px, 1.6fr) 150px auto; gap: 8px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.crow input, .crow select { width: 100%; min-width: 0; font: inherit; font-size: 14px; color: var(--ink); background: var(--night); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+.crow .ops { display: flex; gap: 4px; }
+.crow .ops button { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 3px 8px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.crow .ops button.del { color: #ff8a7a; }
+.crow .ops button:disabled { opacity: .3; cursor: default; }
+.chead { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(160px, 1.6fr) 150px auto; gap: 8px; font-size: 12px; color: var(--muted); padding: 0 10px; }
+@media (max-width: 700px) { .crow, .chead { grid-template-columns: 1fr 1fr; } .chead { display: none; } }
 @media (max-width: 760px) {
   main.chatmain > .wrap { padding: 0; }
   .chat { grid-template-columns: 1fr; border-radius: 0; border-left: 0; border-right: 0; }
@@ -101,6 +116,7 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
       <aside class="side">
         <h2>頻道</h2>
         <div class="chlist" id="chlist"></div>
+        <button type="button" class="btn-sec mgr" id="mgr" hidden>⚙ 管理頻道</button>
         <div class="online" id="online"></div>
       </aside>
       <section class="panel">
@@ -270,6 +286,59 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
     input.value = ""; grow(); input.focus();
     if (!live) { var n = await db.from("chat_messages").select("*").eq("channel", cur.slug).gt("id", lastId).order("id"); (n.data || []).forEach(onIncoming); }
   });
+  /* ---------- Staff：管理頻道 ---------- */
+  var ROLES = [["any", "所有會員"], ["member", "白名單成員"], ["police", "LAPD 成員"], ["fire", "LAFD 成員"], ["ems", "EMS 成員"], ["staff", "管理團隊（Staff）"], ["admin", "僅最高管理"]];
+  function manage() {
+    var list = channels.map(function (c) { return { slug: c.slug, title: c.title, description: c.description, view_role: c.view_role, orig: true }; });
+    var removed = [];
+    var d = el("div", { class: "dlg", role: "dialog", "aria-modal": "true", "aria-label": "管理頻道" }), bx = el("div", { class: "box" });
+    var hd = el("header"); hd.appendChild(el("h3", null, "管理聊天室頻道"));
+    var x = el("button", { type: "button", class: "btn-sec" }, "關閉"); x.addEventListener("click", function () { d.remove(); }); hd.appendChild(x);
+    var bd = el("div", { class: "bd" }), ft = el("div", { class: "ft" });
+    function draw() {
+      bd.innerHTML = "";
+      bd.appendChild(el("p", { class: "note", style: "margin:0" }, "修改頻道名稱、說明、誰看得到，並調整順序。刪除頻道會一併刪除裡面所有訊息。"));
+      var h = el("div", { class: "chead" }); ["頻道名稱", "說明", "誰可以看與發言", ""].forEach(function (t) { h.appendChild(el("span", null, t)); }); bd.appendChild(h);
+      list.forEach(function (c, i) {
+        var r = el("div", { class: "crow" });
+        var t = el("input", { maxlength: "30", placeholder: "頻道名稱", "aria-label": "頻道名稱" }); t.value = c.title; t.addEventListener("input", function () { c.title = t.value; });
+        var ds = el("input", { maxlength: "80", placeholder: "說明（可留空）", "aria-label": "說明" }); ds.value = c.description; ds.addEventListener("input", function () { c.description = ds.value; });
+        var rl = el("select", { "aria-label": "權限" }); ROLES.forEach(function (o) { rl.appendChild(el("option", { value: o[0] }, o[1])); }); rl.value = c.view_role; rl.addEventListener("change", function () { c.view_role = rl.value; });
+        var ops = el("div", { class: "ops" });
+        var up = el("button", { type: "button", title: "上移" }, "↑"), dn = el("button", { type: "button", title: "下移" }, "↓"), del = el("button", { type: "button", class: "del" }, "刪除");
+        up.disabled = i === 0; dn.disabled = i === list.length - 1;
+        up.addEventListener("click", function () { list.splice(i - 1, 0, list.splice(i, 1)[0]); draw(); });
+        dn.addEventListener("click", function () { list.splice(i + 1, 0, list.splice(i, 1)[0]); draw(); });
+        del.addEventListener("click", function () { if (c.orig && !confirm("刪除「" + c.title + "」？裡面的所有訊息都會一起刪除，無法復原。")) return; if (c.orig) removed.push(c.slug); list.splice(i, 1); draw(); });
+        ops.appendChild(up); ops.appendChild(dn); ops.appendChild(del);
+        r.appendChild(t); r.appendChild(ds); r.appendChild(rl); r.appendChild(ops); bd.appendChild(r);
+      });
+    }
+    var add = el("button", { type: "button", class: "btn-sec" }, "＋ 新增頻道");
+    add.addEventListener("click", function () { list.push({ slug: "c" + Date.now().toString(36), title: "", description: "", view_role: "any", orig: false }); draw(); var ins = bd.querySelectorAll(".crow input"); ins[ins.length - 2].focus(); });
+    var msg = el("span", { class: "form-msg", role: "status" });
+    var save = el("button", { type: "button", class: "btn-primary" }, "儲存");
+    save.addEventListener("click", async function () {
+      msg.className = "form-msg";
+      if (list.some(function (c) { return !c.title.trim(); })) { msg.className = "form-msg err"; msg.textContent = "每個頻道都要有名稱。"; return; }
+      if (!list.length) { msg.className = "form-msg err"; msg.textContent = "至少要保留一個頻道。"; return; }
+      save.disabled = true; msg.textContent = "儲存中…";
+      try {
+        for (var i = 0; i < removed.length; i++) { var r1 = await db.from("chat_channels").delete().eq("slug", removed[i]); if (r1.error) throw r1.error; }
+        var rows = list.map(function (c, i) { return { slug: c.slug, title: c.title.trim(), description: c.description.trim(), view_role: c.view_role, sort: (i + 1) * 10 }; });
+        var r2 = await db.from("chat_channels").upsert(rows); if (r2.error) throw r2.error;
+        var r3 = await db.from("chat_channels").select("*").order("sort"); channels = r3.data || channels;
+        d.remove();
+        var still = channels.some(function (c) { return cur && c.slug === cur.slug; });
+        if (still) { cur = channels.filter(function (c) { return c.slug === cur.slug; })[0]; renderChannels(); document.getElementById("ch-title").textContent = (cur.view_role === "any" ? "# " : "🔒 ") + cur.title; document.getElementById("ch-desc").textContent = cur.description; }
+        else open(channels[0].slug);
+      } catch (err) { save.disabled = false; msg.className = "form-msg err"; msg.textContent = PSRP.errText(err); }
+    });
+    var left = el("div"); left.appendChild(add); ft.appendChild(left);
+    var right = el("div", { style: "display:flex;gap:10px;align-items:center" }); right.appendChild(msg); right.appendChild(save); ft.appendChild(right);
+    draw(); bx.appendChild(hd); bx.appendChild(bd); bx.appendChild(ft); d.appendChild(bx); document.body.appendChild(d);
+  }
+  document.getElementById("mgr").addEventListener("click", manage);
   document.getElementById("mb").addEventListener("click", function () { document.getElementById("app").classList.toggle("open"); });
 
   async function start() {
@@ -284,6 +353,7 @@ main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-heig
     if (r.error || !r.data.length) { gate.appendChild(el("div", { class: "notice warn" }, "聊天室尚未開放。")); return; }
     channels = r.data;
     document.getElementById("app").hidden = false;
+    document.getElementById("mgr").hidden = !staff;
     var saved = null; try { saved = localStorage.getItem("psrp-chat-ch"); } catch (e) { /* 略過 */ }
     var want = location.hash.replace("#", "") || saved;
     await open(channels.some(function (c) { return c.slug === want; }) ? want : channels[0].slug);
