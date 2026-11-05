@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deployment 勤務表 · LAPD</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/assets/seal-lapd.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/pd.css">
+<style>
+.sheet { background: #f5f3ec; color: #16192a; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.35); overflow: hidden; }
+.sh-head { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; padding: 20px 26px; border-bottom: 3px double #16192a; }
+.sh-head img { width: 72px; height: 72px; object-fit: contain; }
+.sh-head .t1 { font-family: var(--font-display); font-weight: 700; letter-spacing: .14em; font-size: 15px; color: #3a4060; }
+.sh-head .t2 { font-family: var(--font-display); font-weight: 700; letter-spacing: .06em; font-size: clamp(22px, 3vw, 32px); line-height: 1.1; }
+.sh-head .t3 { font-size: 13px; color: #555b70; margin-top: 2px; }
+.sh-head .live { text-align: right; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: #555b70; }
+.sh-head .live b { display: inline-flex; align-items: center; gap: 6px; color: #1f8a5c; font-size: 13px; }
+.sh-head .live b::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #1fbf72; box-shadow: 0 0 0 0 rgba(31,191,114,.6); animation: pulse 1.6s infinite; }
+.sh-head .live.paused b { color: #b8862a; } .sh-head .live.paused b::before { background: #e0a030; animation: none; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(31,191,114,0); } 100% { box-shadow: 0 0 0 0 rgba(31,191,114,0); } }
+.facts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 1px solid #cfcabd; }
+.facts div { padding: 10px 26px; border-right: 1px solid #e0dccf; font-family: "IBM Plex Mono", monospace; font-size: 14px; }
+.facts b { display: block; font-family: var(--font-body); font-size: 11px; letter-spacing: .12em; color: #6b7086; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 10px 26px; border-bottom: 1px solid #cfcabd; font-size: 12px; color: #555b70; align-items: center; }
+.toolbar2 { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 26px; border-bottom: 1px solid #cfcabd; font-size: 13.5px; }
+.toolbar2 label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.toolbar2 .tb { display: flex; gap: 8px; flex-wrap: wrap; }
+.pbtn { background: #16192a; color: #f5f3ec; border: 0; border-radius: 4px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.pbtn.alt { background: #fff; color: #16192a; border: 1px solid #b9b3a3; font-weight: 500; }
+.pbtn.gold { background: #b8862a; }
+.sec-title { background: #16192a; color: #f5f3ec; font-family: var(--font-display); font-weight: 700; letter-spacing: .14em; font-size: 14px; padding: 6px 26px; display: flex; align-items: center; gap: 8px; }
+.dtw { overflow-x: auto; }
+table.dep { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 1040px; }
+.dep th { background: #e8e4d8; color: #3a4060; font-weight: 700; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; text-align: left; padding: 6px 10px; border-bottom: 1px solid #cfcabd; white-space: nowrap; }
+.dep td { padding: 8px 10px; border-bottom: 1px solid #e0dccf; vertical-align: top; color: #16192a; }
+.dep td.cs { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 15px; white-space: nowrap; width: 80px; }
+.dep td.asg { color: #3a4060; min-width: 190px; }
+.dep td.asg small { display: block; color: #6b7086; font-size: 12px; margin-top: 2px; }
+.dep td.off { min-width: 220px; }
+.dep td.off .o { white-space: nowrap; }
+.dep td.off .o + .o { margin-top: 3px; }
+.dep .rk { display: inline-block; min-width: 54px; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: #3a4060; }
+.dep .sn { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: #6b7086; margin-left: 6px; }
+.dep td.pl { font-family: "IBM Plex Mono", monospace; letter-spacing: .06em; white-space: nowrap; }
+.dep td.tm { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: #555b70; white-space: nowrap; }
+.dep tr.empty td { color: #a09b8c; }
+.dep tr.empty td.cs { color: #8a8576; }
+.dep tr.help td { background: #ffe1df; }
+.st { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 4px; color: #fff; white-space: nowrap; }
+.kick { background: none; border: 1px solid #cfcabd; color: #8a3a3a; border-radius: 4px; font: inherit; font-size: 11px; padding: 0 6px; margin-left: 6px; cursor: pointer; }
+.notes-blk { border-top: 2px solid #16192a; }
+.notes-blk .nt { background: #e8e4d8; color: #3a4060; font-weight: 700; font-size: 12px; letter-spacing: .1em; padding: 6px 26px; display: flex; gap: 8px; align-items: center; }
+.notes-blk .nbd { padding: 10px 26px 14px; white-space: pre-wrap; font-size: 14px; line-height: 1.7; min-height: 24px; }
+.sh-foot { padding: 12px 26px; font-size: 12px; color: #6b7086; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px solid #cfcabd; }
+/* 編輯模式 */
+.editbar { display: none; background: #fff5d6; border-bottom: 1px solid #e0c97a; padding: 10px 26px; font-size: 13.5px; color: #5a4510; gap: 8px 14px; flex-wrap: wrap; align-items: center; }
+.editing .editbar { display: flex; }
+.e-in { width: 100%; min-width: 0; background: #fff; border: 1px solid #c9c3b2; border-radius: 4px; padding: 4px 7px; font: inherit; color: #16192a; }
+.e-in:focus { outline: 2px solid #b8862a; outline-offset: 0; border-color: #b8862a; }
+.e-in.mono { font-family: "IBM Plex Mono", monospace; font-weight: 600; text-transform: uppercase; }
+.e-in.sm { font-size: 12px; margin-top: 4px; }
+.e-in.bad { border-color: #d8402f; background: #fff0ee; }
+textarea.e-in { min-height: 80px; resize: vertical; line-height: 1.6; }
+.sec-title .e-in { background: #262a40; color: #fff; border-color: #444a66; font-family: var(--font-display); letter-spacing: .1em; font-weight: 700; max-width: 520px; }
+.ib { background: none; border: 1px solid currentColor; color: inherit; opacity: .75; border-radius: 4px; padding: 1px 7px; font: inherit; font-size: 12px; cursor: pointer; line-height: 1.5; }
+.ib:hover { opacity: 1; }
+.ib.del { color: #c0392b; }
+.sec-title .ib { color: #f5f3ec; }
+.ops { white-space: nowrap; width: 1%; }
+.editing table.dep { min-width: 1360px; }
+.editing .dep td.cs { width: 104px; min-width: 104px; }
+.editing .dep td.asg { min-width: 250px; }
+.editing .dep td.off { min-width: 210px; }
+.editing .dep td.pl { min-width: 120px; }
+.editing .dep td { padding: 8px 6px; }
+.addrow td { padding: 6px 10px; background: #fbfaf5; }
+.saved-tick { color: #1f8a5c; font-size: 12px; margin-left: 6px; }
+.colh { display: flex; gap: 4px; align-items: center; }
+.colh .e-in { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 2px 5px; min-width: 90px; }
+.sh-head [contenteditable] { outline: 1px dashed #b8862a; outline-offset: 2px; border-radius: 2px; }
+.cmdbox { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.cmdbox div { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+.cmdbox code { color: var(--gold); font-size: 14px; }
+.roster table { min-width: 640px; }
+.roster input, .roster select { background: var(--night); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 13.5px; width: 100%; }
+@media (max-width: 760px) {
+  .sh-head { grid-template-columns: auto 1fr; padding: 14px 16px; }
+  .sh-head .live { grid-column: 1 / -1; text-align: left; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts div, .legend, .toolbar2, .sec-title, .sh-foot, .editbar, .notes-blk .nt, .notes-blk .nbd { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+</head>
+<body class="pd">
+<div class="pd-util"><div class="in"><span>Official Portal · Los Angeles Police Department · Palm State RolePlay</span><a href="/">← 返回 Palm State 主站</a></div></div>
+<header class="pdh"><div class="in"><a class="brand" href="/pd/"><img src="/assets/seal-lapd.png" alt="LAPD 警徽"><span><b>LAPD</b><small>LOS ANGELES POLICE DEPT.</small></span></a><nav aria-label="LAPD 選單"><a href="/pd/">首頁</a><a href="/pd/news/">部門公告</a><a href="/pd/deployment/" aria-current="page">勤務表</a><a href="/pd/manual/">部門手冊</a><a href="/pd/#codes">無線電代碼</a><a href="/apply/?dept=lapd">加入 LAPD</a><a href="https://law.psrp2.com/">加州法典</a></nav><div class="account" id="account"></div></div></header>
+
+<main class="page" style="padding-top:24px">
+  <div class="wrap">
+    <div id="gate"></div>
+    <div id="app" hidden>
+      <article class="sheet" id="sheet">
+        <header class="sh-head">
+          <img src="/assets/seal-lapd.png" alt="LAPD">
+          <div>
+            <div class="t1" id="h-t1"></div>
+            <div class="t2" id="h-t2"></div>
+            <div class="t3" id="h-t3"></div>
+          </div>
+          <div class="live" id="live"><b id="live-b">LIVE</b><br><span id="updated">—</span></div>
+        </header>
+        <div class="facts">
+          <div><b>DATE 日期</b><span id="f-date"></span></div>
+          <div><b>WATCH 班別</b><span id="f-watch"></span></div>
+          <div><b>UNITS IN SERVICE 上線單位</b><span id="f-units">0</span></div>
+          <div><b>OFFICERS ON DUTY 值勤員警</b><span id="f-off">0</span></div>
+          <div><b>WATCH COMMANDER 值勤指揮官</b><span id="f-wc">—</span></div>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="toolbar2">
+          <label><input type="checkbox" id="only-active"> 只顯示已上線單位</label>
+          <span class="tb" id="cmd-tools"></span>
+        </div>
+        <div class="editbar">
+          <b>✏️ 編輯模式</b><span>直接點格子打字，離開格子就會自動儲存。編輯時暫停自動更新。</span>
+          <span class="tb" style="margin-left:auto">
+            <button type="button" class="pbtn alt" id="e-addsec">＋ 新增區塊</button>
+            <button type="button" class="pbtn alt" id="e-addcol">＋ 新增欄位</button>
+            <button type="button" class="pbtn alt" id="e-addnote">＋ 新增備註欄</button>
+            <button type="button" class="pbtn gold" id="e-done">完成編輯</button>
+          </span>
+        </div>
+        <div id="sections"></div>
+        <div id="notes"></div>
+        <footer class="sh-foot"><span>Palm State RolePlay · 角色扮演用途，非真實警政資料</span><span id="h-form"></span></footer>
+      </article>
+
+      <div class="cmdbox">
+        <div><code>/duty on callsign: 1A11 plate: 1ABC234</code><br>上線並登記呼號（車牌可省略）。雙人車：第二位輸入同一個呼號就會加入同車。</div>
+        <div><code>/status code: 10-97 location: 7th &amp; Main</code><br>更新單位狀態與位置，同車兩人會一起更新。</div>
+        <div><code>/plate plate: 1ABC234</code><br>補登或更換車牌。</div>
+        <div><code>/duty off</code> 下線　·　<code>/deployment</code> 在 Discord 查看目前上線單位</div>
+      </div>
+
+      <section class="roster" id="roster" hidden>
+        <h2 class="section-title">人員名冊（LAPD 高層）</h2>
+        <p class="note">第一次上線時，系統會從 Discord 暱稱自動判讀階級與警號（例如「SGT John Carter #1234」）。這裡可以修正，之後上線就會使用名冊資料。</p>
+        <div class="tw"><table><thead><tr><th>Discord ID</th><th>姓名</th><th>階級</th><th>警號</th><th></th></tr></thead><tbody id="roster-body"></tbody></table></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="pdf"><div class="in"><img src="/assets/seal-lapd.png" alt=""><div><b>LOS ANGELES POLICE DEPARTMENT</b><span class="motto">TO PROTECT AND TO SERVE · 保護與服務</span><small>Palm State RolePlay 角色扮演用途，並非真實警政機關或官方網站。</small></div><nav><a href="/pd/">LAPD 首頁</a><a href="/news/">伺服器公告</a><a href="/rules/">伺服器規則</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><a href="/">Palm State 主站</a></nav></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var STATUS = {
+    avail: ["10-8 AVAILABLE", "#1f8a5c"], enroute: ["CODE 2 EN ROUTE", "#2f6fe0"], code3: ["CODE 3 EMERGENCY", "#d8402f"],
+    onscene: ["10-97 ON SCENE", "#b8862a"], code6: ["CODE 6 INVESTIGATING", "#b8862a"], stop: ["TRAFFIC STOP", "#d8742a"],
+    pursuit: ["PURSUIT", "#d8402f"], custody: ["10-15 IN CUSTODY", "#7a4fc0"], station: ["10-19 TO STATION", "#6b7086"],
+    code7: ["CODE 7 MEAL", "#6b7086"], oos: ["10-7 OUT OF SERVICE", "#3a4060"], help: ["11-99 OFFICER NEEDS HELP", "#ff0000"]
+  };
+  var ABBR = { "Chief of Police": "COP", "Assistant Chief": "AC", "Deputy Chief": "DC", "Commander": "CMDR", "Captain": "CAPT", "Lieutenant": "LT", "Sergeant II": "SGT II", "Sergeant I": "SGT", "Detective": "DET", "Police Officer III": "PO III", "Police Officer II": "PO II", "Police Officer I": "PO I" };
+  var RANKS = Object.keys(ABBR);
+  var DEF_HEADER = { t1: "LOS ANGELES POLICE DEPARTMENT · OPERATIONS-CENTRAL BUREAU", t2: "DAILY FIELD DEPLOYMENT — CENTRAL AREA (01)", t3: "每日勤務部署表 · 由 Discord 指令即時更新", form: "LAPD Form 15.48.00（RP）" };
+  var el = PSRP.el, db = null, me = null, cmd = false, editing = false;
+  var units = [], sessions = [], S = { header: DEF_HEADER, columns: [], sections: [], notes: [] };
+
+  function hhmm(d) { var x = new Date(d); return String(x.getHours()).padStart(2, "0") + String(x.getMinutes()).padStart(2, "0"); }
+  function watch() {
+    var h = new Date().getHours() + new Date().getMinutes() / 60;
+    if (h >= 22.75 || h < 6.75) return "WATCH 1 (2245–0645)";
+    if (h < 14.75) return "WATCH 2 (0645–1545)";
+    return "WATCH 3 (1445–2345)";
+  }
+  function secLabel(s) { return String(s).replace(/^\d+\s+/, ""); }
+  function flash(node) { var t = el("span", { class: "saved-tick" }, "✓"); node.after(t); setTimeout(function () { t.remove(); }, 1200); }
+  function fail(err) { alert("儲存失敗：" + PSRP.errText(err)); }
+  (function () {
+    var lg = document.getElementById("legend"); lg.appendChild(el("b", null, "STATUS"));
+    Object.keys(STATUS).forEach(function (k) { lg.appendChild(el("span", { class: "st", style: "background:" + STATUS[k][1] }, STATUS[k][0])); });
+  })();
+
+  /* ---------- 讀取 ---------- */
+  async function load(force) {
+    if (editing && !force) return;
+    var q = [db.from("dep_units").select("*").order("sort"), db.from("dep_sessions").select("*").is("ended_at", null).order("started_at"), db.from("dep_settings").select("key, value")];
+    var r = await Promise.all(q);
+    if (r[0].error || r[1].error) { document.getElementById("updated").textContent = "讀取失敗"; return; }
+    units = r[0].data;
+    sessions = r[1].data.filter(function (s) { return Date.now() - new Date(s.started_at).getTime() < 14 * 3600e3; });
+    (r[2].data || []).forEach(function (x) { S[x.key] = x.value; });
+    S.header = Object.assign({}, DEF_HEADER, S.header || {});
+    S.columns = S.columns || []; S.sections = S.sections || []; S.notes = S.notes || [];
+    render();
+  }
+  function sectionList() {
+    var list = S.sections.slice();
+    units.forEach(function (u) { if (list.indexOf(u.section) === -1) list.push(u.section); });
+    return list;
+  }
+  async function saveSetting(key, value) {
+    S[key] = value;
+    var r = await db.from("dep_settings").upsert({ key: key, value: value, updated_at: new Date().toISOString() });
+    if (r.error) fail(r.error);
+    return !r.error;
+  }
+
+  /* ---------- 小工具：可編輯欄位 ---------- */
+  function inp(value, opts, onSave) {
+    var t = opts.area ? el("textarea", { class: "e-in" }) : el("input", { class: "e-in" + (opts.cls ? " " + opts.cls : ""), maxlength: String(opts.max || 120) });
+    if (opts.ph) t.placeholder = opts.ph;
+    if (opts.label) t.setAttribute("aria-label", opts.label);
+    t.value = value == null ? "" : value;
+    var last = t.value;
+    t.addEventListener("change", async function () {
+      var v = opts.upper ? t.value.trim().toUpperCase() : t.value.trim();
+      if (v === last) return;
+      t.classList.remove("bad");
+      var ok = await onSave(v, t);
+      if (ok === false) { t.classList.add("bad"); return; }
+      last = v; t.value = v; flash(t);
+    });
+    if (!opts.area) t.addEventListener("keydown", function (e) { if (e.key === "Enter") t.blur(); });
+    return t;
+  }
+  function ib(text, title, cls, fn) { var b = el("button", { type: "button", class: "ib" + (cls ? " " + cls : ""), title: title, "aria-label": title }, text); b.addEventListener("click", fn); return b; }
+
+  /* ---------- 畫面 ---------- */
+  function render() {
+    var sheet = document.getElementById("sheet");
+    sheet.classList.toggle("editing", editing);
+    var live = document.getElementById("live"); live.classList.toggle("paused", editing);
+    document.getElementById("live-b").textContent = editing ? "PAUSED" : "LIVE";
+    ["t1", "t2", "t3", "form"].forEach(function (k) {
+      var n = document.getElementById("h-" + k);
+      n.textContent = S.header[k] || "";
+      if (editing) n.setAttribute("contenteditable", "plaintext-only"); else n.removeAttribute("contenteditable");
+    });
+    var only = document.getElementById("only-active").checked && !editing;
+    var by = {}; sessions.forEach(function (s) { (by[s.callsign] = by[s.callsign] || []).push(s); });
+    var now = new Date();
+    document.getElementById("f-date").textContent = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+    document.getElementById("f-watch").textContent = watch();
+    document.getElementById("f-units").textContent = Object.keys(by).length + " / " + units.length;
+    document.getElementById("f-off").textContent = sessions.length;
+    var wcu = units.filter(function (u) { return /watch commander/i.test(u.assignment) && by[u.callsign]; })[0];
+    var wc = wcu ? by[wcu.callsign][0] : null;
+    document.getElementById("f-wc").textContent = wc ? (ABBR[wc.rank] || wc.rank) + " " + wc.officer_name : "—";
+    document.getElementById("updated").textContent = editing ? "編輯中，暫停更新" : "更新 " + now.toLocaleTimeString("zh-TW");
+
+    var box = document.getElementById("sections"); box.innerHTML = "";
+    var secs = sectionList();
+    secs.forEach(function (sec, si) {
+      var list = units.filter(function (u) { return u.section === sec && (!only || by[u.callsign]); });
+      if (!list.length && !editing) return;
+      var title = el("div", { class: "sec-title" });
+      if (editing) {
+        title.appendChild(inp(sec, { max: 80, label: "區塊名稱" }, function (v) { return renameSection(sec, v); }));
+        title.appendChild(ib("↑", "區塊上移", "", function () { moveSection(si, -1); }));
+        title.appendChild(ib("↓", "區塊下移", "", function () { moveSection(si, 1); }));
+        title.appendChild(ib("刪除區塊", "刪除區塊", "", function () { deleteSection(sec); }));
+      } else title.textContent = secLabel(sec);
+      box.appendChild(title);
+      var tw = el("div", { class: "dtw" }), t = el("table", { class: "dep" });
+      var hr = el("tr");
+      ["Unit", "Assignment 勤務", "Officer(s) 員警 · Serial No.", "Vehicle 車牌", "Status 狀態", "Location / Notes 位置"].forEach(function (h) { hr.appendChild(el("th", null, h)); });
+      S.columns.forEach(function (c) {
+        var th = el("th");
+        if (editing) {
+          var w = el("div", { class: "colh" });
+          w.appendChild(inp(c.name, { max: 30, label: "欄位名稱" }, function (v) { c.name = v || "欄位"; return saveSetting("columns", S.columns); }));
+          w.appendChild(ib("✕", "刪除這個欄位", "del", function () { deleteColumn(c); }));
+          th.appendChild(w);
+        } else th.textContent = c.name;
+        hr.appendChild(th);
+      });
+      hr.appendChild(el("th", null, "In Svc 上線"));
+      if (editing) hr.appendChild(el("th", null, ""));
+      var thead = el("thead"); thead.appendChild(hr); t.appendChild(thead);
+      var tb = el("tbody");
+      list.forEach(function (u, ui) { tb.appendChild(unitRow(u, by[u.callsign] || [], list, ui)); });
+      if (editing) {
+        var ar = el("tr", { class: "addrow" }), td = el("td", { colspan: String(8 + S.columns.length) });
+        var add = el("button", { type: "button", class: "pbtn alt" }, "＋ 在「" + secLabel(sec) + "」新增單位");
+        add.addEventListener("click", function () { addUnit(sec); });
+        td.appendChild(add); ar.appendChild(td); tb.appendChild(ar);
+      }
+      t.appendChild(tb); tw.appendChild(t); box.appendChild(tw);
+    });
+    if (!box.children.length) box.appendChild(el("p", { style: "padding:20px 26px;color:#6b7086" }, "目前沒有上線單位。"));
+    renderNotes();
+  }
+
+  function unitRow(u, crew, list, ui) {
+    var lead = crew[0];
+    var tr = el("tr", { class: crew.length ? (lead.status === "help" ? "help" : "") : "empty" });
+    var cs = el("td", { class: "cs" }), asg = el("td", { class: "asg" });
+    if (editing) {
+      cs.appendChild(inp(u.callsign, { cls: "mono", max: 12, upper: true, label: "呼號" }, function (v) { return renameUnit(u, v); }));
+      asg.appendChild(inp(u.assignment, { max: 80, ph: "勤務內容", label: "勤務" }, function (v) { return saveUnit(u, { assignment: v }); }));
+      asg.appendChild(inp(u.notes, { cls: "sm", max: 120, ph: "補充說明（例如巡區、責任區）", label: "補充說明" }, function (v) { return saveUnit(u, { notes: v }); }));
+      var seats = el("select", { class: "e-in sm", "aria-label": "可上線人數" });
+      [1, 2, 3, 4, 5, 6].forEach(function (n) { seats.appendChild(el("option", { value: String(n) }, n + " 人單位")); });
+      seats.value = String(u.seats);
+      seats.addEventListener("change", async function () { if (await saveUnit(u, { seats: Number(seats.value) }) !== false) flash(seats); });
+      asg.appendChild(seats);
+    } else {
+      cs.textContent = u.callsign;
+      asg.textContent = u.assignment + (u.seats > 1 ? "  · " + u.seats + "-officer" : "");
+      if (u.notes) asg.appendChild(el("small", null, u.notes));
+    }
+    tr.appendChild(cs); tr.appendChild(asg);
+
+    var off = el("td", { class: "off" });
+    if (!crew.length) off.textContent = "— NOT DEPLOYED —";
+    crew.forEach(function (s) {
+      var o = el("div", { class: "o" });
+      o.appendChild(el("span", { class: "rk" }, ABBR[s.rank] || s.rank));
+      o.appendChild(document.createTextNode(s.officer_name));
+      if (s.badge) o.appendChild(el("span", { class: "sn" }, "#" + s.badge));
+      if (cmd) { var k = el("button", { type: "button", class: "kick", title: "強制下線" }, "下線"); k.addEventListener("click", function () { kick(s); }); o.appendChild(k); }
+      off.appendChild(o);
+    });
+    tr.appendChild(off);
+
+    var plate = (crew.filter(function (s) { return s.plate; })[0] || {}).plate || "";
+    var pl = el("td", { class: "pl" }), st = el("td"), loc = el("td");
+    if (editing && crew.length) {
+      pl.appendChild(inp(plate, { cls: "mono", max: 12, upper: true, label: "車牌" }, function (v) { return saveCrew(u, { plate: v }); }));
+      var ss = el("select", { class: "e-in", "aria-label": "狀態" });
+      Object.keys(STATUS).forEach(function (k) { ss.appendChild(el("option", { value: k }, STATUS[k][0])); });
+      ss.value = lead.status in STATUS ? lead.status : "avail";
+      ss.addEventListener("change", async function () { if (await saveCrew(u, { status: ss.value, status_at: new Date().toISOString() }) !== false) flash(ss); });
+      st.appendChild(ss);
+      loc.appendChild(inp(lead.location, { max: 60, label: "位置" }, function (v) { return saveCrew(u, { location: v }); }));
+    } else {
+      pl.textContent = plate || (crew.length ? "—" : "");
+      if (lead) { var sd = STATUS[lead.status] || STATUS.avail; st.appendChild(el("span", { class: "st", style: "background:" + sd[1] }, sd[0])); }
+      loc.textContent = lead ? (lead.location || "") : "";
+    }
+    tr.appendChild(pl); tr.appendChild(st); tr.appendChild(loc);
+
+    S.columns.forEach(function (c) {
+      var td = el("td"), v = (u.extra || {})[c.id] || "";
+      if (editing) td.appendChild(inp(v, { max: 120, label: c.name }, function (nv) { var ex = Object.assign({}, u.extra || {}); ex[c.id] = nv; return saveUnit(u, { extra: ex }); }));
+      else td.textContent = v;
+      tr.appendChild(td);
+    });
+    tr.appendChild(el("td", { class: "tm" }, lead ? hhmm(lead.started_at) + (lead.status_at && lead.status_at !== lead.started_at ? " / " + hhmm(lead.status_at) : "") : ""));
+    if (editing) {
+      var ops = el("td", { class: "ops" });
+      if (ui > 0) ops.appendChild(ib("↑", "上移", "", function () { swapUnits(u, list[ui - 1]); }));
+      if (ui < list.length - 1) ops.appendChild(ib("↓", "下移", "", function () { swapUnits(u, list[ui + 1]); }));
+      ops.appendChild(ib("🗑", "刪除單位", "del", function () { deleteUnit(u, crew.length); }));
+      tr.appendChild(ops);
+    }
+    return tr;
+  }
+
+  function renderNotes() {
+    var box = document.getElementById("notes"); box.innerHTML = "";
+    S.notes.forEach(function (n, i) {
+      if (!editing && !String(n.body || "").trim()) return;
+      var b = el("section", { class: "notes-blk" }), h = el("div", { class: "nt" });
+      if (editing) {
+        h.appendChild(inp(n.title, { max: 80, label: "備註欄標題" }, function (v) { n.title = v; return saveSetting("notes", S.notes); }));
+        h.appendChild(ib("🗑", "刪除這個備註欄", "del", async function () {
+          if (!confirm("刪除「" + n.title + "」備註欄？")) return;
+          S.notes.splice(i, 1); await saveSetting("notes", S.notes); render();
+        }));
+      } else h.textContent = n.title;
+      b.appendChild(h);
+      var bd = el("div", { class: "nbd" });
+      if (editing) bd.appendChild(inp(n.body, { area: true, ph: "輸入內容，例如勤前教育重點、通緝車輛、特別勤務…", label: n.title }, function (v) { n.body = v; return saveSetting("notes", S.notes); }));
+      else bd.textContent = n.body;
+      b.appendChild(bd); box.appendChild(b);
+    });
+  }
+
+  /* ---------- 編輯動作 ---------- */
+  async function saveUnit(u, patch) {
+    var r = await db.from("dep_units").update(patch).eq("callsign", u.callsign);
+    if (r.error) { fail(r.error); return false; }
+    Object.assign(u, patch); return true;
+  }
+  async function renameUnit(u, v) {
+    if (!/^[A-Z0-9][A-Z0-9 \-]{0,11}$/.test(v)) { alert("呼號只能用英文大寫、數字、空格或 -，最多 12 字。"); return false; }
+    if (units.some(function (x) { return x !== u && x.callsign === v; })) { alert("已經有 " + v + " 這個呼號了。"); return false; }
+    var r = await db.from("dep_units").update({ callsign: v }).eq("callsign", u.callsign);
+    if (r.error) { fail(r.error); return false; }
+    sessions.forEach(function (s) { if (s.callsign === u.callsign) s.callsign = v; });
+    u.callsign = v; return true;
+  }
+  async function saveCrew(u, patch) {
+    var r = await db.from("dep_sessions").update(patch).eq("callsign", u.callsign).is("ended_at", null);
+    if (r.error) { fail(r.error); return false; }
+    sessions.forEach(function (s) { if (s.callsign === u.callsign) Object.assign(s, patch); });
+    return true;
+  }
+  async function addUnit(sec) {
+    var n = 1; while (units.some(function (x) { return x.callsign === "NEW" + n; })) n++;
+    var maxSort = units.reduce(function (m, x) { return Math.max(m, x.sort || 0); }, 0);
+    var inSec = units.filter(function (x) { return x.section === sec; });
+    var sort = inSec.length ? inSec[inSec.length - 1].sort + 1 : maxSort + 10;
+    var later = units.filter(function (x) { return x.sort >= sort && x.section !== sec; });
+    for (var i = 0; i < later.length; i++) await db.from("dep_units").update({ sort: later[i].sort + 1 }).eq("callsign", later[i].callsign);
+    var r = await db.from("dep_units").insert({ callsign: "NEW" + n, section: sec, assignment: "新單位（請修改）", seats: 2, sort: sort });
+    if (r.error) return fail(r.error);
+    await load(true);
+    var inputs = document.querySelectorAll("td.cs input");
+    [].forEach.call(inputs, function (x) { if (x.value === "NEW" + n) { x.focus(); x.select(); x.scrollIntoView({ block: "center" }); } });
+  }
+  async function swapUnits(a, b) {
+    var sa = a.sort, sb = b.sort; if (sa === sb) sb = sa + 1;
+    var r1 = await db.from("dep_units").update({ sort: sb }).eq("callsign", a.callsign);
+    var r2 = await db.from("dep_units").update({ sort: sa }).eq("callsign", b.callsign);
+    if (r1.error || r2.error) fail(r1.error || r2.error);
+    await load(true);
+  }
+  async function deleteUnit(u, onDuty) {
+    if (!confirm("確定要刪除 " + u.callsign + "（" + u.assignment + "）？" + (onDuty ? "\n目前在這個單位上線的員警會被下線。" : ""))) return;
+    var r = await db.from("dep_units").delete().eq("callsign", u.callsign);
+    if (r.error) return fail(r.error);
+    await load(true);
+  }
+  async function renameSection(old, v) {
+    if (!v) return false;
+    if (v !== old && sectionList().indexOf(v) !== -1) { alert("已經有同名的區塊。"); return false; }
+    var r = await db.from("dep_units").update({ section: v }).eq("section", old);
+    if (r.error) { fail(r.error); return false; }
+    var list = sectionList().map(function (s) { return s === old ? v : s; });
+    units.forEach(function (u) { if (u.section === old) u.section = v; });
+    var ok = await saveSetting("sections", list);
+    render(); return ok;
+  }
+  async function moveSection(i, d) {
+    var list = sectionList(), j = i + d; if (j < 0 || j >= list.length) return;
+    var t = list[i]; list[i] = list[j]; list[j] = t;
+    await saveSetting("sections", list); render();
+  }
+  async function deleteSection(sec) {
+    var n = units.filter(function (u) { return u.section === sec; }).length;
+    if (!confirm(n ? "「" + secLabel(sec) + "」裡還有 " + n + " 個單位，會一起刪除。確定？" : "刪除「" + secLabel(sec) + "」區塊？")) return;
+    if (n) { var r = await db.from("dep_units").delete().eq("section", sec); if (r.error) return fail(r.error); }
+    await saveSetting("sections", sectionList().filter(function (s) { return s !== sec; }));
+    await load(true);
+  }
+  async function deleteColumn(c) {
+    if (!confirm("刪除「" + c.name + "」欄位？這個欄位裡填的內容也會一起清除。")) return;
+    await saveSetting("columns", S.columns.filter(function (x) { return x !== c; }));
+    for (var i = 0; i < units.length; i++) {
+      var u = units[i];
+      if (u.extra && c.id in u.extra) { var ex = Object.assign({}, u.extra); delete ex[c.id]; await saveUnit(u, { extra: ex }); }
+    }
+    render();
+  }
+  document.getElementById("e-addsec").addEventListener("click", async function () {
+    var n = 1, name; do { name = "新區塊 NEW SECTION" + (n > 1 ? " " + n : ""); n++; } while (sectionList().indexOf(name) !== -1);
+    await saveSetting("sections", sectionList().concat([name])); render();
+    var ins = document.querySelectorAll(".sec-title input"); if (ins.length) { var x = ins[ins.length - 1]; x.focus(); x.select(); x.scrollIntoView({ block: "center" }); }
+  });
+  document.getElementById("e-addcol").addEventListener("click", async function () {
+    await saveSetting("columns", S.columns.concat([{ id: "c" + Date.now().toString(36), name: "新欄位" }])); render();
+  });
+  document.getElementById("e-addnote").addEventListener("click", async function () {
+    await saveSetting("notes", S.notes.concat([{ title: "新備註欄 NOTES", body: "" }])); render();
+    var ta = document.querySelectorAll("#notes textarea"); if (ta.length) { ta[ta.length - 1].focus(); ta[ta.length - 1].scrollIntoView({ block: "center" }); }
+  });
+  document.getElementById("e-done").addEventListener("click", function () { setEditing(false); });
+  ["t1", "t2", "t3", "form"].forEach(function (k) {
+    var n = document.getElementById("h-" + k);
+    n.addEventListener("blur", async function () {
+      if (!editing) return;
+      var v = n.textContent.replace(/\s+/g, " ").trim();
+      if (v === (S.header[k] || "")) return;
+      var h = Object.assign({}, S.header); h[k] = v;
+      if (await saveSetting("header", h)) flash(n);
+    });
+    n.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); n.blur(); } });
+  });
+  function setEditing(on) {
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    editing = on;
+    var b = document.getElementById("edit-toggle"); if (b) b.textContent = on ? "完成編輯" : "✏️ 編輯勤務表";
+    if (on) { history.replaceState(null, "", "#edit"); render(); } else { history.replaceState(null, "", location.pathname); load(true); }
+  }
+  document.getElementById("only-active").addEventListener("change", render);
+
+  async function kick(s) {
+    if (!confirm("確定要讓 " + s.officer_name + " 從 " + s.callsign + " 下線？")) return;
+    var r = await db.from("dep_sessions").update({ ended_at: new Date().toISOString() }).eq("id", s.id);
+    if (r.error) alert(PSRP.errText(r.error)); load(true);
+  }
+  async function loadRoster() {
+    var r = await db.from("police_roster").select("*").order("updated_at", { ascending: false });
+    var tb = document.getElementById("roster-body"); tb.innerHTML = "";
+    (r.data || []).forEach(function (p) {
+      var tr = el("tr");
+      tr.appendChild(el("td", { style: "font-family:monospace;font-size:12px" }, p.discord_id));
+      var n = el("input"); n.value = p.name; var td1 = el("td"); td1.appendChild(n); tr.appendChild(td1);
+      var rk = el("select"); RANKS.forEach(function (x) { rk.appendChild(el("option", { value: x }, x)); }); rk.value = p.rank; var td2 = el("td"); td2.appendChild(rk); tr.appendChild(td2);
+      var bd = el("input", { inputmode: "numeric" }); bd.value = p.badge; var td3 = el("td"); td3.appendChild(bd); tr.appendChild(td3);
+      var sv = el("button", { type: "button", class: "btn-sec" }, "儲存"), td4 = el("td"); td4.appendChild(sv); tr.appendChild(td4);
+      sv.addEventListener("click", async function () {
+        var u = await db.from("police_roster").update({ name: n.value.trim(), rank: rk.value, badge: bd.value.trim(), updated_at: new Date().toISOString() }).eq("discord_id", p.discord_id);
+        if (!u.error) await db.from("dep_sessions").update({ officer_name: n.value.trim(), rank: rk.value, badge: bd.value.trim() }).eq("discord_id", p.discord_id).is("ended_at", null);
+        sv.textContent = u.error ? "失敗" : "已儲存"; setTimeout(function () { sv.textContent = "儲存"; }, 1500); load(true);
+      });
+      tb.appendChild(tr);
+    });
+    if (!(r.data || []).length) tb.appendChild(el("tr")).appendChild(el("td", { colspan: "5", class: "note" }, "還沒有人使用過 /duty 指令。"));
+  }
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    var gate = document.getElementById("gate");
+    if (!PSRP.client) { gate.appendChild(el("div", { class: "notice warn" }, "系統暫時無法使用。")); return; }
+    db = PSRP.client;
+    me = await PSRP.profile();
+    if (!me) { PSRP.mountAuthForm(gate, function () { location.reload(); }, "LAPD 勤務表僅限 LAPD 成員，請先登入。"); return; }
+    if (!PSRP.hasRole(me, "police")) { var g = gate.appendChild(el("div", { class: "gate-msg" })); g.appendChild(el("h2", null, "需要 LAPD 身分組")); g.appendChild(el("p", null, "勤務表只開放給 LAPD 成員。")); return; }
+    cmd = PSRP.hasRole(me, "police_cmd");
+    document.getElementById("app").hidden = false;
+    if (cmd) {
+      document.getElementById("roster").hidden = false;
+      var tools = document.getElementById("cmd-tools");
+      var eb = el("button", { type: "button", class: "pbtn", id: "edit-toggle" }, "✏️ 編輯勤務表");
+      eb.addEventListener("click", function () { setEditing(!editing); });
+      tools.appendChild(el("span", { style: "color:#6b7086;align-self:center" }, "LAPD 高層"));
+      tools.appendChild(eb);
+      loadRoster();
+    }
+    await load(true);
+    if (cmd && location.hash === "#edit") setEditing(true);
+    setInterval(function () { if (!document.hidden) load(); }, 10000);
+  }
+  start();
+})();
+</script>
+</body>
+</html>
