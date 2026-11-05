@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="/assets/seal-lapd.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=Great+Vibes&family=Zhi+Mang+Xing&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=Great+Vibes&family=Zen+Kurenaido&family=Iansui&display=swap">
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/pd.css">
 <style>
@@ -88,7 +88,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
 .ann .pdfview { width: 100%; height: 70vh; border: 1px solid #d8d4c8; border-radius: 6px; background: #fff; }
 .ann .sign { margin-top: 30px; text-align: right; font-family: var(--font-zh-display); font-weight: 700; font-size: 17px; line-height: 1.8; }
 .ann .sign small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 13px; color: #6b7086; }
-.ann .sign .sig { display: inline-block; font-family: "Great Vibes", "Zhi Mang Xing", cursive; font-weight: 400; font-size: clamp(34px, 5vw, 46px); line-height: 1.15; color: #1c2f6b; transform: rotate(-3deg); transform-origin: right bottom; padding: 0 6px 4px; border-bottom: 1px solid #b9b3a3; min-width: 180px; text-align: center; }
+.ann .sign .sig { display: inline-block; font-family: "Great Vibes", "Zen Kurenaido", "Iansui", cursive; font-weight: 400; font-size: clamp(32px, 4.6vw, 44px); line-height: 1.2; word-spacing: .18em; color: #1c2f6b; transform: rotate(-3deg) skewX(-8deg); transform-origin: right bottom; padding: 0 6px 4px; border-bottom: 1px solid #b9b3a3; min-width: 180px; text-align: center; }
 .ann .sign .printed { display: block; margin-top: 8px; font-family: var(--font-zh-display); font-weight: 700; font-size: 15px; color: #1d2030; }
 .ann .nf { border-top: 1px solid #d8d4c8; padding: 12px 34px; font-size: 12px; color: #6b7086; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 @media (max-width: 640px) {
@@ -310,21 +310,6 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   document.getElementById("more").addEventListener("click", function () { shown += PAGE; renderList(); });
 
   /* ---------- 公告正式版面 ---------- */
-  /* 手寫簽名：草書字型多半只有簡體字形，顯示時把繁體轉成對應的草書字形（資料仍保存原本的繁體） */
-  var t2s = null, t2sP = null;
-  function loadT2S() {
-    if (t2sP) return t2sP;
-    t2sP = new Promise(function (res) {
-      if (window.OpenCC) return res();
-      var sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/t2cn.js";
-      sc.onload = res; sc.onerror = function () { res(); }; document.head.appendChild(sc);
-    }).then(function () { try { t2s = window.OpenCC ? OpenCC.Converter({ from: "t", to: "cn" }) : null; } catch (e) { t2s = null; } });
-    return t2sP;
-  }
-  function sigify(root) {
-    var els = root.querySelectorAll(".sig[data-raw]"); if (!els.length) return;
-    loadT2S().then(function () { [].forEach.call(els, function (e) { e.textContent = t2s ? t2s(e.getAttribute("data-raw")) : e.getAttribute("data-raw"); }); });
-  }
   function noticeHtml(a) {
     var d = DEPTS[a.department], atts = a.attachments || [];
     var imgs = atts.filter(function (f) { return /^image\//.test(f.type); }), pdfs = atts.filter(function (f) { return f.type === "application/pdf"; });
@@ -389,7 +374,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     }
     bar.appendChild(right); v.appendChild(bar);
     if (!a) { v.appendChild(el("div", { class: "empty-news" }, "找不到這則公告，可能已被刪除。")); }
-    else { var w = el("div"); w.innerHTML = noticeHtml(a); v.appendChild(w); sigify(w); document.title = a.title + " · LAPD 部門公告"; }
+    else { var w = el("div"); w.innerHTML = noticeHtml(a); v.appendChild(w); document.title = a.title + " · LAPD 部門公告"; }
   }
 
   /* ---------- 路由 ---------- */
@@ -491,7 +476,7 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
   }
   document.getElementById("c-preview").addEventListener("click", function () {
     var p = document.getElementById("c-prev"); p.hidden = false;
-    p.innerHTML = '<h2 class="section-title">預覽</h2><div class="preview-wrap">' + noticeHtml(draft()) + "</div>"; sigify(p);
+    p.innerHTML = '<h2 class="section-title">預覽</h2><div class="preview-wrap">' + noticeHtml(draft()) + "</div>";
     p.scrollIntoView({ behavior: "smooth" });
   });
   document.getElementById("cform").addEventListener("submit", async function (e) {
