@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>線上編輯 · Palm State RolePlay</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+body { overflow-x: hidden; }
+.ed-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.ed-head h1 { margin: 0; font-family: var(--font-zh-display); font-size: 22px; }
+.ed-head .st { color: var(--muted); font-size: 13.5px; }
+.ed-head .acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.dirty-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--sun); margin-right: 6px; }
+.ed { display: grid; grid-template-columns: 230px minmax(0, 1fr) minmax(0, 1fr); gap: 14px; padding: 14px 0 30px; height: calc(100vh - 150px); min-height: 520px; }
+.chlist { overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+.chlist button.ch { display: block; width: 100%; text-align: left; background: none; border: 0; color: var(--muted); font: inherit; font-size: 13.5px; padding: 7px 9px; border-radius: 6px; cursor: pointer; line-height: 1.45; }
+.chlist button.ch:hover { background: var(--panel-2); color: var(--ink); }
+.chlist button.ch[aria-current="true"] { background: var(--panel-2); color: var(--ink); box-shadow: inset 3px 0 0 var(--gold); }
+.chlist button.ch.mod::after { content: " ●"; color: var(--sun); }
+.chlist .add { width: 100%; margin-top: 8px; }
+.pane { display: flex; flex-direction: column; min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.pane .ph { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding: 8px; border-bottom: 1px solid var(--line); }
+.pane .ph b { font-size: 13px; color: var(--muted); margin-right: 4px; }
+.pane .ph button { font: inherit; font-size: 12.5px; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.pane textarea { flex: 1; min-height: 0; resize: none; border: 0; outline: none; background: var(--night); color: var(--ink); font: 14px/1.7 "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; padding: 14px; tab-size: 2; }
+.preview { flex: 1; min-height: 0; overflow: auto; padding: 18px 20px; background: #f6f3ea; color: #1d2030; }
+/* 預覽樣式（簡化版） */
+.preview .part-head { border-bottom: 2px solid #1d2030; margin: 6px 0 14px; padding-bottom: 6px; }
+.preview .part-no { margin: 0; font-size: 12px; letter-spacing: .14em; color: #8a6a1f; font-weight: 700; }
+.preview .part-head h2 { margin: 2px 0; font-family: var(--font-zh-display); font-size: 22px; }
+.preview .part-en { margin: 0; color: #6b7086; font-size: 13px; }
+.preview h3 { font-size: 17px; margin: 18px 0 6px; } .preview h3 .en { color: #6b7086; font-weight: 400; font-size: 14px; }
+.preview .tw { overflow-x: auto; margin: 8px 0 14px; }
+.preview table { border-collapse: collapse; width: 100%; font-size: 13.5px; background: #fff; }
+.preview th, .preview td { border: 1px solid #d6d1c3; padding: 6px 8px; text-align: left; vertical-align: top; }
+.preview th { background: #ebe6d8; }
+.preview td.sec { font-weight: 700; white-space: nowrap; }
+.preview .b { display: inline-block; font-weight: 700; font-size: 11.5px; border-radius: 3px; padding: 0 5px; margin-right: 2px; color: #fff; background: #777; }
+.preview .b-f { background: #b8322a; } .preview .b-w { background: #b8742a; } .preview .b-m { background: #2f5fb8; } .preview .b-i { background: #4b8a3a; }
+.preview h2 small { display: block; font-size: 12px; letter-spacing: .14em; color: #8a6a1f; }
+.preview > h2, .preview h2[id] { font-family: var(--font-zh-display); font-size: 22px; border-bottom: 2px solid #1d2030; padding-bottom: 4px; }
+.preview .rule { background: #fff; border: 1px solid #d6d1c3; border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+.preview .rule h4 { margin: 0 0 4px; font-size: 15.5px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.preview .rule h4 code { color: #8a6a1f; font-weight: 700; }
+.preview .rule p { margin: 4px 0; }
+.preview .lv { font-size: 11.5px; font-weight: 700; padding: 1px 7px; border-radius: 4px; color: #fff; }
+.preview .lv-a { background: #b8322a; } .preview .lv-b { background: #c8642a; } .preview .lv-c { background: #b8942a; } .preview .lv-d { background: #4b8a3a; }
+.preview .callout { background: #eee6cf; border-left: 4px solid #b8942a; padding: 10px 14px; border-radius: 4px; margin: 10px 0; }
+.helpbox { font-size: 13.5px; line-height: 1.8; }
+.helpbox code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; }
+.modal { position: fixed; inset: 0; z-index: 90; background: rgba(5,8,20,.75); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal .box { background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 760px; max-height: 86vh; overflow: auto; padding: 20px; }
+.modal h3 { margin: 0 0 12px; }
+.hist { display: grid; gap: 8px; }
+.hist .row { display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--panel); border-radius: 8px; padding: 8px 12px; font-size: 14px; flex-wrap: wrap; }
+.mobile-tabs { display: none; }
+@media (max-width: 1100px) {
+  .ed { grid-template-columns: 200px minmax(0, 1fr); height: auto; }
+  .ed .pane.pv { grid-column: 1 / -1; height: 60vh; }
+  .ed .pane.src { height: 70vh; }
+}
+@media (max-width: 760px) {
+  .ed { grid-template-columns: 1fr; }
+  .chlist { max-height: 200px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/rules/">伺服器規則</a>
+      <a href="/news/">公告</a>
+      <a href="/apply/">公職招募</a>
+      <a href="https://law.psrp2.com/">加州法典</a>
+      <a href="/lapd/">LAPD 手冊</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="gate"></div>
+  <div id="app" hidden>
+    <div class="ed-head">
+      <div>
+        <h1 id="doc-title">線上編輯</h1>
+        <div class="st" id="status"></div>
+      </div>
+      <div class="acts">
+        <select id="doc-pick" class="btn-sec" aria-label="切換文件"></select>
+        <button type="button" class="btn-sec" id="b-help">格式說明</button>
+        <button type="button" class="btn-sec" id="b-hist">修訂紀錄</button>
+        <a class="btn-sec" id="b-view" target="_blank" rel="noopener" style="text-decoration:none">查看頁面 ↗</a>
+        <button type="button" class="btn-primary" id="b-save">儲存並發布</button>
+      </div>
+    </div>
+    <div class="ed">
+      <nav class="chlist" id="chlist" aria-label="章節"></nav>
+      <section class="pane src">
+        <div class="ph" id="tools"><b>插入</b></div>
+        <textarea id="src" spellcheck="false" aria-label="章節內容"></textarea>
+      </section>
+      <section class="pane pv">
+        <div class="ph"><b>即時預覽</b><span class="note" style="font-size:12.5px">實際頁面的樣式會更完整</span></div>
+        <div class="preview" id="preview"></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script src="/assets/marked.js"></script>
+<script src="/assets/mdbook.js"></script>
+<script>
+(function () {
+  var DOCS = {
+    law:   { title: "加州法典", view: "https://law.psrp2.com/", mode: "book", prefix: "t" },
+    rules: { title: "伺服器規則", view: "/rules/", mode: "rules" },
+    lapd:  { title: "LAPD 部門手冊", view: "/lapd/", mode: "book", prefix: "d" }
+  };
+  var TOOLS = {
+    book: [
+      ["章（大標題）", "\n## 第X章 章名 Chapter Title\n\n"],
+      ["節（小標題）", "\n### 節名 Section Title\n\n"],
+      ["法條表格", "\n| 條號 Section | 罪名 Offense | 等級 Class | 刑度 Penalty |\n| --- | --- | --- | --- |\n| PC 000 | 罪名 Offense | M | 郡監獄最高 6 個月 |\n"],
+      ["一般表格", "\n| 項目 | 說明 |\n| --- | --- |\n| 內容 | 內容 |\n"],
+      ["條列", "\n- 項目一\n- 項目二\n"],
+      ["粗體", null]
+    ],
+    rules: [
+      ["章", "\n## 第X章 章名 {#chX}\n\n"],
+      ["條文", "\n#### X.X 條文標題 [C]\n\n條文內容。\n"],
+      ["提示框", "\n> 提示內容\n"],
+      ["表格", "\n| 項目 | 說明 |\n| --- | --- |\n| 內容 | 內容 |\n"],
+      ["條列", "\n- 項目一\n- 項目二\n"],
+      ["粗體", null]
+    ]
+  };
+  var HELP = {
+    book: "<p><code>## 第一章 章名 English</code> 新的一章（左側目錄會自動產生）。<br><code>### 小標題 English</code> 章內的小節。<br>中文寫在前、英文寫在後，系統會自動分開排版。</p><p>表格：用 <code>|</code> 分欄，第二行固定是 <code>| --- | --- |</code>。<br>「等級」欄填 <code>F</code>（重罪）、<code>W</code>（可重可輕）、<code>M</code>（輕罪）、<code>I</code>（違規），會自動變成彩色標籤；第一欄以 PC、VC 等開頭會自動加粗成條號。</p><p><code>**粗體**</code>、<code>- 條列</code>、<code>1. 編號</code>、空一行代表分段。</p>",
+    rules: "<p><code>## 第一章 章名 {#英文代號}</code> 新的一章；<code>{#...}</code> 是網址錨點，可省略。標題開頭為「附錄」時不計入章數。</p><p><code>#### 1.1 條文標題 [C]</code> 一條規則。最後的 <code>[A]</code>～<code>[D]</code> 是處分等級（A 嚴重、B 重大、C 一般、D 輕微），可省略。條文下方的段落與條列會自動歸入該條。</p><p><code>&gt; 文字</code> 黃色提示框。表格格子內寫 <code>[B]</code> 也會變成等級標籤。</p>"
+  };
+  var esc = PSRPMd.esc, el = PSRP.el;
+  var slug = new URLSearchParams(location.search).get("doc") || "rules";
+  if (!DOCS[slug]) slug = "rules";
+  var cfg = DOCS[slug], doc = null, chapters = [], cur = 0, dirty = false, me = null;
+  var srcEl = document.getElementById("src"), pv = document.getElementById("preview");
+
+  function setStatus(t) { document.getElementById("status").innerHTML = (dirty ? '<span class="dirty-dot"></span>有未儲存的變更 · ' : "") + t; }
+  function lastSaved() { return doc ? "上次儲存：" + new Date(doc.updated_at).toLocaleString("zh-TW") : ""; }
+  function markDirty() { if (!dirty) { dirty = true; setStatus(lastSaved()); } }
+  function render(md) {
+    if (cfg.mode === "rules") return PSRPMd.renderRules(md).html;
+    return PSRPMd.renderBook(md, cfg.prefix).html;
+  }
+  var t;
+  function refreshPreview() {
+    clearTimeout(t);
+    t = setTimeout(function () {
+      var head = chapters[0] && chapters[0].title === "（開頭）" && cur !== 0 ? "" : "";
+      try { pv.innerHTML = render(head + chapters[cur].text); } catch (e) { pv.textContent = "預覽錯誤：" + e.message; }
+    }, 180);
+  }
+  function chTitle(c) { return c.title.replace(/^##\s*/, "") || "（無標題）"; }
+  function renderList() {
+    var box = document.getElementById("chlist"); box.innerHTML = "";
+    chapters.forEach(function (c, i) {
+      var b = el("button", { type: "button", class: "ch" + (c.mod ? " mod" : ""), "aria-current": String(i === cur) }, chTitle(c));
+      b.addEventListener("click", function () { select(i); });
+      box.appendChild(b);
+    });
+    var add = el("button", { type: "button", class: "btn-sec add" }, "＋ 新增一章");
+    add.addEventListener("click", function () {
+      var name = prompt(cfg.mode === "rules" ? "新章節名稱（例如：第十四章 活動規範）" : "新章節名稱（例如：第二十章 特殊勤務 Special Operations）");
+      if (!name) return;
+      chapters.push({ title: name, text: "## " + name + "\n\n", mod: true }); markDirty(); select(chapters.length - 1);
+    });
+    box.appendChild(add);
+  }
+  function select(i) {
+    cur = i; srcEl.value = chapters[i].text; renderList(); refreshPreview(); srcEl.focus(); srcEl.setSelectionRange(0, 0); srcEl.scrollTop = 0;
+  }
+  srcEl.addEventListener("input", function () {
+    chapters[cur].text = srcEl.value;
+    var m = srcEl.value.match(/^## (.+)$/m);
+    var nt = m ? m[1].replace(/\s*\{#[\w-]+\}\s*$/, "") : chapters[cur].title;
+    if (!chapters[cur].mod || nt !== chapters[cur].title) { chapters[cur].mod = true; chapters[cur].title = nt; renderList(); }
+    markDirty(); refreshPreview();
+  });
+  srcEl.addEventListener("keydown", function (e) {
+    if (e.key === "Tab") { e.preventDefault(); var s = srcEl.selectionStart; srcEl.setRangeText("  ", s, srcEl.selectionEnd, "end"); srcEl.dispatchEvent(new Event("input")); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); save(); }
+  });
+  function buildTools() {
+    var bar = document.getElementById("tools");
+    TOOLS[cfg.mode].forEach(function (x) {
+      var b = el("button", { type: "button" }, x[0]);
+      b.addEventListener("click", function () {
+        var s = srcEl.selectionStart, e2 = srcEl.selectionEnd, ins = x[1] === null ? "**" + (srcEl.value.slice(s, e2) || "粗體文字") + "**" : x[1];
+        srcEl.setRangeText(ins, s, e2, "end"); srcEl.focus(); srcEl.dispatchEvent(new Event("input"));
+      });
+      bar.appendChild(b);
+    });
+  }
+  function fullSource() { return chapters.map(function (c) { return c.text.replace(/\s+$/, ""); }).join("\n\n") + "\n"; }
+
+  async function save() {
+    if (!dirty) { setStatus("沒有變更。 " + lastSaved()); return; }
+    var btn = document.getElementById("b-save"); btn.disabled = true; setStatus("儲存中…");
+    var r = await PSRP.client.from("documents").update({ source: fullSource() }).eq("slug", slug).eq("updated_at", doc.updated_at).select("updated_at").maybeSingle();
+    btn.disabled = false;
+    if (r.error) { setStatus('<span style="color:#ff8a7a">儲存失敗：' + esc(PSRP.errText(r.error)) + "</span>"); return; }
+    if (!r.data) {
+      setStatus('<span style="color:#ff8a7a">儲存失敗：其他人剛剛也修改了這份文件。請先複製你的內容，重新整理頁面後再合併。</span>'); return;
+    }
+    doc.updated_at = r.data.updated_at; dirty = false;
+    chapters.forEach(function (c) { c.mod = false; }); renderList();
+    try { localStorage.removeItem("psrp-doc-" + slug); } catch (e) {}
+    setStatus("✓ 已發布，網站頁面已更新。 " + lastSaved());
+  }
+  document.getElementById("b-save").addEventListener("click", save);
+  window.addEventListener("beforeunload", function (e) { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+  function modal(title, content) {
+    var m = el("div", { class: "modal", role: "dialog", "aria-modal": "true" });
+    var box = el("div", { class: "box" });
+    var h = el("div", { style: "display:flex;justify-content:space-between;align-items:center;gap:10px" });
+    h.appendChild(el("h3", null, title));
+    var x = el("button", { type: "button", class: "btn-sec" }, "關閉"); x.addEventListener("click", function () { m.remove(); });
+    h.appendChild(x); box.appendChild(h); box.appendChild(content); m.appendChild(box);
+    m.addEventListener("click", function (e) { if (e.target === m) m.remove(); });
+    document.body.appendChild(m); return m;
+  }
+  document.getElementById("b-help").addEventListener("click", function () {
+    var c = el("div", { class: "helpbox" }); c.innerHTML = HELP[cfg.mode] + "<p>快捷鍵：<code>Ctrl + S</code> 儲存。每次儲存都會保留上一版，可以在「修訂紀錄」還原。</p>"; modal("格式說明", c);
+  });
+  document.getElementById("b-hist").addEventListener("click", async function () {
+    var c = el("div", { class: "hist" }); c.appendChild(el("p", { class: "note" }, "讀取中…"));
+    var m = modal("修訂紀錄（最近 30 版）", c);
+    var r = await PSRP.client.from("document_history").select("id, source, edited_by, saved_at").eq("slug", slug).order("saved_at", { ascending: false }).limit(30);
+    c.innerHTML = "";
+    if (r.error) { c.appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    if (!r.data.length) { c.appendChild(el("p", { class: "note" }, "還沒有任何修訂紀錄。第一次儲存後，舊版本會出現在這裡。")); return; }
+    var ids = r.data.map(function (h) { return h.edited_by; }).filter(Boolean), names = {};
+    if (ids.length) { var n = await PSRP.client.rpc("editor_names", { ids: ids }); (n.data || []).forEach(function (x) { names[x.id] = x.display_name; }); }
+    r.data.forEach(function (h) {
+      var row = el("div", { class: "row" });
+      row.appendChild(el("span", null, new Date(h.saved_at).toLocaleString("zh-TW") + "　" + (names[h.edited_by] ? "（" + names[h.edited_by] + " 編輯的版本）" : "") + "　" + h.source.length.toLocaleString() + " 字"));
+      var b = el("button", { type: "button", class: "btn-sec" }, "載入這一版");
+      b.addEventListener("click", function () {
+        if (!confirm("要把編輯器內容換成這個舊版本嗎？載入後按「儲存並發布」才會生效。")) return;
+        chapters = PSRPMd.splitChapters(h.source).map(function (c) { return { title: c.title, text: c.text, mod: true }; });
+        markDirty(); m.remove(); select(0);
+      });
+      row.appendChild(b); c.appendChild(row);
+    });
+  });
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    var gate = document.getElementById("gate");
+    if (!PSRP.client) { gate.appendChild(el("div", { class: "notice warn" }, "帳號系統尚未啟用。")); return; }
+    me = await PSRP.profile();
+    if (!me) { PSRP.mountAuthForm(gate, function () { location.reload(); }, "線上編輯僅限管理團隊與部門高層，請先登入。"); return; }
+    var r = await PSRP.client.from("documents").select("slug, title, source, editor_role, updated_at").order("slug");
+    var docs = (r.data || []).filter(function (d) { return DOCS[d.slug] && PSRP.hasRole(me, d.editor_role); });
+    var pick = document.getElementById("doc-pick");
+    docs.forEach(function (d) { pick.appendChild(el("option", { value: d.slug }, "編輯：" + DOCS[d.slug].title)); });
+    doc = docs.filter(function (d) { return d.slug === slug; })[0];
+    if (!doc) {
+      gate.innerHTML = "";
+      var g = el("div", { class: "gate-msg" });
+      g.appendChild(el("h2", null, "沒有編輯權限"));
+      g.appendChild(el("p", { class: "note" }, docs.length ? "你可以編輯：" + docs.map(function (d) { return DOCS[d.slug].title; }).join("、") : "這個帳號沒有任何文件的編輯權限。部門手冊由該部門高層編輯，規則與法典由管理團隊編輯。"));
+      if (docs.length) { var a = el("a", { class: "btn-primary", href: "?doc=" + docs[0].slug, style: "text-decoration:none;display:inline-block;margin-top:10px" }, "前往編輯 " + DOCS[docs[0].slug].title); g.appendChild(a); }
+      gate.appendChild(g); return;
+    }
+    pick.value = slug;
+    pick.addEventListener("change", function () { if (dirty && !confirm("有未儲存的變更，確定要切換文件？")) { pick.value = slug; return; } dirty = false; location.search = "?doc=" + pick.value; });
+    document.title = "編輯 " + cfg.title + " · Palm State RolePlay";
+    document.getElementById("doc-title").textContent = "編輯：" + cfg.title;
+    document.getElementById("b-view").href = cfg.view;
+    chapters = PSRPMd.splitChapters(doc.source).map(function (c) { return { title: c.title, text: c.text, mod: false }; });
+    if (!chapters.length) chapters = [{ title: "（開頭）", text: "", mod: false }];
+    document.getElementById("app").hidden = false;
+    buildTools(); select(chapters.length > 1 ? 1 : 0); setStatus(lastSaved());
+  }
+  start();
+})();
+</script>
+</body>
+</html>
