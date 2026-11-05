@@ -4,7 +4,7 @@
   var ready = !!(cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase);
   var client = ready ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
 
-  var ROLE_NAMES = { admin: "管理團隊", reviewer: "招募審核", police: "LAPD", fire: "LAFD", ems: "EMS" };
+  var ROLE_NAMES = { admin: "管理團隊", reviewer: "招募審核", police: "LAPD", fire: "LAFD", ems: "EMS", police_cmd: "LAPD 高層", fire_cmd: "LAFD 高層", ems_cmd: "EMS 高層" };
   var DEPT_NAMES = { lapd: "洛杉磯警察局 LAPD", lafd: "洛杉磯消防局 LAFD", ems: "緊急醫療 EMS" };
   var STATUS_NAMES = { pending: "審核中", interview: "待面試", approved: "已錄取", rejected: "未錄取" };
 
@@ -13,6 +13,8 @@
     if (/Invalid login credentials/i.test(m)) return "Email 或密碼不正確。";
     if (/Email not confirmed/i.test(m)) return "請先到信箱點擊確認信中的連結，再登入。";
     if (/User already registered/i.test(m)) return "這個 Email 已經註冊過，請直接登入。";
+    if (/manual linking is disabled|provider is not enabled|Unsupported provider/i.test(m)) return "Discord 連結功能尚未開放，請稍後再試。";
+    if (/Identity is already linked/i.test(m)) return "這個 Discord 帳號已經連結到其他網站帳號。";
     if (/Password should be at least/i.test(m)) return "密碼至少需要 8 個字元。";
     if (/only request this after|security purposes/i.test(m)) return "請稍等一分鐘再重新寄送。";
     if (/New password should be different/i.test(m)) return "新密碼不能和舊密碼相同。";
@@ -35,7 +37,7 @@
     return r.data;
   }
   function hasRole(p, role) {
-    return !!(p && p.roles && (p.roles.indexOf(role) !== -1 || p.roles.indexOf("admin") !== -1));
+    return !!(p && p.roles && (p.roles.indexOf(role) !== -1 || p.roles.indexOf("admin") !== -1 || p.roles.indexOf(role + "_cmd") !== -1));
   }
   async function signIn(email, password) {
     var r = await client.auth.signInWithPassword({ email: email, password: password });
