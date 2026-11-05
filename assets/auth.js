@@ -126,8 +126,10 @@
   /* 右上角帳號狀態 */
   async function mountAccountChip(container) {
     if (!container) return;
-    container.innerHTML = "";
+    var token = (container._chipToken = (container._chipToken || 0) + 1);
     var p = await profile();
+    if (token !== container._chipToken) return; /* 只保留最後一次呼叫的結果，避免重複顯示 */
+    container.innerHTML = "";
     if (!p) {
       var a = el("a", { href: "/apply/", class: "chip-login" }, "登入／註冊");
       container.appendChild(a); return;

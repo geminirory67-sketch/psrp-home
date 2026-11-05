@@ -104,7 +104,7 @@ fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 18px 18p
 legend { padding: 0 8px; font-weight: 700; font-size: 16px; }
 
 .depts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-.deptpick { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 12px; padding: 18px; cursor: pointer; display: grid; gap: 6px; }
+.deptpick { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 12px; padding: 18px; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 6px; height: 100%; }
 .deptpick:hover, .deptpick[aria-pressed="true"] { border-color: var(--c); background: var(--panel-2); }
 .deptpick b { font-family: var(--font-zh-display); font-size: 20px; font-weight: 900; }
 .deptpick span { color: var(--muted); font-size: 14px; }
@@ -157,3 +157,12 @@ footer.foot a { color: var(--ink); text-decoration: none; }
 @media (max-width: 700px) { .member { grid-template-columns: 1fr; } }
 .gate-msg { max-width: 560px; margin: 40px auto; text-align: center; }
 .gate-msg h2 { font-family: var(--font-zh-display); font-size: 26px; margin-bottom: 10px; }
+
+/* 部門選擇與表單細節 */
+.depts { align-items: stretch; }
+.deptpick[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--c) inset; }
+.section-title { font-family: inherit; font-weight: 700; }
+.appform { display: grid; gap: 20px; margin-top: 8px; }
+legend { font-size: 15px; color: var(--gold-soft, #f5d58a); }
+.account { gap: 6px; }
+.account .chip-name { max-width: 10em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
