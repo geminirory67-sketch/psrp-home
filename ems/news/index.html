@@ -273,7 +273,13 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
     var list = document.getElementById("list"); list.innerHTML = "";
     document.getElementById("count").textContent = all.length ? "共 " + res.length + " 則公告" + (res.length !== all.length ? "（全部 " + all.length + " 則）" : "") : "";
     if (!res.length) {
-      list.appendChild(el("div", { class: "empty-news" }, all.length ? "找不到符合的公告，試試其他關鍵字。" : "目前還沒有公告。"));
+      var em = el("div", { class: "empty-news" }, all.length ? "找不到符合的公告，試試其他關鍵字。" : (PD ? "目前還沒有部門公告。" : "目前還沒有伺服器官方公告。"));
+      if (!all.length && !PD) {
+        var lk = el("div", { style: "margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap" });
+        [["/pd/news/", "LAPD 部門公告"], ["/fd/news/", "LAFD 部門公告"], ["/ems/news/", "EMS 部門公告"]].forEach(function (x) { lk.appendChild(el("a", { class: "btn-sec", href: x[0], style: "text-decoration:none" }, x[1] + " →")); });
+        em.appendChild(lk);
+      }
+      list.appendChild(em);
     }
     res.slice(0, shown).forEach(function (a) {
       var d = DEPTS[a.department];
@@ -351,6 +357,16 @@ mark { background: rgba(232,184,90,.35); color: inherit; border-radius: 2px; pad
           location.hash = ""; load();
         });
         right.appendChild(ed); right.appendChild(del);
+        if (a.department !== "all" && !isInt(a) && PSRP.hasRole(me, "admin")) {
+          var mv = el("button", { type: "button", class: "btn-sec" }, "移到伺服器公告");
+          mv.addEventListener("click", async function () {
+            if (!confirm("把「" + a.title + "」改成伺服器官方公告？之後會顯示在官網公告欄，不再出現在部門網站。")) return;
+            var r = await PSRP.client.from("announcements").update({ department: "all", signer: a.signer || DEPTS.all.signer }).eq("id", a.id);
+            if (r.error) { alert(PSRP.errText(r.error)); return; }
+            location.href = "/news/#n" + a.id;
+          });
+          right.appendChild(mv);
+        }
       }
     }
     bar.appendChild(right); v.appendChild(bar);
