@@ -180,6 +180,7 @@
     (p.roles || []).forEach(function (r) { container.appendChild(el("span", { class: "chip-role r-" + r }, ROLE_NAMES[r] || r)); });
     if (hasRole(p, "reviewer")) container.appendChild(el("a", { href: "/admin/", class: "chip-link" }, "管理後台"));
     else if (hasRole(p, "support")) container.appendChild(el("a", { href: "/support/", class: "chip-link" }, "工單管理"));
+    else container.appendChild(el("a", { href: "/support/", class: "chip-link" }, "工單"));
     var out = el("button", { type: "button", class: "chip-out" }, "登出");
     out.addEventListener("click", signOut);
     container.appendChild(out);

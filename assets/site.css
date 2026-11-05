@@ -203,3 +203,13 @@ legend { font-size: 15px; color: var(--gold-soft, #f5d58a); }
   .grid2 { grid-template-columns: 1fr; }
   fieldset { padding: 14px 12px 16px; }
 }
+
+/* 主選單：白名單申請按鈕、頁尾網站地圖 */
+.navl a.nav-cta { color: var(--gold); border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent); margin-left: 4px; font-weight: 500; }
+.navl a.nav-cta:hover, .navl a.nav-cta[aria-current="page"] { background: var(--gold); color: #1b1405; }
+footer.foot .wrap.fgrid { display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 24px 32px; justify-content: stretch; }
+footer.foot .fgrid > div { display: grid; gap: 7px; align-content: start; }
+footer.foot .fgrid h4 { margin: 0 0 4px; color: var(--ink); font-size: 13px; letter-spacing: .12em; }
+footer.foot .fgrid .fb b { color: var(--ink); font-size: 15px; }
+footer.foot .fgrid a:hover { text-decoration: underline; }
+@media (max-width: 760px) { footer.foot .wrap.fgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } footer.foot .fgrid .fb { grid-column: 1 / -1; } }
