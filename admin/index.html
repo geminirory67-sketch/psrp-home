@@ -17,13 +17,12 @@
     <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
     <nav class="navl" aria-label="主選單">
       <a href="/">首頁</a>
-      <a href="/rules/">伺服器規則</a>
       <a href="/news/">公告</a>
-      <a href="/whitelist/">白名單</a>
-      <a href="/apply/">公職招募</a>
-      <a href="/support/">工單</a>
-      <a href="https://law.psrp2.com/">加州法典</a>
+      <a href="/forums/">論壇</a>
+      <a href="/chat/">聊天室</a>
       <a href="/safety/">公共安全</a>
+      <a href="/rules/">規則</a>
+      <a class="nav-cta" href="/whitelist/">白名單申請</a>
     </nav>
     <div class="account" id="account"></div>
   </div>
@@ -119,9 +118,11 @@
 </main>
 
 <footer class="foot">
-  <div class="wrap">
-    <span>© 2026 Palm State RolePlay。版權所有。</span>
-    <span><a href="/">首頁</a> · <a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></span>
+  <div class="wrap fgrid">
+    <div class="fb"><b>Palm State RolePlay</b><span>以洛杉磯為舞台的 FiveM 中文角色扮演伺服器。</span><span>© 2026 Palm State RolePlay。版權所有。</span></div>
+    <div><h4>社群</h4><a href="/news/">伺服器公告</a><a href="/forums/">論壇</a><a href="/chat/">聊天室</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></div>
+    <div><h4>加入我們</h4><a href="/whitelist/">白名單申請</a><a href="/apply/">公職招募</a><a href="/safety/">公共安全</a></div>
+    <div><h4>規範與協助</h4><a href="/rules/">伺服器規則</a><a href="https://law.psrp2.com/">加州法典</a><a href="/support/">工單客服</a></div>
   </div>
 </footer>
 
@@ -334,7 +335,7 @@
   });
 
   /* ---------- Discord 設定 ---------- */
-  var DC_DEPTS = [["tickets", "工單通知（Staff 頻道，開新工單時標記下方身分組）"], ["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"], ["lapd_internal", "🔒 LAPD 內部公告（只發「僅限部門內部」的公告，請設成只有 LAPD 看得到的頻道）"], ["lafd_internal", "🔒 LAFD 內部公告"], ["ems_internal", "🔒 EMS 內部公告"]];
+  var DC_DEPTS = [["whitelist", "📝 白名單申請通知（Staff 頻道，有新的白名單申請時標記下方身分組）"], ["recruit", "📝 公職申請通知（LAPD／LAFD／EMS 新申請，Staff 頻道）"], ["tickets", "工單通知（Staff 頻道，開新工單時標記下方身分組）"], ["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"], ["lapd_internal", "🔒 LAPD 內部公告（只發「僅限部門內部」的公告，請設成只有 LAPD 看得到的頻道）"], ["lafd_internal", "🔒 LAFD 內部公告"], ["ems_internal", "🔒 EMS 內部公告"]];
   var CFG_FIELDS = [["guild_id", "Discord 伺服器 ID"], ["role_member", "Member 身分組 ID"], ["role_civ", "CIV 身分組 ID"], ["role_police", "LAPD 身分組 ID"], ["role_fire", "LAFD 身分組 ID"], ["role_ems", "EMS 身分組 ID"]];
   async function loadConfig() {
     var box = document.getElementById("dcfg"); box.innerHTML = "";
@@ -371,7 +372,7 @@
       var it = el("div", { class: "appitem" });
       it.appendChild(el("b", null, d[1]));
       var g = el("div", { class: "grid2" });
-      var l1 = el("label", { class: "fld" }); l1.appendChild(el("span", null, "公告頻道 ID"));
+      var l1 = el("label", { class: "fld" }); l1.appendChild(el("span", null, "頻道 ID"));
       var ch = el("input", { inputmode: "numeric", placeholder: "例如 1234567890123456789" }); ch.value = row.channel_id; l1.appendChild(ch);
       var l2 = el("label", { class: "fld" }); l2.appendChild(el("span", null, "標記身分組（可留空）"));
       var mr = el("input", { placeholder: "身分組 ID、everyone 或 here" }); mr.value = row.mention_role_id; l2.appendChild(mr);
