@@ -19,6 +19,7 @@
       <a href="/">首頁</a>
       <a href="/rules/">伺服器規則</a>
       <a href="/news/">公告</a>
+      <a href="/whitelist/">白名單</a>
       <a href="/apply/">公職招募</a>
       <a href="/support/">工單</a>
       <a href="https://law.psrp2.com/">加州法典</a>
@@ -62,6 +63,7 @@
             <option value="lapd">LAPD</option>
             <option value="lafd">LAFD</option>
             <option value="ems">EMS</option>
+            <option value="whitelist">白名單</option>
           </select>
           <button type="button" class="btn-sec" id="reload">重新整理</button>
         </div>
@@ -84,6 +86,21 @@
           標記身分組（可留空）：填身分組 ID（在身分組上按右鍵 → 複製身分組 ID），或填 <code>everyone</code>、<code>here</code>。<br>
           Bot 在該頻道需要「檢視頻道」「傳送訊息」「嵌入連結」權限；要標記 everyone 還需要「提及 @everyone」。
         </div>
+        <h2 class="section-title">Discord 伺服器與身分組</h2>
+        <div class="notice">
+          核准白名單或公職申請時，Bot 會自動在 Discord 給玩家對應的身分組（玩家需先在網站連結 Discord）。請填入伺服器 ID 與各身分組 ID（在伺服器名稱或身分組上按右鍵 → 複製 ID）。<br>
+          Bot 需要「管理身分組」權限，而且 <b>Bot 的身分組位置必須排在 Member、CIV 等身分組上面</b>（伺服器設定 → 身分組，把 Bot 的身分組拖到上方）。<br>
+          「LAPD」身分組也會用來判斷誰可以使用 /duty 等勤務指令。
+        </div>
+        <div class="appitem">
+          <div class="grid2" id="dcfg"></div>
+          <p class="form-msg" id="dcfg-msg" role="status"></p>
+          <div class="review-actions">
+            <button type="button" class="btn-primary" id="dcfg-save">儲存設定</button>
+            <button type="button" class="btn-sec" id="dcfg-register">註冊 / 更新 Discord 斜線指令</button>
+          </div>
+        </div>
+        <h2 class="section-title">通知頻道</h2>
         <div class="applist" id="dclist"></div>
       </section>
 
@@ -218,10 +235,12 @@
     lab.appendChild(note); box.appendChild(lab);
     var msg = el("p", { class: "form-msg", role: "status" });
     var acts = el("div", { class: "review-actions" });
-    [["interview", "安排面試", ""], ["approved", "錄取並給予身分組", "btn-ok"], ["rejected", "不錄取", "btn-bad"], ["pending", "退回審核中", ""]].forEach(function (s) {
+    [["interview", "安排面試", ""], ["approved", a.department === "whitelist" ? "通過白名單" : "錄取並給予身分組", "btn-ok"], ["rejected", "不錄取", "btn-bad"], ["pending", "退回審核中", ""]].forEach(function (s) {
       var b = el("button", { type: "button", class: "btn-sec " + s[2] }, s[1]);
       b.addEventListener("click", async function () {
-        if (s[0] === "approved" && !confirm("確定錄取？系統會自動給予此帳號 " + PSRP.ROLE_NAMES[{ lapd: "police", lafd: "fire", ems: "ems" }[a.department]] + " 身分組。")) return;
+        if (s[0] === "approved" && !confirm(a.department === "whitelist"
+              ? "確定通過白名單？系統會給予網站 Member、CIV 身分組；玩家若已連結 Discord，Bot 也會自動在 Discord 給予 Member、CIV 身分組並私訊通知。"
+              : "確定錄取？系統會自動給予此帳號 " + PSRP.ROLE_NAMES[{ lapd: "police", lafd: "fire", ems: "ems" }[a.department]] + " 身分組（Discord 身分組也會同步，需玩家已連結 Discord）。")) return;
         b.disabled = true; msg.className = "form-msg"; msg.textContent = "";
         var r = await PSRP.client.rpc("review_application", { app_id: a.id, new_status: s[0], note: note.value.trim() });
         b.disabled = false;
@@ -257,7 +276,7 @@
       left.appendChild(el("b", null, m.display_name || "（未命名）"));
       left.appendChild(el("div", { class: "note" }, "Discord: " + (m.discord || "—") + "  ·  註冊於 " + new Date(m.created_at).toLocaleDateString("zh-TW")));
       var tog = el("div", { class: "roletog" });
-      ["admin", "reviewer", "support", "police", "fire", "ems", "police_cmd", "fire_cmd", "ems_cmd"].forEach(function (r) {
+      ["admin", "reviewer", "support", "member", "civ", "police", "fire", "ems", "police_cmd", "fire_cmd", "ems_cmd"].forEach(function (r) {
         var l = el("label"); var c = el("input", { type: "checkbox", value: r });
         c.checked = (m.roles || []).indexOf(r) !== -1;
         if (m.id === me.id && r === "admin") c.disabled = true;
@@ -315,7 +334,33 @@
 
   /* ---------- Discord 設定 ---------- */
   var DC_DEPTS = [["tickets", "工單通知（Staff 頻道，開新工單時標記下方身分組）"], ["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"]];
+  var CFG_FIELDS = [["guild_id", "Discord 伺服器 ID"], ["role_member", "Member 身分組 ID"], ["role_civ", "CIV 身分組 ID"], ["role_police", "LAPD 身分組 ID"], ["role_fire", "LAFD 身分組 ID"], ["role_ems", "EMS 身分組 ID"]];
+  async function loadConfig() {
+    var box = document.getElementById("dcfg"); box.innerHTML = "";
+    var r = await PSRP.client.from("discord_config").select("*");
+    var cur = {}; (r.data || []).forEach(function (x) { cur[x.key] = x.value; });
+    CFG_FIELDS.forEach(function (f) {
+      var l = el("label", { class: "fld" }); l.appendChild(el("span", null, f[1]));
+      var i = el("input", { inputmode: "numeric", "data-k": f[0], placeholder: "15～22 位數字" }); i.value = cur[f[0]] || ""; l.appendChild(i); box.appendChild(l);
+    });
+  }
+  document.getElementById("dcfg-save").addEventListener("click", async function () {
+    var msg = document.getElementById("dcfg-msg"), rows = [];
+    var bad = [].filter.call(document.querySelectorAll("#dcfg input"), function (i) { return i.value.trim() && !/^\d{15,22}$/.test(i.value.trim()); });
+    if (bad.length) { msg.className = "form-msg err"; msg.textContent = "ID 應該是 15～22 位數字。"; bad[0].focus(); return; }
+    [].forEach.call(document.querySelectorAll("#dcfg input"), function (i) { rows.push({ key: i.dataset.k, value: i.value.trim(), updated_at: new Date().toISOString() }); });
+    var r = await PSRP.client.from("discord_config").upsert(rows);
+    msg.className = r.error ? "form-msg err" : "form-msg ok"; msg.textContent = r.error ? PSRP.errText(r.error) : "已儲存";
+  });
+  document.getElementById("dcfg-register").addEventListener("click", async function () {
+    var msg = document.getElementById("dcfg-msg"), b = this; b.disabled = true; msg.className = "form-msg"; msg.textContent = "註冊中…";
+    var t = await PSRP.client.functions.invoke("discord-notify", { body: { type: "register" } });
+    b.disabled = false;
+    if (t.error) { var txt = t.error.message; try { txt = await t.error.context.text(); } catch (e) {} msg.className = "form-msg err"; msg.textContent = txt; }
+    else { msg.className = "form-msg ok"; msg.textContent = typeof t.data === "string" ? t.data : "已註冊"; }
+  });
   async function loadDiscord() {
+    loadConfig();
     var box = document.getElementById("dclist"); box.innerHTML = "";
     var r = await PSRP.client.from("discord_channels").select("*");
     if (r.error) { box.appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
