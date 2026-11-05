@@ -116,6 +116,12 @@ section.block { padding-block: clamp(64px, 9vw, 104px); }
 
 /* manuals */
 .docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.acct { display: inline-flex; gap: 6px; align-items: center; margin-left: 6px; font-size: 13.5px; }
+.acct a, .acct button { font: inherit; font-size: 13.5px; color: var(--ink); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.acct .chip-name { font-weight: 700; max-width: 9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct .chip-role { font-size: 12px; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,.07); color: var(--gold-soft, #f5d58a); }
+@media (max-width: 1180px) { .acct .chip-role { display: none; } }
+@media (max-width: 860px) { .acct { margin: 8px 0 0; flex-wrap: wrap; } .acct .chip-role { display: inline; } }
 .docc { text-decoration: none; display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start; padding: 24px; border-radius: 12px; background: linear-gradient(160deg, #1d2550, #151b36); border: 1px solid var(--line); transition: transform .15s ease, border-color .15s ease; }
 .docc:hover { transform: translateY(-2px); border-color: var(--gold); }
 .spine { width: 54px; height: 70px; border-radius: 4px 8px 8px 4px; background: var(--b); position: relative; box-shadow: inset 6px 0 0 rgba(0,0,0,.25); }
@@ -172,10 +178,11 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
     <nav class="links" id="links" aria-label="主選單">
       <a href="#depts">部門</a>
       <a href="#jobs">職業</a>
-      <a href="#city">城市生活</a>
-      <a href="#join">如何加入</a>
+      <a href="/rules/">伺服器規則</a>
+      <a href="/apply/">公職招募</a>
       <a class="doc" href="https://law.psrp2.com/">加州法典</a>
-      <a class="doc" href="https://law.psrp2.com/lapd/">LAPD 手冊</a>
+      <a class="doc" href="/lapd/">LAPD 手冊</a>
+      <span class="acct" id="account"></span>
     </nav>
     <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="links">選單</button>
     <a class="btn-discord" href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">
@@ -247,7 +254,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
           </div>
           <p>巡邏、交通執法、刑事偵查與特勤任務。依加州法條執法，所有行動都要經得起法庭檢驗。</p>
           <ul><li>巡邏</li><li>刑事偵查</li><li>SWAT</li><li>K9</li><li>空中支援</li><li>交通局</li></ul>
-          <a class="more" href="https://law.psrp2.com/lapd/">閱讀 LAPD 部門手冊 →</a>
+          <a class="more" href="/apply/">申請加入 LAPD →</a>
         </article>
         <article class="dept" style="--c: var(--lafd)">
           <span class="code">ALL HANDS</span>
@@ -323,7 +330,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       <div class="sec-head">
         <span class="k">Reference Library</span>
         <h2 id="docs-h">法規資料庫</h2>
-        <p>執法與遊戲內的法律問題都以這兩份文件為準，可以用中文、英文或條號即時搜尋。</p>
+        <p>伺服器規則、法典與部門手冊是所有遊戲內判斷的依據；公職職位請透過線上招募申請。</p>
       </div>
       <div class="docs">
         <a class="docc" href="https://law.psrp2.com/">
@@ -335,13 +342,31 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
             <span class="go">開啟法典 →</span>
           </span>
         </a>
-        <a class="docc" href="https://law.psrp2.com/lapd/">
+        <a class="docc" href="/lapd/">
           <span class="spine" style="--b: #2f5fb8" aria-hidden="true"></span>
           <span>
             <h3>LAPD 部門手冊</h3>
-            <span class="en">Department Manual</span>
+            <span class="en">Department Manual · 僅限 LAPD 成員登入閱讀</span>
             <p>組織架構、階級晉升、無線電代碼、交通攔停、逮捕程序、武力使用、追緝政策與懲戒制度，共 19 章。</p>
             <span class="go">開啟手冊 →</span>
+          </span>
+        </a>
+        <a class="docc" href="/rules/">
+          <span class="spine" style="--b: #8a3a3a" aria-hidden="true"></span>
+          <span>
+            <h3>伺服器規則</h3>
+            <span class="en">Server Rules · 所有玩家必讀</span>
+            <p>社群行為、RP 核心規則、犯罪劇情限制、安全區、經濟與車輛規範，以及完整的分級處分制度。</p>
+            <span class="go">閱讀規則 →</span>
+          </span>
+        </a>
+        <a class="docc" href="/apply/">
+          <span class="spine" style="--b: #2f8a6a" aria-hidden="true"></span>
+          <span>
+            <h3>公職招募</h3>
+            <span class="en">LAPD · LAFD · EMS Recruitment</span>
+            <p>註冊帳號後即可線上申請警察、消防與緊急醫療職位，審核進度會即時顯示。</p>
+            <span class="go">前往申請 →</span>
           </span>
         </a>
       </div>
@@ -379,7 +404,9 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       <ul>
         <li><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a></li>
         <li><a href="https://law.psrp2.com/">加州法典</a></li>
-        <li><a href="https://law.psrp2.com/lapd/">LAPD 部門手冊</a></li>
+        <li><a href="/rules/">伺服器規則</a></li>
+        <li><a href="/apply/">公職招募</a></li>
+        <li><a href="/lapd/">LAPD 部門手冊（成員限定）</a></li>
       </ul>
     </div>
     <div>
@@ -393,7 +420,11 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
 <script>
+if (window.PSRP) PSRP.mountAccountChip(document.getElementById("account"));
 (function () {
   var b = document.getElementById("menu"), l = document.getElementById("links");
   b.addEventListener("click", function () { var o = l.classList.toggle("open"); b.setAttribute("aria-expanded", String(o)); });
