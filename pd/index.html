@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>洛杉磯警察局 LAPD · Palm State RolePlay</title>
+<meta name="description" content="Palm State RolePlay 洛杉磯警察局入口：部門公告、勤務表、部門手冊、無線電代碼與招募資訊。">
+<link rel="icon" type="image/png" href="/assets/seal-lapd.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/pd.css">
+<style>
+.hero { position: relative; overflow: hidden; background: radial-gradient(1200px 500px at 15% 40%, rgba(212,175,90,.12), transparent 60%), linear-gradient(180deg, #0f2246 0%, #07101f 100%); border-bottom: 1px solid #233a62; }
+.hero::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 80px); pointer-events: none; }
+.hero .wrap { position: relative; z-index: 1; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 44px; align-items: center; padding-block: 56px 52px; }
+.hero .seal { width: 240px; height: 240px; object-fit: contain; filter: drop-shadow(0 12px 30px rgba(0,0,0,.5)); }
+.hero .k { font-family: var(--font-display); letter-spacing: .3em; font-size: 13px; color: var(--gold); font-weight: 600; }
+.hero h1 { margin: 8px 0 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 5.4vw, 64px); line-height: 1; letter-spacing: .04em; }
+.hero .zh { font-family: var(--font-zh-display); font-weight: 900; font-size: clamp(24px, 3vw, 34px); letter-spacing: .2em; margin-top: 10px; }
+.hero .motto { display: inline-block; margin-top: 16px; padding: 6px 0; border-top: 1px solid rgba(212,175,90,.5); border-bottom: 1px solid rgba(212,175,90,.5); font-family: var(--font-display); letter-spacing: .32em; color: var(--gold); font-size: 15px; font-weight: 600; }
+.hero p { color: var(--muted); max-width: 640px; margin: 16px 0 0; }
+.ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+.ctas a { text-decoration: none; padding: 11px 20px; border-radius: 4px; font-weight: 700; font-size: 15px; border: 1px solid #2c4675; color: var(--ink); background: rgba(255,255,255,.03); }
+.ctas a.pri { background: var(--gold); color: #0b1324; border-color: var(--gold); }
+.ctas a:hover { border-color: var(--gold); }
+
+.band { padding-block: 44px 8px; }
+.h2 { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 0 0 18px; }
+.h2 h2 { margin: 0; font-family: var(--font-zh-display); font-weight: 900; font-size: 28px; }
+.h2 span { font-family: var(--font-display); letter-spacing: .24em; color: var(--gold); font-size: 13px; font-weight: 600; text-transform: uppercase; }
+.h2 a { margin-left: auto; color: var(--muted); font-size: 14px; }
+
+.mem { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 8px; padding: 20px 22px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+.stat { background: var(--night-2); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
+.stat b { display: block; font-family: "IBM Plex Mono", monospace; font-size: 26px; line-height: 1.2; }
+.stat small { color: var(--muted); font-size: 12px; letter-spacing: .1em; }
+.stat .lv { display: inline-flex; align-items: center; gap: 6px; color: #3ccf8e; font-size: 12px; font-weight: 700; letter-spacing: .14em; }
+.stat .lv::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #3ccf8e; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.tile { display: grid; gap: 4px; text-decoration: none; background: var(--night-2); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; color: var(--ink); }
+.tile:hover { border-color: var(--gold); }
+.tile b { font-size: 16px; } .tile small { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.tile.cmd { border-style: dashed; }
+.tile.cmd b::before { content: "★ "; color: var(--gold); }
+.loginbox { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+
+.bul { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.bc { display: grid; gap: 6px; text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-top: 3px solid #6d9cff; border-radius: 6px; padding: 14px 16px; }
+.bc.int { border-top-color: #e0584a; }
+.bc:hover { border-color: var(--gold); }
+.bc .m { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.bc .m .i { color: #ffb4a8; font-weight: 700; }
+.bc h3 { margin: 0; font-size: 16.5px; line-height: 1.45; }
+.bc p { margin: 0; color: var(--muted); font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.org { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.oc { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+.oc .ab { display: inline-block; font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 13px; color: #0b1324; background: var(--gold); border-radius: 3px; padding: 1px 8px; }
+.oc h3 { margin: 8px 0 2px; font-size: 17px; }
+.oc .en { font-family: var(--font-display); letter-spacing: .12em; font-size: 12.5px; color: var(--muted); text-transform: uppercase; }
+.oc p { margin: 8px 0 0; color: #c3cee2; font-size: 14px; line-height: 1.65; }
+
+.cols2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+table.ref { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.ref caption { text-align: left; font-weight: 700; padding: 0 0 8px; font-size: 15px; }
+.ref th, .ref td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.ref th { background: var(--panel-2); font-size: 12px; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+.ref td:first-child { font-family: "IBM Plex Mono", monospace; font-weight: 600; white-space: nowrap; color: var(--gold); }
+.ref tr:last-child td { border-bottom: 0; }
+.phon { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 6px; }
+.phon span { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px; font-size: 14px; }
+.phon b { font-family: "IBM Plex Mono", monospace; color: var(--gold); margin-right: 6px; }
+
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; counter-reset: s; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.steps li { list-style: none; padding: 18px 16px; border-right: 1px solid var(--line); counter-increment: s; }
+.steps li:last-child { border-right: 0; }
+.steps li::before { content: "0" counter(s); display: block; font-family: var(--font-display); font-weight: 700; font-size: 28px; color: var(--gold); line-height: 1; }
+.steps b { display: block; margin-top: 8px; } .steps small { color: var(--muted); font-size: 13px; line-height: 1.55; display: block; margin-top: 4px; }
+
+@media (max-width: 900px) {
+  .hero .wrap { grid-template-columns: 1fr; gap: 18px; padding-block: 34px; text-align: center; }
+  .hero .seal { width: 150px; height: 150px; margin: 0 auto; }
+  .hero p { margin-inline: auto; } .ctas { justify-content: center; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols2 { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; } .steps li { border-right: 0; border-bottom: 1px solid var(--line); }
+}
+</style>
+</head>
+<body class="pd">
+<div class="pd-util"><div class="in"><span>Official Portal · Los Angeles Police Department · Palm State RolePlay</span><a href="/">← 返回 Palm State 主站</a></div></div>
+<header class="pdh"><div class="in"><a class="brand" href="/pd/"><img src="/assets/seal-lapd.png" alt="LAPD 警徽"><span><b>LAPD</b><small>LOS ANGELES POLICE DEPT.</small></span></a><nav aria-label="LAPD 選單"><a href="/pd/" aria-current="page">首頁</a><a href="/pd/news/">部門公告</a><a href="/pd/deployment/">勤務表</a><a href="/pd/manual/">部門手冊</a><a href="/pd/#codes">無線電代碼</a><a href="/apply/?dept=lapd">加入 LAPD</a><a href="https://law.psrp2.com/">加州法典</a></nav><div class="account" id="account"></div></div></header>
+
+<section class="hero">
+  <div class="wrap">
+    <img class="seal" src="/assets/seal-lapd.png" alt="洛杉磯警察局警徽">
+    <div>
+      <div class="k">PALM STATE · CITY OF LOS ANGELES</div>
+      <h1>LOS ANGELES<br>POLICE DEPARTMENT</h1>
+      <div class="zh">洛杉磯警察局</div>
+      <div class="motto">TO PROTECT AND TO SERVE · 保護與服務</div>
+      <p>依加州法典執法，所有行動都要經得起法庭檢驗。從學院新生做起，巡邏、交通、刑事偵查、特勤，一路晉升到指揮職。</p>
+      <div class="ctas" id="ctas">
+        <a class="pri" href="/apply/?dept=lapd">加入 LAPD</a>
+        <a href="/pd/news/">部門公告</a>
+        <a href="/pd/#codes">無線電代碼</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <section class="band" id="member">
+      <div class="h2"><span>Members Area</span><h2>員警專區</h2></div>
+      <div class="mem" id="mem"><p class="note" style="margin:0">讀取中…</p></div>
+    </section>
+
+    <section class="band">
+      <div class="h2"><span>Bulletins</span><h2>最新部門公告</h2><a href="/pd/news/">全部公告 →</a></div>
+      <div class="bul" id="bul"><p class="note">讀取中…</p></div>
+    </section>
+
+    <section class="band" id="org">
+      <div class="h2"><span>Organization</span><h2>組織與勤務單位</h2></div>
+      <div class="org">
+        <div class="oc"><span class="ab">COP</span><h3>局長室</h3><div class="en">Office of the Chief of Police</div><p>全局最高指揮。人事命令、政策與部門手冊由局長室核定發布。</p></div>
+        <div class="oc"><span class="ab">L</span><h3>值勤指揮官 · 督導</h3><div class="en">Watch Commander · Supervisors</div><p>1L10 為該班次值勤指揮官，1L20／1L30 為現場督導巡佐，負責派遣協調、武力使用與追緝審核。</p></div>
+        <div class="oc"><span class="ab">A</span><h3>巡邏分局</h3><div class="en">Patrol Division — Basic Cars</div><p>雙人巡邏車（例如 1A11）是警力主幹，負責報案處理與巡區責任；單人車（L）與 X-Ray 機動車支援。</p></div>
+        <div class="oc"><span class="ab">T · E · M</span><h3>交通局</h3><div class="en">Traffic Division</div><p>T 交通執法、E 車禍調查、M 重機巡邏。負責交通違規、酒駕與重大事故現場。</p></div>
+        <div class="oc"><span class="ab">W · G</span><h3>刑事偵查與幫派</h3><div class="en">Detective Bureau · GED</div><p>W 刑事警探負責案件偵辦與移送；G 幫派執法組處理幫派、毒品與槍枝案件。</p></div>
+        <div class="oc"><span class="ab">D · K9</span><h3>都會特勤</h3><div class="en">Metropolitan Division</div><p>D 為 SWAT 特勤隊，處理挾持、重裝嫌犯與高風險搜索；K9 警犬隊協助搜索與追捕。</p></div>
+        <div class="oc"><span class="ab">AIR</span><h3>空中支援</h3><div class="en">Air Support Division</div><p>AIR 1／AIR 2 直升機提供追緝空中監視、搜索與現場照明，是地面單位的眼睛。</p></div>
+        <div class="oc"><span class="ab">FB · SL</span><h3>社區警政</h3><div class="en">Foot Beat · Senior Lead Officer</div><p>徒步巡邏與資深領導員警，負責商圈巡守、社區聯繫與治安問題回報。</p></div>
+      </div>
+    </section>
+
+    <section class="band" id="ranks">
+      <div class="h2"><span>Rank Structure</span><h2>階級制度</h2></div>
+      <div class="cols2">
+        <table class="ref"><thead><tr><th>縮寫</th><th>階級</th><th>職責</th></tr></thead><tbody>
+          <tr><td>COP</td><td>Chief of Police 局長</td><td>全局指揮</td></tr>
+          <tr><td>AC / DC</td><td>Assistant / Deputy Chief 副局長</td><td>局處指揮</td></tr>
+          <tr><td>CMDR</td><td>Commander 指揮官</td><td>分局群督導</td></tr>
+          <tr><td>CAPT</td><td>Captain 分局長</td><td>分局指揮</td></tr>
+          <tr><td>LT</td><td>Lieutenant 副隊長</td><td>值勤指揮官</td></tr>
+          <tr><td>SGT II / SGT</td><td>Sergeant 巡佐</td><td>現場督導</td></tr>
+        </tbody></table>
+        <table class="ref"><thead><tr><th>縮寫</th><th>階級</th><th>職責</th></tr></thead><tbody>
+          <tr><td>DET</td><td>Detective 警探</td><td>刑事偵查</td></tr>
+          <tr><td>PO III</td><td>Police Officer III 資深員警</td><td>帶訓、資深領導</td></tr>
+          <tr><td>PO II</td><td>Police Officer II 員警</td><td>獨立執勤</td></tr>
+          <tr><td>PO I</td><td>Police Officer I 試用員警</td><td>學院結訓、試用期</td></tr>
+          <tr><td>RCT</td><td>Recruit 學員</td><td>學院受訓中</td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section class="band" id="codes">
+      <div class="h2"><span>Radio Codes</span><h2>無線電代碼</h2></div>
+      <div class="cols2">
+        <table class="ref"><caption>勤務代碼 Codes</caption><thead><tr><th>代碼</th><th>意義</th></tr></thead><tbody>
+          <tr><td>Code 1</td><td>請回應無線電</td></tr>
+          <tr><td>Code 2</td><td>一般前往，不開警燈警笛</td></tr>
+          <tr><td>Code 3</td><td>緊急前往，開啟警燈警笛</td></tr>
+          <tr><td>Code 4</td><td>現場不需支援</td></tr>
+          <tr><td>Code 5</td><td>監控中，其他單位勿靠近</td></tr>
+          <tr><td>Code 6</td><td>下車調查（附位置）</td></tr>
+          <tr><td>Code 7</td><td>用餐休息</td></tr>
+          <tr><td>Code 30</td><td>警報觸發</td></tr>
+          <tr><td>Code 37</td><td>車輛為失竊車</td></tr>
+        </tbody></table>
+        <table class="ref"><caption>常用 10 / 11 代碼</caption><thead><tr><th>代碼</th><th>意義</th></tr></thead><tbody>
+          <tr><td>10-4</td><td>收到</td></tr>
+          <tr><td>10-7</td><td>暫停勤務</td></tr>
+          <tr><td>10-8</td><td>恢復勤務、可派遣</td></tr>
+          <tr><td>10-15</td><td>押解嫌犯中</td></tr>
+          <tr><td>10-19</td><td>返回警局</td></tr>
+          <tr><td>10-20</td><td>目前位置</td></tr>
+          <tr><td>10-97</td><td>抵達現場</td></tr>
+          <tr><td>11-99</td><td>員警緊急求援（最高優先）</td></tr>
+          <tr><td>Code 4 Adam</td><td>現場安全，嫌犯已控制</td></tr>
+        </tbody></table>
+      </div>
+      <h3 style="margin:22px 0 10px;font-size:16px">LAPD 通訊字母 Phonetic Alphabet</h3>
+      <div class="phon" id="phon"></div>
+    </section>
+
+    <section class="band" id="join">
+      <div class="h2"><span>Recruitment</span><h2>加入 LAPD</h2><a href="/apply/?dept=lapd">立即申請 →</a></div>
+      <ol class="steps" style="margin:0;padding:0">
+        <li><b>線上申請</b><small>先通過白名單，再到公職招募填寫 LAPD 申請表。</small></li>
+        <li><b>書面審核</b><small>高層審核角色背景與 RP 經驗，結果會私訊通知。</small></li>
+        <li><b>面試</b><small>Discord 語音面試，考核情境判斷與法規觀念。</small></li>
+        <li><b>學院訓練</b><small>學習手冊、無線電、攔停與武力使用規範。</small></li>
+        <li><b>試用上線</b><small>以 PO I 身分在 FTO 帶領下執勤，通過後獨立上線。</small></li>
+      </ol>
+    </section>
+  </div>
+</main>
+
+<footer class="pdf"><div class="in"><img src="/assets/seal-lapd.png" alt=""><div><b>LOS ANGELES POLICE DEPARTMENT</b><span class="motto">TO PROTECT AND TO SERVE · 保護與服務</span><small>Palm State RolePlay 角色扮演用途，並非真實警政機關或官方網站。</small></div><nav><a href="/pd/">LAPD 首頁</a><a href="/news/">伺服器公告</a><a href="/rules/">伺服器規則</a><a href="https://discord.gg/U8Js6HYvW3" target="_blank" rel="noopener">Discord</a><a href="/">Palm State 主站</a></nav></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var el = PSRP.el, ABBR = { "Chief of Police": "COP", "Assistant Chief": "AC", "Deputy Chief": "DC", "Commander": "CMDR", "Captain": "CAPT", "Lieutenant": "LT", "Sergeant II": "SGT II", "Sergeant I": "SGT", "Detective": "DET", "Police Officer III": "PO III", "Police Officer II": "PO II", "Police Officer I": "PO I" };
+  var PH = "Adam Boy Charles David Edward Frank George Henry Ida John King Lincoln Mary Nora Ocean Paul Queen Robert Sam Tom Union Victor William X-ray Young Zebra".split(" ");
+  var ph = document.getElementById("phon");
+  PH.forEach(function (w) { var s = el("span"); s.appendChild(el("b", null, w[0])); s.appendChild(document.createTextNode(w)); ph.appendChild(s); });
+
+  function tile(href, title, sub, cls) { var a = el("a", { class: "tile" + (cls ? " " + cls : ""), href: href }); a.appendChild(el("b", null, title)); a.appendChild(el("small", null, sub)); return a; }
+  function fmt(d) { var x = new Date(d); return x.getFullYear() + "/" + String(x.getMonth() + 1).padStart(2, "0") + "/" + String(x.getDate()).padStart(2, "0"); }
+
+  async function bulletins() {
+    var box = document.getElementById("bul");
+    var r = await PSRP.client.from("announcements").select("id, title, summary, body, category, ref_no, created_at, visibility, pinned").eq("department", "lapd").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(6);
+    box.innerHTML = "";
+    if (r.error || !r.data.length) { box.appendChild(el("p", { class: "note" }, r.error ? "公告暫時無法讀取。" : "目前還沒有 LAPD 公告。")); return; }
+    r.data.forEach(function (a) {
+      var c = el("a", { class: "bc" + (a.visibility === "internal" ? " int" : ""), href: "/pd/news/#n" + a.id });
+      var m = el("div", { class: "m" });
+      if (a.pinned) m.appendChild(el("span", null, "📌 置頂"));
+      if (a.visibility === "internal") m.appendChild(el("span", { class: "i" }, "🔒 內部"));
+      m.appendChild(el("span", null, a.category)); m.appendChild(el("span", null, a.ref_no || "")); m.appendChild(el("span", null, fmt(a.created_at)));
+      c.appendChild(m); c.appendChild(el("h3", null, a.title));
+      c.appendChild(el("p", null, a.summary || String(a.body || "").replace(/[#>*_`|\-]/g, " ").replace(/\s+/g, " ").slice(0, 120)));
+      box.appendChild(c);
+    });
+  }
+
+  async function memberArea(me) {
+    var box = document.getElementById("mem"); box.innerHTML = "";
+    if (!me) {
+      var lb = el("div", { class: "loginbox" });
+      lb.appendChild(el("div", null, "LAPD 成員登入後可以看到即時勤務概況、內部公告與部門手冊。"));
+      var a = el("a", { class: "chip-login", href: "/apply/?next=" + encodeURIComponent("/pd/") }, "登入 / 註冊");
+      lb.appendChild(a); box.appendChild(lb); return;
+    }
+    if (!PSRP.hasRole(me, "police")) {
+      var nb = el("div", { class: "loginbox" });
+      nb.appendChild(el("div", null, "你目前不是 LAPD 成員。通過招募與學院訓練後，就會開通員警專區。"));
+      nb.appendChild(el("a", { class: "chip-login", href: "/apply/?dept=lapd" }, "申請加入 LAPD"));
+      box.appendChild(nb); return;
+    }
+    var cmd = PSRP.hasRole(me, "police_cmd");
+    document.getElementById("ctas").insertBefore(el("a", { class: "pri", href: "/pd/deployment/" }, "勤務表 Deployment"), document.getElementById("ctas").firstChild);
+    var st = el("div", { class: "stats" });
+    function stat(id, label, live) { var d = el("div", { class: "stat" }); if (live) d.appendChild(el("span", { class: "lv" }, "LIVE")); d.appendChild(el("b", { id: id }, "—")); d.appendChild(el("small", null, label)); st.appendChild(d); }
+    stat("s-units", "上線單位 Units", true); stat("s-off", "值勤員警 Officers"); stat("s-wc", "值勤指揮官 Watch Cmdr"); stat("s-help", "11-99 求援");
+    box.appendChild(st);
+    var t = el("div", { class: "tiles" });
+    t.appendChild(tile("/pd/deployment/", "勤務表 Deployment", "即時上線單位、車牌與狀態"));
+    t.appendChild(tile("/pd/news/", "部門公告", "包含僅限內部的公告"));
+    t.appendChild(tile("/pd/manual/", "部門手冊", "SOP、武力使用、攔停規範"));
+    t.appendChild(tile("/pd/#codes", "無線電代碼", "Code、10 代碼與通訊字母"));
+    t.appendChild(tile("https://law.psrp2.com/", "加州法典", "罪名、條號與刑度查詢"));
+    if (cmd) {
+      t.appendChild(tile("/pd/news/", "發布公告", "對外公開或僅限內部", "cmd"));
+      t.appendChild(tile("/pd/deployment/#edit", "編輯勤務表", "新增單位、欄位與勤前備註", "cmd"));
+      t.appendChild(tile("/editor/?doc=lapd", "編輯部門手冊", "線上修改章節與內容", "cmd"));
+    }
+    box.appendChild(t);
+    var r = await Promise.all([PSRP.client.from("dep_sessions").select("callsign, rank, officer_name, status, started_at").is("ended_at", null), PSRP.client.from("dep_units").select("callsign, assignment")]);
+    if (r[0].error) return;
+    var ss = r[0].data.filter(function (s) { return Date.now() - new Date(s.started_at).getTime() < 14 * 3600e3; });
+    var cs = {}; ss.forEach(function (s) { cs[s.callsign] = 1; });
+    document.getElementById("s-units").textContent = Object.keys(cs).length;
+    document.getElementById("s-off").textContent = ss.length;
+    var wcu = (r[1].data || []).filter(function (u) { return /watch commander/i.test(u.assignment) && cs[u.callsign]; })[0];
+    var wc = wcu && ss.filter(function (s) { return s.callsign === wcu.callsign; })[0];
+    document.getElementById("s-wc").textContent = wc ? (ABBR[wc.rank] || wc.rank) + " " + wc.officer_name : "—";
+    document.getElementById("s-wc").style.fontSize = "17px";
+    var help = ss.filter(function (s) { return s.status === "help"; });
+    var hb = document.getElementById("s-help"); hb.textContent = help.length ? help.map(function (s) { return s.callsign; }).join(" ") : "0";
+    if (help.length) hb.style.color = "#ff5c6c";
+  }
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    if (!PSRP.client) { document.getElementById("mem").textContent = "系統暫時無法使用。"; return; }
+    var me = await PSRP.profile();
+    memberArea(me); bulletins();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
