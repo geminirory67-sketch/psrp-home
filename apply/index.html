@@ -18,6 +18,7 @@
     <nav class="navl" aria-label="主選單">
       <a href="/">首頁</a>
       <a href="/rules/">伺服器規則</a>
+      <a href="/news/">公告</a>
       <a href="/apply/" aria-current="page">公職招募</a>
       <a href="https://law.psrp2.com/">加州法典</a>
       <a href="/lapd/">LAPD 手冊</a>
@@ -41,6 +42,7 @@
 
     <div id="portal" hidden>
       <div id="flash"></div>
+      <div id="dcbox"></div>
 
       <h2 class="section-title">我的申請</h2>
       <div class="applist" id="mine"><p class="note">讀取中…</p></div>
@@ -150,6 +152,25 @@
     gate.innerHTML = ""; portal.hidden = false;
     document.getElementById("f-dc").value = me.discord || "";
     loadMine();
+    renderDiscord();
+  }
+
+  function renderDiscord() {
+    var box = document.getElementById("dcbox"); box.innerHTML = "";
+    var n = PSRP.el("div", { class: "notice" + (me.discord_id ? " ok" : ""), style: "display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap" });
+    if (me.discord_id) {
+      n.appendChild(PSRP.el("span", null, "✓ 已連結 Discord" + (me.discord ? "（" + me.discord + "）" : "") + "。審核結果會由伺服器 Bot 私訊通知你，請確認你在 Palm State RolePlay 的 Discord 伺服器內，並允許伺服器成員私訊。"));
+    } else {
+      n.appendChild(PSRP.el("span", null, "連結你的 Discord 帳號，申請狀態更新時（收到申請、安排面試、錄取結果）會由 Bot 私訊通知你。"));
+      var b = PSRP.el("button", { type: "button", class: "btn-primary", style: "background:#5865f2;border-color:#5865f2;color:#fff" }, "連結 Discord");
+      b.addEventListener("click", async function () {
+        b.disabled = true;
+        var r = await PSRP.client.auth.linkIdentity({ provider: "discord", options: { redirectTo: location.origin + "/apply/" } });
+        if (r.error) { b.disabled = false; alert(PSRP.errText(r.error)); }
+      });
+      n.appendChild(b);
+    }
+    box.appendChild(n);
   }
 
   async function loadMine() {
