@@ -43,6 +43,7 @@
         <button type="button" role="tab" data-tab="apps" aria-selected="true">申請審核</button>
         <button type="button" role="tab" data-tab="members" aria-selected="false" class="admin-only">成員管理</button>
         <button type="button" role="tab" data-tab="docs" aria-selected="false" class="admin-only">文件管理</button>
+        <button type="button" role="tab" data-tab="discord" aria-selected="false" class="admin-only">Discord 設定</button>
       </div>
 
       <section id="tab-apps">
@@ -73,6 +74,16 @@
         </div>
         <p class="note" style="margin-bottom:12px">勾選後按「儲存」即生效。錄取申請時系統會自動給予對應部門身分組；這裡可以手動調整。「招募審核」可以進入後台審核申請；「部門高層」可以發布該部門公告、線上編輯該部門手冊（並自動擁有該部門成員權限）；「管理團隊」擁有全部權限。</p>
         <div class="applist" id="members"></div>
+      </section>
+
+      <section id="tab-discord" hidden>
+        <div class="notice">
+          <b>新公告會由 Bot 自動發到這裡設定的 Discord 頻道。</b>部門沒有設定頻道時，會改發到「伺服器（全部）」的頻道。<br>
+          取得頻道 ID：Discord → 使用者設定 → 進階 → 開啟「開發者模式」，然後在頻道上按右鍵 →「複製頻道 ID」。<br>
+          標記身分組（可留空）：填身分組 ID（在身分組上按右鍵 → 複製身分組 ID），或填 <code>everyone</code>、<code>here</code>。<br>
+          Bot 在該頻道需要「檢視頻道」「傳送訊息」「嵌入連結」權限；要標記 everyone 還需要「提及 @everyone」。
+        </div>
+        <div class="applist" id="dclist"></div>
       </section>
 
       <section id="tab-docs" hidden>
@@ -125,9 +136,10 @@
   document.querySelector(".admtabs").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-tab]"); if (!b) return;
     [].slice.call(document.querySelectorAll(".admtabs button")).forEach(function (x) { x.setAttribute("aria-selected", String(x === b)); });
-    ["apps", "members", "docs"].forEach(function (t) { document.getElementById("tab-" + t).hidden = t !== b.dataset.tab; });
+    ["apps", "members", "docs", "discord"].forEach(function (t) { document.getElementById("tab-" + t).hidden = t !== b.dataset.tab; });
     if (b.dataset.tab === "members") loadMembers();
     if (b.dataset.tab === "docs") loadDocs();
+    if (b.dataset.tab === "discord") loadDiscord();
   });
 
   /* ---------- 申請審核 ---------- */
@@ -299,6 +311,51 @@
     msg.className = "form-msg ok"; msg.textContent = "已匯入：" + done.join("、");
     loadDocs();
   });
+
+  /* ---------- Discord 設定 ---------- */
+  var DC_DEPTS = [["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"]];
+  async function loadDiscord() {
+    var box = document.getElementById("dclist"); box.innerHTML = "";
+    var r = await PSRP.client.from("discord_channels").select("*");
+    if (r.error) { box.appendChild(el("p", { class: "form-msg err" }, PSRP.errText(r.error))); return; }
+    var cur = {}; (r.data || []).forEach(function (d) { cur[d.department] = d; });
+    DC_DEPTS.forEach(function (d) {
+      var row = cur[d[0]] || { channel_id: "", mention_role_id: "" };
+      var it = el("div", { class: "appitem" });
+      it.appendChild(el("b", null, d[1]));
+      var g = el("div", { class: "grid2" });
+      var l1 = el("label", { class: "fld" }); l1.appendChild(el("span", null, "公告頻道 ID"));
+      var ch = el("input", { inputmode: "numeric", placeholder: "例如 1234567890123456789" }); ch.value = row.channel_id; l1.appendChild(ch);
+      var l2 = el("label", { class: "fld" }); l2.appendChild(el("span", null, "標記身分組（可留空）"));
+      var mr = el("input", { placeholder: "身分組 ID、everyone 或 here" }); mr.value = row.mention_role_id; l2.appendChild(mr);
+      g.appendChild(l1); g.appendChild(l2); it.appendChild(g);
+      var msg = el("p", { class: "form-msg", role: "status" });
+      var acts = el("div", { class: "review-actions" });
+      var sv = el("button", { type: "button", class: "btn-primary" }, "儲存");
+      var ts = el("button", { type: "button", class: "btn-sec" }, "測試發送");
+      sv.addEventListener("click", async function () {
+        var c = ch.value.trim(), m = mr.value.trim();
+        if (c && !/^\d{15,22}$/.test(c)) { msg.className = "form-msg err"; msg.textContent = "頻道 ID 應該是 15～22 位數字。"; return; }
+        if (m && !/^(\d{15,22}|everyone|here)$/i.test(m)) { msg.className = "form-msg err"; msg.textContent = "標記請填身分組 ID、everyone 或 here。"; return; }
+        sv.disabled = true;
+        var u = await PSRP.client.from("discord_channels").upsert({ department: d[0], channel_id: c, mention_role_id: m.toLowerCase() === "everyone" || m.toLowerCase() === "here" ? m.toLowerCase() : m, updated_at: new Date().toISOString() });
+        sv.disabled = false;
+        msg.className = u.error ? "form-msg err" : "form-msg ok"; msg.textContent = u.error ? PSRP.errText(u.error) : "已儲存";
+      });
+      ts.addEventListener("click", async function () {
+        ts.disabled = true; msg.className = "form-msg"; msg.textContent = "發送中…";
+        var t = await PSRP.client.functions.invoke("discord-notify", { body: { type: "test", department: d[0] } });
+        ts.disabled = false;
+        if (t.error) {
+          var txt = t.error.message;
+          try { txt = await t.error.context.text(); } catch (e) {}
+          msg.className = "form-msg err"; msg.textContent = txt;
+        } else { msg.className = "form-msg ok"; msg.textContent = (typeof t.data === "string" ? t.data : "已發送測試訊息") + "，請到 Discord 頻道確認。"; }
+      });
+      acts.appendChild(sv); acts.appendChild(ts); it.appendChild(msg); it.appendChild(acts);
+      box.appendChild(it);
+    });
+  }
 
   if (PSRP.client) PSRP.client.auth.onAuthStateChange(function (ev) { if (ev === "SIGNED_IN" && !me) start(); });
   start();
