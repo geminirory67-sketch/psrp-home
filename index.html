@@ -199,7 +199,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       <a href="/apply/">公職招募</a>
       <a href="/support/">工單</a>
       <a class="doc" href="https://law.psrp2.com/">加州法典</a>
-      <a class="doc" href="/pd/">LAPD 警察局</a>
+      <a class="doc" href="/safety/">公共安全</a>
       <span class="acct" id="account"></span>
     </nav>
     <button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="links">選單</button>
@@ -261,7 +261,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       <div class="sec-head">
         <span class="k">Public Safety</span>
         <h2 id="depts-h">選擇你的崗位</h2>
-        <p>每個部門都有完整的階級、訓練與標準作業程序。從學院新生做起，一路晉升到指揮職。</p>
+        <p>每個部門都有完整的階級、訓練與標準作業程序。從學院新生做起，一路晉升到指揮職。所有部門都在 <a href="/safety/" style="color:var(--sun)">公共安全</a> 入口。</p>
       </div>
       <div class="depts">
         <article class="dept" style="--c: var(--lapd)">
@@ -282,6 +282,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
           </div>
           <p>建築火災、山林野火、車禍救援與危險物品處理。從雲梯車到救援直升機，全城的火場都歸你們管。</p>
           <ul><li>消防車隊</li><li>雲梯救援</li><li>野火</li><li>危險物品</li><li>水上救援</li></ul>
+          <a class="more" href="/fd/">進入 LAFD 官方入口 →</a>
         </article>
         <article class="dept" style="--c: var(--ems)">
           <span class="code">RESCUE 1</span>
@@ -291,6 +292,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
           </div>
           <p>救護車在第一時間抵達現場，急診室接手搶救。槍擊、車禍、用藥過量，每一通 911 都是與時間賽跑。</p>
           <ul><li>救護車</li><li>急診室</li><li>外科</li><li>醫護訓練</li></ul>
+          <a class="more" href="/ems/">進入 EMS 官方入口 →</a>
         </article>
         <article class="dept" style="--c: var(--civ)">
           <span class="code">CITY HALL</span>
@@ -439,7 +441,7 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
         <li><a href="/support/">工單回報</a></li>
         <li><a href="/whitelist/">白名單申請</a></li>
         <li><a href="/apply/">公職招募</a></li>
-        <li><a href="/pd/">LAPD 警察局入口</a></li>
+        <li><a href="/safety/">公共安全（LAPD・LAFD・EMS）</a></li>
         <li><a href="/pd/manual/">LAPD 部門手冊（成員限定）</a></li>
       </ul>
     </div>
@@ -462,7 +464,7 @@ if (window.PSRP) PSRP.mountAccountChip(document.getElementById("account"));
 (async function () {
   if (!window.PSRP || !PSRP.client) return;
   var C = { all: ["PSRP", "#e8b85a"], lapd: ["LAPD", "#4a86ff"], lafd: ["LAFD", "#ff4b3a"], ems: ["EMS", "#2fd0a6"] };
-  var r = await PSRP.client.from("announcements").select("id, department, category, title, summary, body, created_at, pinned").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(3);
+  var r = await PSRP.client.from("announcements").select("id, department, category, title, summary, body, created_at, pinned").eq("department", "all").order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(3);
   if (r.error || !r.data.length) return;
   var box = document.getElementById("latest");
   r.data.forEach(function (a) {
