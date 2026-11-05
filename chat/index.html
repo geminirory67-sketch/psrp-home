@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>聊天室 · Palm State RolePlay</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; }
+main.chatmain { flex: 1; min-height: 0; display: flex; }
+main.chatmain > .wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; padding-block: 16px; max-width: 1360px; }
+#gate:empty { display: none; }
+.chat { flex: 1; min-height: 0; display: grid; grid-template-columns: 240px minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+.side { background: var(--night-2); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.side h2 { margin: 0; padding: 14px 16px 8px; font-size: 12px; letter-spacing: .14em; color: var(--muted); }
+.chlist { flex: 1; overflow: auto; padding: 0 8px 8px; }
+.chb { display: flex; width: 100%; align-items: center; gap: 8px; text-align: left; background: none; border: 0; color: var(--muted); font: inherit; font-size: 14.5px; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.chb:hover { background: var(--panel-2); color: var(--ink); }
+.chb[aria-current="true"] { background: var(--panel-2); color: var(--ink); box-shadow: inset 3px 0 0 var(--gold); }
+.chb .hash { color: var(--muted); opacity: .7; }
+.chb .dot { margin-left: auto; min-width: 18px; height: 18px; border-radius: 9px; background: var(--sun); color: #1b1405; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+.online { border-top: 1px solid var(--line); padding: 10px 16px 12px; font-size: 13px; color: var(--muted); max-height: 40%; overflow: auto; }
+.online b { color: var(--ink); }
+.online ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 3px; }
+.online li::before { content: "● "; color: var(--ok); font-size: 10px; }
+.panel { display: flex; flex-direction: column; min-height: 0; }
+.ph { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.ph h1 { margin: 0; font-size: 18px; }
+.ph p { margin: 0; color: var(--muted); font-size: 13.5px; }
+.ph .live { margin-left: auto; font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.ph .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--warn); }
+.ph .live.on::before { background: var(--ok); }
+.ph .mb { display: none; background: none; border: 1px solid var(--line); color: var(--ink); border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 13px; }
+.msgs { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 18px; display: flex; flex-direction: column; }
+.older { align-self: center; margin-bottom: 10px; }
+.day { align-self: center; font-size: 12px; color: var(--muted); background: var(--night-2); border-radius: 999px; padding: 2px 12px; margin: 10px 0; }
+.m { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 12px; padding: 4px 6px; border-radius: 6px; position: relative; }
+.m:hover { background: rgba(255,255,255,.03); }
+.m.cont { padding-top: 0; }
+.m.cont .av { visibility: hidden; height: 0; }
+.m.cont .who { display: none; }
+.av { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; margin-top: 3px; }
+.who { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.who b { font-size: 14.5px; }
+.who time { font-size: 11.5px; color: var(--muted); }
+.rb { font-size: 10.5px; padding: 0 6px; border-radius: 4px; background: var(--panel-2); color: var(--muted); }
+.rb.admin { background: #4a3a12; color: var(--gold); } .rb.support { background: #1f3a2c; color: #7fe0b0; } .rb.police, .rb.police_cmd { background: #16284d; color: #8db4ff; }
+.rb.fire, .rb.fire_cmd { background: #4a1c18; color: #ff9c8c; } .rb.ems, .rb.ems_cmd { background: #123a33; color: #6fe0c6; }
+.txt { font-size: 15px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; }
+.txt a { color: #8db4ff; }
+.txt .men { background: rgba(232,184,90,.18); color: var(--gold); border-radius: 3px; padding: 0 2px; }
+.m.me-mention { background: rgba(232,184,90,.07); box-shadow: inset 3px 0 0 var(--gold); }
+.m.del .txt { color: var(--muted); font-style: italic; }
+.m .x { position: absolute; right: 8px; top: 4px; display: none; background: var(--night-2); border: 1px solid var(--line); color: var(--muted); border-radius: 5px; font: inherit; font-size: 12px; padding: 1px 8px; cursor: pointer; }
+.m:hover .x { display: block; }
+.compose { border-top: 1px solid var(--line); padding: 12px 18px 14px; display: grid; gap: 6px; }
+.compose .row { display: flex; gap: 8px; align-items: flex-end; }
+.compose textarea { flex: 1; resize: none; min-height: 44px; max-height: 160px; font: inherit; font-size: 15px; color: var(--ink); background: var(--night); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; line-height: 1.5; }
+.compose textarea:focus { outline: none; border-color: var(--gold); }
+.compose .hint { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.compose .err { color: var(--bad); }
+.empty { margin: auto; text-align: center; color: var(--muted); }
+@media (max-width: 760px) {
+  main.chatmain > .wrap { padding: 0; }
+  .chat { grid-template-columns: 1fr; border-radius: 0; border-left: 0; border-right: 0; }
+  .side { display: none; position: absolute; z-index: 20; inset: 0 auto 0 0; width: 78%; max-width: 300px; box-shadow: 10px 0 30px rgba(0,0,0,.4); }
+  .chat.open .side { display: flex; }
+  .chat { position: relative; }
+  .ph .mb { display: inline-block; }
+  .ph p { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo.jpg" alt="" width="36" height="36"><b>Palm State</b></a>
+    <nav class="navl" aria-label="主選單">
+      <a href="/">首頁</a>
+      <a href="/news/">公告</a>
+      <a href="/forums/">論壇</a>
+      <a href="/chat/" aria-current="page">聊天室</a>
+      <a href="/safety/">公共安全</a>
+      <a href="/rules/">規則</a>
+      <a class="nav-cta" href="/whitelist/">白名單申請</a>
+    </nav>
+    <div class="account" id="account"></div>
+  </div>
+</header>
+
+<main class="chatmain">
+  <div class="wrap">
+    <div id="gate"></div>
+    <div class="chat" id="app" hidden>
+      <aside class="side">
+        <h2>頻道</h2>
+        <div class="chlist" id="chlist"></div>
+        <div class="online" id="online"></div>
+      </aside>
+      <section class="panel">
+        <div class="ph">
+          <button type="button" class="mb" id="mb" aria-label="切換頻道">☰ 頻道</button>
+          <div><h1 id="ch-title"># 綜合大廳</h1><p id="ch-desc"></p></div>
+          <span class="live" id="live">連線中</span>
+        </div>
+        <div class="msgs" id="msgs" aria-live="polite"></div>
+        <form class="compose" id="compose" novalidate>
+          <div class="row">
+            <textarea id="input" rows="1" maxlength="500" placeholder="輸入訊息，Enter 送出、Shift+Enter 換行" aria-label="訊息"></textarea>
+            <button type="submit" class="btn-primary" id="send">送出</button>
+          </div>
+          <div class="hint"><span id="err" class="err" role="status"></span><span id="cnt">0 / 500</span></div>
+        </form>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/config.js"></script>
+<script src="/assets/auth.js"></script>
+<script>
+(function () {
+  var el = PSRP.el, db = PSRP.client, me = null, staff = false, myName = "";
+  var channels = [], cur = null, msgs = {}, unread = {}, lastId = 0, oldest = null, rt = null, live = false;
+  var COLORS = ["#4a86ff", "#e8b85a", "#3ccf8e", "#ff8a3d", "#b98cff", "#ff5c6c", "#2fd0a6", "#5865f2"];
+  var box = document.getElementById("msgs"), input = document.getElementById("input");
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function color(name) { var h = 0; String(name).split("").forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) >>> 0; }); return COLORS[h % COLORS.length]; }
+  function hhmm(d) { var x = new Date(d); return String(x.getHours()).padStart(2, "0") + ":" + String(x.getMinutes()).padStart(2, "0"); }
+  function dayKey(d) { var x = new Date(d); return x.getFullYear() + "/" + (x.getMonth() + 1) + "/" + x.getDate(); }
+  function fmt(t) {
+    var s = esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener nofollow">$1</a>');
+    if (myName) { var re = new RegExp("@" + myName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"); s = s.replace(re, '<span class="men">@' + esc(myName) + "</span>"); }
+    return s;
+  }
+  function atBottom() { return box.scrollHeight - box.scrollTop - box.clientHeight < 80; }
+
+  /* ---------- 頻道 ---------- */
+  function renderChannels() {
+    var l = document.getElementById("chlist"); l.innerHTML = "";
+    channels.forEach(function (c) {
+      var b = el("button", { type: "button", class: "chb", "aria-current": String(cur && c.slug === cur.slug) });
+      b.appendChild(el("span", { class: "hash" }, c.view_role === "any" ? "#" : "🔒"));
+      b.appendChild(el("span", null, c.title));
+      if (unread[c.slug]) b.appendChild(el("span", { class: "dot" }, unread[c.slug] > 99 ? "99+" : String(unread[c.slug])));
+      b.addEventListener("click", function () { open(c.slug); document.getElementById("app").classList.remove("open"); });
+      l.appendChild(b);
+    });
+  }
+  async function open(slug) {
+    cur = channels.filter(function (c) { return c.slug === slug; })[0] || channels[0];
+    try { localStorage.setItem("psrp-chat-ch", cur.slug); } catch (e) { /* 略過 */ }
+    unread[cur.slug] = 0; renderChannels();
+    document.getElementById("ch-title").textContent = (cur.view_role === "any" ? "# " : "🔒 ") + cur.title;
+    document.getElementById("ch-desc").textContent = cur.description;
+    input.placeholder = "傳訊息到 " + cur.title + "（Enter 送出、Shift+Enter 換行）";
+    box.innerHTML = ""; box.appendChild(el("p", { class: "empty" }, "讀取中…"));
+    msgs = {}; lastId = 0; oldest = null;
+    var r = await db.from("chat_messages").select("*").eq("channel", cur.slug).order("id", { ascending: false }).limit(80);
+    if (r.error) { box.innerHTML = ""; box.appendChild(el("p", { class: "empty" }, "讀取失敗：" + PSRP.errText(r.error))); return; }
+    r.data.reverse().forEach(add);
+    oldest = r.data.length ? r.data[0].id : null;
+    render(true, r.data.length === 80);
+    input.focus();
+  }
+  function add(m) { msgs[m.id] = m; if (m.id > lastId) lastId = m.id; }
+
+  /* ---------- 訊息 ---------- */
+  function render(scroll, hasOlder) {
+    var stick = scroll || atBottom();
+    box.innerHTML = "";
+    var list = Object.keys(msgs).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return msgs[k]; });
+    if (hasOlder || (box._hasOlder && !scroll)) {
+      box._hasOlder = true;
+      var ob = el("button", { type: "button", class: "btn-sec older" }, "載入更早的訊息");
+      ob.addEventListener("click", loadOlder); box.appendChild(ob);
+    } else box._hasOlder = false;
+    if (!list.length) box.appendChild(el("p", { class: "empty" }, "還沒有訊息，打聲招呼吧！"));
+    var prev = null, lastDay = "";
+    list.forEach(function (m) {
+      var d = dayKey(m.created_at);
+      if (d !== lastDay) { box.appendChild(el("div", { class: "day" }, d === dayKey(new Date()) ? "今天" : d)); lastDay = d; prev = null; }
+      var cont = prev && prev.user_id === m.user_id && !prev.deleted && new Date(m.created_at) - new Date(prev.created_at) < 5 * 60e3;
+      var mention = myName && m.user_id !== me.id && m.body.indexOf("@" + myName) !== -1;
+      var row = el("div", { class: "m" + (cont ? " cont" : "") + (m.deleted ? " del" : "") + (mention ? " me-mention" : ""), "data-id": String(m.id) });
+      var av = el("div", { class: "av", style: "background:" + color(m.author_name), "aria-hidden": "true" }, String(m.author_name || "?").trim().charAt(0).toUpperCase());
+      row.appendChild(av);
+      var right = el("div"), who = el("div", { class: "who" });
+      who.appendChild(el("b", { style: "color:" + color(m.author_name) }, m.author_name));
+      (m.author_roles || []).filter(function (r) { return r !== "member" && r !== "civ"; }).slice(0, 2).forEach(function (r) { who.appendChild(el("span", { class: "rb " + r }, PSRP.ROLE_NAMES[r] || r)); });
+      who.appendChild(el("time", { datetime: m.created_at, title: new Date(m.created_at).toLocaleString("zh-TW") }, hhmm(m.created_at)));
+      right.appendChild(who);
+      var t = el("div", { class: "txt", title: cont ? hhmm(m.created_at) : "" }); t.innerHTML = fmt(m.body); right.appendChild(t);
+      row.appendChild(right);
+      if (!m.deleted && (m.user_id === me.id || staff)) {
+        var x = el("button", { type: "button", class: "x", title: "刪除訊息" }, "刪除");
+        x.addEventListener("click", async function () {
+          if (!confirm("刪除這則訊息？")) return;
+          var r = await db.rpc("chat_delete", { p_id: m.id }); if (r.error) return alert(PSRP.errText(r.error));
+          m.deleted = true; m.body = "（訊息已刪除）"; render();
+        });
+        row.appendChild(x);
+      }
+      box.appendChild(row); prev = m;
+    });
+    if (stick) box.scrollTop = box.scrollHeight;
+  }
+  async function loadOlder() {
+    if (!oldest) return;
+    var h = box.scrollHeight;
+    var r = await db.from("chat_messages").select("*").eq("channel", cur.slug).lt("id", oldest).order("id", { ascending: false }).limit(80);
+    if (r.error) return;
+    r.data.forEach(add); if (r.data.length) oldest = r.data[r.data.length - 1].id;
+    box._hasOlder = r.data.length === 80;
+    render(false, box._hasOlder);
+    box.scrollTop = box.scrollHeight - h;
+  }
+  function onIncoming(m) {
+    if (!m || !m.channel) return;
+    if (cur && m.channel === cur.slug) { var isNew = !msgs[m.id]; add(m); render(m.user_id === me.id); if (isNew && document.hidden) document.title = "（新訊息）聊天室 · Palm State RolePlay"; }
+    else if (m.user_id !== me.id && !m.deleted) { unread[m.channel] = (unread[m.channel] || 0) + 1; renderChannels(); }
+  }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) document.title = "聊天室 · Palm State RolePlay"; });
+
+  /* ---------- 即時連線（Realtime），失敗時改用輪詢 ---------- */
+  function setLive(on) { live = on; var l = document.getElementById("live"); l.classList.toggle("on", on); l.textContent = on ? "即時連線" : "自動更新"; }
+  function connect() {
+    try {
+      rt = db.channel("psrp-chat", { config: { presence: { key: me.id } } })
+        .on("postgres_changes", { event: "*", schema: "public", table: "chat_messages" }, function (p) { onIncoming(p.new); })
+        .on("presence", { event: "sync" }, function () { renderOnline(rt.presenceState()); })
+        .subscribe(function (status) {
+          if (status === "SUBSCRIBED") { setLive(true); rt.track({ name: myName, at: Date.now() }); }
+          else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") setLive(false);
+        });
+    } catch (e) { setLive(false); }
+  }
+  function renderOnline(state) {
+    var names = []; Object.keys(state || {}).forEach(function (k) { var s = state[k][0]; if (s && s.name && names.indexOf(s.name) === -1) names.push(s.name); });
+    var o = document.getElementById("online"); o.innerHTML = "";
+    o.appendChild(el("b", null, "線上 " + names.length + " 人"));
+    var ul = el("ul"); names.slice(0, 50).forEach(function (n) { ul.appendChild(el("li", null, n)); }); o.appendChild(ul);
+  }
+  setInterval(async function () {
+    if (!cur || document.hidden || live) return;
+    var r = await db.from("chat_messages").select("*").eq("channel", cur.slug).gt("id", lastId).order("id").limit(100);
+    (r.data || []).forEach(onIncoming);
+  }, 4000);
+
+  /* ---------- 送出 ---------- */
+  function grow() { input.style.height = "auto"; input.style.height = Math.min(160, input.scrollHeight) + "px"; document.getElementById("cnt").textContent = input.value.length + " / 500"; }
+  input.addEventListener("input", grow);
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); document.getElementById("compose").requestSubmit(); } });
+  document.getElementById("compose").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var v = input.value.trim(), err = document.getElementById("err"); err.textContent = "";
+    if (!v || !cur) return;
+    var btn = document.getElementById("send"); btn.disabled = true;
+    var r = await db.rpc("chat_send", { p_channel: cur.slug, p_body: v });
+    btn.disabled = false;
+    if (r.error) { err.textContent = PSRP.errText(r.error); return; }
+    input.value = ""; grow(); input.focus();
+    if (!live) { var n = await db.from("chat_messages").select("*").eq("channel", cur.slug).gt("id", lastId).order("id"); (n.data || []).forEach(onIncoming); }
+  });
+  document.getElementById("mb").addEventListener("click", function () { document.getElementById("app").classList.toggle("open"); });
+
+  async function start() {
+    PSRP.mountAccountChip(document.getElementById("account"));
+    var gate = document.getElementById("gate");
+    if (!db) { gate.appendChild(el("div", { class: "notice warn" }, "聊天室暫時無法使用。")); return; }
+    me = await PSRP.profile();
+    if (!me) { gate.style.paddingTop = "20px"; PSRP.mountAuthForm(gate, function () { location.reload(); }, "聊天室僅限網站會員使用，請先登入或註冊帳號。"); return; }
+    staff = PSRP.hasRole(me, "admin") || PSRP.hasRole(me, "support");
+    myName = me.display_name || "";
+    var r = await db.from("chat_channels").select("*").order("sort");
+    if (r.error || !r.data.length) { gate.appendChild(el("div", { class: "notice warn" }, "聊天室尚未開放。")); return; }
+    channels = r.data;
+    document.getElementById("app").hidden = false;
+    var saved = null; try { saved = localStorage.getItem("psrp-chat-ch"); } catch (e) { /* 略過 */ }
+    var want = location.hash.replace("#", "") || saved;
+    await open(channels.some(function (c) { return c.slug === want; }) ? want : channels[0].slug);
+    connect();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
