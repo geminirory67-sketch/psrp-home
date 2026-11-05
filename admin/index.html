@@ -20,6 +20,7 @@
       <a href="/rules/">伺服器規則</a>
       <a href="/news/">公告</a>
       <a href="/apply/">公職招募</a>
+      <a href="/support/">工單</a>
       <a href="https://law.psrp2.com/">加州法典</a>
       <a href="/lapd/">LAPD 手冊</a>
     </nav>
@@ -72,13 +73,13 @@
         <div class="filters">
           <input id="msearch" type="search" placeholder="搜尋暱稱或 Discord" aria-label="搜尋成員">
         </div>
-        <p class="note" style="margin-bottom:12px">勾選後按「儲存」即生效。錄取申請時系統會自動給予對應部門身分組；這裡可以手動調整。「招募審核」可以進入後台審核申請；「部門高層」可以發布該部門公告、線上編輯該部門手冊（並自動擁有該部門成員權限）；「管理團隊」擁有全部權限。</p>
+        <p class="note" style="margin-bottom:12px">勾選後按「儲存」即生效。錄取申請時系統會自動給予對應部門身分組；這裡可以手動調整。「招募審核」可以進入後台審核申請；「工單客服」可以查看與回覆所有工單；「部門高層」可以發布該部門公告、線上編輯該部門手冊（並自動擁有該部門成員權限）；「管理團隊」擁有全部權限。</p>
         <div class="applist" id="members"></div>
       </section>
 
       <section id="tab-discord" hidden>
         <div class="notice">
-          <b>新公告會由 Bot 自動發到這裡設定的 Discord 頻道。</b>部門沒有設定頻道時，會改發到「伺服器（全部）」的頻道。<br>
+          <b>新公告與工單會由 Bot 自動發到這裡設定的 Discord 頻道。</b>「工單通知」建議設成只有 Staff 看得到的頻道，標記你們的 Staff 身分組。部門沒有設定頻道時，會改發到「伺服器（全部）」的頻道。<br>
           取得頻道 ID：Discord → 使用者設定 → 進階 → 開啟「開發者模式」，然後在頻道上按右鍵 →「複製頻道 ID」。<br>
           標記身分組（可留空）：填身分組 ID（在身分組上按右鍵 → 複製身分組 ID），或填 <code>everyone</code>、<code>here</code>。<br>
           Bot 在該頻道需要「檢視頻道」「傳送訊息」「嵌入連結」權限；要標記 everyone 還需要「提及 @everyone」。
@@ -256,7 +257,7 @@
       left.appendChild(el("b", null, m.display_name || "（未命名）"));
       left.appendChild(el("div", { class: "note" }, "Discord: " + (m.discord || "—") + "  ·  註冊於 " + new Date(m.created_at).toLocaleDateString("zh-TW")));
       var tog = el("div", { class: "roletog" });
-      ["admin", "reviewer", "police", "fire", "ems", "police_cmd", "fire_cmd", "ems_cmd"].forEach(function (r) {
+      ["admin", "reviewer", "support", "police", "fire", "ems", "police_cmd", "fire_cmd", "ems_cmd"].forEach(function (r) {
         var l = el("label"); var c = el("input", { type: "checkbox", value: r });
         c.checked = (m.roles || []).indexOf(r) !== -1;
         if (m.id === me.id && r === "admin") c.disabled = true;
@@ -313,7 +314,7 @@
   });
 
   /* ---------- Discord 設定 ---------- */
-  var DC_DEPTS = [["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"]];
+  var DC_DEPTS = [["tickets", "工單通知（Staff 頻道，開新工單時標記下方身分組）"], ["all", "伺服器（全部）"], ["lapd", "洛杉磯警察局 LAPD"], ["lafd", "洛杉磯消防局 LAFD"], ["ems", "緊急醫療 EMS"]];
   async function loadDiscord() {
     var box = document.getElementById("dclist"); box.innerHTML = "";
     var r = await PSRP.client.from("discord_channels").select("*");
