@@ -69,6 +69,15 @@ a { color: inherit; }
 .hero-panel { display: grid; gap: 14px; }
 .hp-card { background: rgba(13,17,36,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 18px 20px; box-shadow: 0 18px 40px rgba(0,0,0,.3); }
 .hp-card h2 { margin: 0 0 12px; font-size: 13px; letter-spacing: .16em; color: var(--sun); font-family: var(--font-display); text-transform: uppercase; font-weight: 700; }
+.hp-dc { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px 14px; align-items: center; border-color: rgba(88,101,242,.55); background: linear-gradient(135deg, rgba(88,101,242,.28), rgba(13,17,36,.7)); }
+.hp-dc .dc-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--discord); color: #fff; display: grid; place-items: center; grid-row: span 2; }
+.hp-dc .dc-tx { display: grid; gap: 2px; } .hp-dc .dc-tx b { font-size: 15.5px; } .hp-dc .dc-tx span { font-size: 13px; color: #c6cbe6; line-height: 1.5; }
+.hp-dc #hp-dc-act:empty { display: none; }
+.hp-dc #hp-dc-act { grid-column: 2; margin-top: 6px; }
+.hp-dc .dc-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--discord); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; text-decoration: none; }
+.hp-dc .dc-btn:hover { filter: brightness(1.08); } .hp-dc .dc-btn:disabled { opacity: .6; cursor: default; }
+.hp-dc.ok { border-color: rgba(60,207,142,.5); background: linear-gradient(135deg, rgba(60,207,142,.18), rgba(13,17,36,.7)); }
+.hp-dc.ok .dc-ic { background: var(--ok); }
 .hp-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
 .hp-steps li { display: grid; grid-template-columns: 30px 1fr; gap: 0 12px; counter-increment: s; }
 .hp-steps li::before { content: counter(s); grid-row: span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--sun); color: #1b1405; font-weight: 700; font-family: var(--font-display); }
@@ -255,6 +264,11 @@ footer p { margin: 0 0 8px; line-height: 1.7; }
       </div>
       </div>
       <aside class="hero-panel" aria-label="快速開始與最新動態">
+        <div class="hp-card hp-dc" id="hp-dc">
+          <div class="dc-ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 5.3A17 17 0 0 0 15.4 4l-.5 1a15.6 15.6 0 0 0-5.8 0L8.6 4a17 17 0 0 0-4.2 1.3C1.7 9.3 1 13.2 1.3 17a17 17 0 0 0 5.2 2.6l1.1-1.8c-.6-.2-1.2-.5-1.8-.9l.4-.3a12.2 12.2 0 0 0 11.6 0l.4.3c-.6.4-1.2.7-1.8.9l1.1 1.8a17 17 0 0 0 5.2-2.6c.4-4.4-.7-8.3-3.1-11.7ZM8.7 14.7c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Zm6.6 0c-1 0-1.9-.9-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Z"/></svg></div>
+          <div class="dc-tx"><b id="hp-dc-t">綁定 Discord 帳號</b><span id="hp-dc-s">綁定後審核結果、工單回覆會由 Bot 私訊你，通過後自動給身分組。</span></div>
+          <div id="hp-dc-act"></div>
+        </div>
         <div class="hp-card">
           <h2>三步驟進城</h2>
           <ol class="hp-steps">
@@ -515,6 +529,31 @@ if (window.PSRP) PSRP.mountAccountChip(document.getElementById("account"));
   });
   document.getElementById("news").hidden = false;
 })();
+/* 首頁右側：綁定 Discord */
+(async function () {
+  var card = document.getElementById("hp-dc"), act = document.getElementById("hp-dc-act");
+  var t = document.getElementById("hp-dc-t"), sub = document.getElementById("hp-dc-s");
+  if (!window.PSRP || !PSRP.client) { card.hidden = true; return; }
+  var me = await PSRP.profile();
+  if (!me) {
+    act.appendChild(PSRP.el("a", { class: "dc-btn", href: "/apply/?next=" + encodeURIComponent("/#discord") }, "登入後綁定"));
+    return;
+  }
+  if (me.discord_id) {
+    card.classList.add("ok");
+    t.textContent = "✓ 已綁定 Discord";
+    sub.textContent = (me.discord ? me.discord + " · " : "") + "審核結果與工單回覆會由 Bot 私訊你。";
+    return;
+  }
+  var b = PSRP.el("button", { type: "button", class: "dc-btn" }, "綁定我的 Discord");
+  b.addEventListener("click", async function () {
+    b.disabled = true; b.textContent = "前往 Discord…";
+    var r = await PSRP.client.auth.linkIdentity({ provider: "discord", options: { redirectTo: location.origin + "/#discord" } });
+    if (r.error) { b.disabled = false; b.textContent = "綁定我的 Discord"; alert("綁定失敗：" + PSRP.errText(r.error)); }
+  });
+  act.appendChild(b);
+  if (location.hash === "#discord") card.scrollIntoView({ block: "center" });
+})();
 /* 首頁右側：最新公告與論壇文章 */
 (async function () {
   var box = document.getElementById("hp-feed");
@@ -529,7 +568,7 @@ if (window.PSRP) PSRP.mountAccountChip(document.getElementById("account"));
   (r[1].data || []).forEach(function (f) { items.push({ t: "f", label: "論壇", title: f.title, at: f.last_post_at, href: "/forums/#t/" + f.id + "/last", extra: f.reply_count ? f.reply_count + " 則回覆" : "" }); });
   items.sort(function (a, b) { return a.at < b.at ? 1 : -1; });
   box.innerHTML = "";
-  if (!items.length) { box.innerHTML = '<li class="muted">還沒有新動態，來<a href="/forums/" style="color:var(--sun)">論壇</a>發第一篇文章吧！</li>'; return; }
+  if (!items.length) { box.innerHTML = '<li class="muted">還沒有新動態，來<a href="/forums/" style="color:var(--sun);display:inline;padding:0">論壇</a>發第一篇文章吧！</li>'; return; }
   items.slice(0, 5).forEach(function (it) {
     var li = PSRP.el("li"), a = PSRP.el("a", { href: it.href });
     a.appendChild(PSRP.el("span", { class: "tg " + it.t }, it.label));
