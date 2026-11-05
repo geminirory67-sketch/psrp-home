@@ -175,9 +175,7 @@
       var a = el("a", { href: "/apply/", class: "chip-login" }, "登入／註冊");
       container.appendChild(a); return;
     }
-    var name = el("button", { type: "button", class: "chip-name", title: "修改顯示名稱", style: "background:none;border:0;padding:4px 2px;font:inherit;font-weight:500;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:5px" }, p.display_name || p.email);
-    name.appendChild(el("span", { "aria-hidden": "true", style: "font-size:11px;opacity:.6" }, "✎"));
-    name.addEventListener("click", function () { editName(p, function () { mountAccountChip(container); }); });
+    var name = el("a", { href: "/profile/", class: "chip-name", title: "我的帳號", style: "text-decoration:none;padding:4px 2px" }, p.display_name || p.email);
     container.appendChild(name);
     if (hasRole(p, "reviewer")) container.appendChild(el("a", { href: "/admin/", class: "chip-link" }, "管理後台"));
     else if (hasRole(p, "support")) container.appendChild(el("a", { href: "/support/", class: "chip-link" }, "工單管理"));
@@ -193,7 +191,7 @@
     var wrap = el("div", { id: "psrp-name", role: "dialog", "aria-modal": "true", "aria-label": "修改顯示名稱", style: "position:fixed;inset:0;z-index:100;background:rgba(5,8,20,.75);display:flex;align-items:center;justify-content:center;padding:16px;font-family:'Noto Sans TC',system-ui,sans-serif" });
     var card = el("form", { novalidate: "", style: "width:100%;max-width:420px;background:#151b36;color:#eef0f7;border:1px solid #2b3460;border-radius:12px;padding:22px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.5)" });
     card.appendChild(el("h2", { style: "margin:0;font-size:20px" }, "修改顯示名稱"));
-    card.appendChild(el("p", { style: "margin:0;color:#a3abc8;font-size:14px;line-height:1.6" }, "這個名字會顯示在網站右上角、論壇與聊天室。之後發的文章和訊息會用新名字，已經發過的不會改變。"));
+    card.appendChild(el("p", { style: "margin:0;color:#a3abc8;font-size:14px;line-height:1.6" }, "這個名字會顯示在網站右上角、論壇與聊天室。之後發的文章和訊息會用新名字，已經發過的不會改變。每 30 天只能修改一次。"));
     var inp = el("input", { maxlength: "24", autocomplete: "nickname", "aria-label": "顯示名稱", style: "width:100%;box-sizing:border-box;font:inherit;font-size:16px;color:#eef0f7;background:#0d1124;border:1px solid #2b3460;border-radius:8px;padding:10px 12px" });
     inp.value = p.display_name || "";
     card.appendChild(inp);
@@ -218,7 +216,7 @@
       var r = await client.from("profiles").update({ display_name: v }).eq("id", p.id);
       ok.disabled = false;
       if (r.error) { msg.textContent = "儲存失敗：" + errText(r.error); return; }
-      p.display_name = v; close(); if (done) done();
+      p.display_name = v; p.name_changed_at = new Date().toISOString(); close(); if (done) done();
     });
     setTimeout(function () { inp.focus(); inp.select(); }, 30);
   }
@@ -256,6 +254,6 @@
     client: client, ready: !!client, session: session, profile: profile, hasRole: hasRole,
     signIn: signIn, signUp: signUp, signOut: signOut, errText: errText,
     mountAuthForm: mountAuthForm, mountAccountChip: mountAccountChip, el: el,
-    ROLE_NAMES: ROLE_NAMES, DEPT_NAMES: DEPT_NAMES, STATUS_NAMES: STATUS_NAMES
+    ROLE_NAMES: ROLE_NAMES, DEPT_NAMES: DEPT_NAMES, STATUS_NAMES: STATUS_NAMES, editName: editName
   };
 })();
